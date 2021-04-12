@@ -9,4 +9,4 @@ StiOptions.WebServer.url = "https://localhost:44311/Handler.ashx";
 
 In the Handler.ashx.cs file, you can change all parameters passed from the JS client-side.
 
-[Run adapter sample](https://github.com/stimulsoft/Samples-JS/tree/master/ASP.NET/02.%20Connect%20to%20databases)
+A sample shows how to run an adapter [link](https://github.com/stimulsoft/Samples-JS/tree/master/ASP.NET/02.%20Connect%20to%20databases)

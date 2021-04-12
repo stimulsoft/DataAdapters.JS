@@ -18,4 +18,4 @@ StiOptions.WebServer.url = "http://localhost:9615";
 
 In the app.js file, you can change all parameters passed from the JS client-side.
 
-[Run adapter sample](https://github.com/stimulsoft/Samples-JS/tree/master/Node.js/04.%20Start%20SQL%20Adapters%20from%20Http%20Server)
+A sample shows how to run an adapter [link](https://github.com/stimulsoft/Samples-JS/tree/master/Node.js/04.%20Start%20SQL%20Adapters%20from%20Http%20Server)
