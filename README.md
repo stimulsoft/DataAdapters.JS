@@ -1,0 +1,1 @@
+# DataAdapters.JS
