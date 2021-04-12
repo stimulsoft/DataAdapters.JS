@@ -12,8 +12,8 @@ node index
 Then, in your code, you should specify the host and port.
 
 index.html
-...
+```js
 StiOptions.WebServer.url = "http://localhost:9615";
-...
+```js
 
 In the app.js file, you can change all parameters passed from the JS client-side.
