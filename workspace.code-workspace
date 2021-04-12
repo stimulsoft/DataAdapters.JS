@@ -1,0 +1,40 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"name": "Samples-JS/Node.js",
+			"path": "../Samples-JS/Node.js/04. Start SQL Adapters from Http Server"
+		},
+		{
+			"name": "Samples-JS/ASP.NET",
+			"path": "../Samples-JS/ASP.NET/02. Connect to databases"
+		},
+		{
+			"name": "Samples-JS/PHP",
+			"path": "../Samples-JS/PHP/02. Connect to databases"
+		},
+		{
+			"name": "Samples-JS/Java",
+			"path": "../Samples-JS/Java/01. Data Adapter"
+		},
+		{
+			"name": "Samples-Dashboards-JS/Node.js",
+			"path": "../Samples-Dashboards-JS/Node.js/04. Start SQL Adapters from Http Server"
+		},
+		{
+			"name": "Samples-Dashboards-JS/ASP.NET",
+			"path": "../Samples-Dashboards-JS/ASP.NET/01. Load Dashboard from Server Side"
+		},
+		{
+			"name": "Samples-Dashboards-JS/PHP",
+			"path": "../Samples-Dashboards-JS/PHP/01. Load Dashboard from Server Side"
+		},
+		{
+			"name": "Samples-Dashboards-JS/Java",
+			"path": "../Samples-Dashboards-JS/Java/01. Data Adapter"
+		}
+	],
+	"settings": {}
+}

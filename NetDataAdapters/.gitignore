@@ -1,0 +1,18 @@
+# Folders
+.vs/
+/packages/
+/*/packages/
+/*/bin/
+/*/csx/
+/*/ecf/
+/*/obj/
+/*/obj.NS/
+/*/node_modules/
+
+# Files
+/*/Stimulsoft.*.xml
+*.user
+*.pubxml
+*.DotSettings
+*.PublishSettings
+.DS_Store
