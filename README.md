@@ -7,10 +7,10 @@
 Чтобы использовать этот механизм на стороне клиента, достаточно указать URL-адрес хоста адаптера, который обрабатывает запросы к необходимому адаптеру.
 
 Ссылки на уже готовые адаптеры данных, реализованные для различных платформ:  
-* [Node.js](https://github.com/stimulsoft/DataAdaptersJS/blob/master/NodejsDataAdapters/)  
-* [PHP](https://github.com/stimulsoft/DataAdaptersJS/blob/master/PHPDataAdapters/)  
-* [.NET](https://github.com/stimulsoft/DataAdaptersJS/blob/master/NetDataAdapters/)  
-* [Java](https://github.com/stimulsoft/DataAdaptersJS/blob/master/JavaDataAdapters/)  
+* [Node.js](https://github.com/stimulsoft/DataAdapters.JS/tree/main/NodejsDataAdapters)  
+* [PHP](https://github.com/stimulsoft/DataAdaptersJS/tree/master/PHPDataAdapters/)  
+* [.NET](https://github.com/stimulsoft/DataAdaptersJS/tree/master/NetDataAdapters/)  
+* [Java](https://github.com/stimulsoft/DataAdaptersJS/tree/master/JavaDataAdapters/)  
 
 ## Как это работает
 При запросе данных из SQL источников данных, JS report engine отправляет POST запрос на URL, указанный в опции:  
