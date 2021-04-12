@@ -7,10 +7,10 @@
 Чтобы использовать этот механизм на стороне клиента, достаточно указать URL-адрес хоста адаптера, который обрабатывает запросы к необходимому адаптеру.
 
 Ссылки на уже готовые адаптеры данных, реализованные для различных платформ:  
-* [Node.js](https://github.com/stimulsoft/DataAdapters.JS/tree/main/NodejsDataAdapters) [Пример запуска адаптера](https://github.com/stimulsoft/Samples-JS/tree/master/Node.js/04.%20Start%20SQL%20Adapters%20from%20Http%20Server)
-* [PHP](https://github.com/stimulsoft/DataAdapters.JS/tree/main/PHPDataAdapters) [Пример запуска адаптера](https://github.com/stimulsoft/Samples-JS/tree/master/PHP/02.%20Connect%20to%20databases)
-* [.NET](https://github.com/stimulsoft/DataAdapters.JS/tree/master/NetDataAdapters) [Пример запуска адаптера](https://github.com/stimulsoft/Samples-JS/tree/master/ASP.NET/02.%20Connect%20to%20databases)
-* [Java](https://github.com/stimulsoft/DataAdapters.JS/tree/master/JavaDataAdapters) [Пример запуска адаптера](https://github.com/stimulsoft/Samples-JS/tree/master/Java/01.%20Data%20Adapter)
+* [Node.js](https://github.com/stimulsoft/DataAdapters.JS/tree/main/NodejsDataAdapters) ([Пример](https://github.com/stimulsoft/Samples-JS/tree/master/Node.js/04.%20Start%20SQL%20Adapters%20from%20Http%20Server))
+* [PHP](https://github.com/stimulsoft/DataAdapters.JS/tree/main/PHPDataAdapters) ([Пример](https://github.com/stimulsoft/Samples-JS/tree/master/PHP/02.%20Connect%20to%20databases))
+* [.NET](https://github.com/stimulsoft/DataAdapters.JS/tree/master/NetDataAdapters) ([Пример](https://github.com/stimulsoft/Samples-JS/tree/master/ASP.NET/02.%20Connect%20to%20databases))
+* [Java](https://github.com/stimulsoft/DataAdapters.JS/tree/master/JavaDataAdapters) ([Пример](https://github.com/stimulsoft/Samples-JS/tree/master/Java/01.%20Data%20Adapter))
 
 ## Как это работает
 При запросе данных из SQL источников данных, JS report engine отправляет POST запрос на URL, указанный в опции:  
