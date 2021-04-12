@@ -2,7 +2,7 @@
 This in Eclipse Java project.
 
 index.html
-```java
+```js
 StiOptions.WebServer.url = "http://localhost:8080/JSDataAdapters/JSDataAdapter/";
 ```
 

@@ -9,7 +9,7 @@ StiOptions.WebServer.url = "http://example.com/handler.php";
 
 If you use the PHP server installed on local developers computer:
 index.html
-```php
+```js
 StiOptions.WebServer.url = "http://localhost/handler.php";
 ```
 

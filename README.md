@@ -8,9 +8,9 @@
 
 Ссылки на уже готовые адаптеры данных, реализованные для различных платформ:  
 * [Node.js](https://github.com/stimulsoft/DataAdapters.JS/tree/main/NodejsDataAdapters)  
-* [PHP](https://github.com/stimulsoft/DataAdaptersJS/tree/master/PHPDataAdapters/)  
-* [.NET](https://github.com/stimulsoft/DataAdaptersJS/tree/master/NetDataAdapters/)  
-* [Java](https://github.com/stimulsoft/DataAdaptersJS/tree/master/JavaDataAdapters/)  
+* [PHP](https://github.com/stimulsoft/DataAdapters.JS/tree/main/PHPDataAdapters)  
+* [.NET](https://github.com/stimulsoft/DataAdapters.JS/tree/master/NetDataAdapters)  
+* [Java](https://github.com/stimulsoft/DataAdapters.JS/tree/master/JavaDataAdapters)  
 
 ## Как это работает
 При запросе данных из SQL источников данных, JS report engine отправляет POST запрос на URL, указанный в опции:  
