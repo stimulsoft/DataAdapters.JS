@@ -1,47 +1,47 @@
 
 
-Поскольку чистый JavaScript не имеет встроенных методов для работы с удаленными базами данных, эта функциональность реализуется с помощью серверного кода. Поэтому продукт Stimulsoft Reports.JS содержит серверные адаптеры данных, реализованные с использованием технологий PHP, Node.JS, ASP.NET, Java.
+Since pure JavaScript does not have built-in methods for working with remote databases, this functionality is implemented using server-side code. Therefore, Stimulsoft Reports.JS product contains server data adapters implemented using PHP, Node.JS, ASP.NET, Java technologies.
  
-Адаптер базы данных - это программный уровень между СУБД и клиентским скриптом. Адаптер подключается к СУБД и извлекает необходимые данные, конвертируя их в JSON. Сценарий, запущенный на сервере (с использованием адаптера), обеспечивает обмен данными между клиентским приложением JavaScript и серверной частью.
+The database adapter is a software layer between the DBMS and the client script. The adapter connects to the DBMS and retrieves the necessary data, converting it into JSON. The script running on the server (using the adapter) provides for the exchange of JSON data between the client-side JavaScript application and the server side.
  
-Чтобы использовать этот механизм на стороне клиента, достаточно указать URL-адрес хоста адаптера, который обрабатывает запросы к необходимому адаптеру.
+To use this mechanism on the clint side, you should specify the URL address of the host adapter, which processes requests to a required adapter
 
-Ссылки на примеры с готовыми адаптерами данных, реализованные для различных платформ:  
+Links to examples with ready data adapters, implemented for various platforms:  
 * [Node.js](https://github.com/stimulsoft/Samples-JS/tree/master/Node.js/04.%20Start%20SQL%20Adapters%20from%20Http%20Server)
 * [PHP](https://github.com/stimulsoft/Samples-JS/tree/master/PHP/02.%20Connect%20to%20databases)
 * [.NET](https://github.com/stimulsoft/Samples-JS/tree/master/ASP.NET/02.%20Connect%20to%20databases)
 * [Java](https://github.com/stimulsoft/Samples-JS/tree/master/Java/01.%20Data%20Adapter)
 
-## Как использовать
-Использовать адаптер достаточно просто.  
-Вы должны запусть адаптер и указать адрес адаптера:
+## How to use
+It`s easy to use an adapter.  
+You should run an adapter and specify the its address:
 ```js
 StiOptions.WebServer.url = "http://localhost:9615";
 ```
 
-## Как это работает
-При запросе данных из SQL источников данных, JS report engine отправляет POST запрос на URL, указанный в опции:  
+## How it works
+When requesting data from SQL data sources, the Stimulsoft.Report.Engine sends a POST request to the URL, specified in the option:  
 ```js
-StiOptions.WebServer.url = "https://localhost/handler.php";`
+StiOptions.WebServer.url = "https://localhost/handler.php";
 ```
 
-В теле запроса передается JSON объект с параметрами, которые используют указанную ниже структуру:
-* `command`: возможны два варианта - "*TestConnection*" и "*ExecuteQuery*"
-* `connectionString`: строка подключения к базе
-* `queryString`: строка запроса
-* `database`: тип базы данных
-* `timeout`: время ожидания запроса, указанное в источнике данных
-* `parameters`: масив параметров в виде JSON объекта {name, value}
-* `escapeQueryParameters`: флаг экранирования параметров перед выполнением запроса
+A JSON object with parameters is passed in the body of the request that use the following structure:
+* `command`: two variants are possible - "*TestConnection*" и "*ExecuteQuery*"
+* `connectionString`: database connection string
+* `queryString`: query string
+* `database`: database type
+* `timeout`: the time of request waiting, specified in the data source
+* `parameters`: an array of parameters as a JSON object {name, value}
+* `escapeQueryParameters`: a flag of parameters shielding before requesting
 
-В ответ JS report engine одидает JSON объект с данными в виде следующей структуры:
-* `success`: флаг успешного выполнения команды
-* `notice`: если флаг выполенния команты имеет значение false, то данный параметр будет содержать описание ошибки
-* `rows`: масив строк, каждый элемент - это масив из значений, индексом является номер колонки
-* `columns`: масив имен колонок, индексом является номер колонки
-* `types`: масив типов колонок, индексом является номер колонки. Может принимать значения "*string*", "*number*", "*int*", "*boolean*", "*array*", "*datetime*"
+In response, the Stimulsoft.Report.Engine expects a JSON object with data in the form of the following structure:
+* `success`: a flag of successful command execution
+* `notice`: if the flag of command execution has the false value, this parameter will contain an error description
+* `rows`: strings array, each element is the array of values, the index is the column number
+* `columns`: an array of column names, index is the column number
+* `types`: an array of column types, the index is the column number. It can take the values "*string*", "*number*", "*int*", "*boolean*", "*array*", "*datetime*"
 
-Пример запроса и ответа:
+Request and responce sample:
 ```js
 request = {
     command: "ExecuteQuery",
@@ -74,39 +74,39 @@ response = {
 
 
 ## CustomDataAdapter
-Также предусмотрена возможность зарегистрировать собственный адаптер данных. Для этого необходимо вызвать функцию:
+Also, there is the ability to registrate own data adapter. To do it you should invoke the following option:
 ```js
 Stimulsoft.Report.Dictionary.StiCustomDatabase.registerCustomDatabase(options);
 ```
 
-Опции представляют собой набор свойств и функцию `process()`, которая будет вызываться при запросе данных:
-* `serviceName`: имя адаптера которое отобразится в дизанере при создании нового подключения
-* `sampleConnectionString`: пример строки подключения который вставиться в форме настройки нового подключения
-* `process`: функция которая вызовется для подготовки и передачи данных в Stimulsoft.Report.Engine
+The options are the set of properties and the `process()` function, which will be invoked when requesting data:
+* `serviceName`: adapter name which will be displayed in the designer when creating a new connection
+* `sampleConnectionString`: the sample of a connection string that is inserted in the form of setting up a new connection
+* `process`: the function, which will be invoked to prepareband transmit data to the Stimulsoft.Report.Engine
             
-На вход функции `process()` передаются два аргумента: `command` и `callback`. 
+Two arguments are transmitted to the input of the `process()` function: `command` and` callback`. 
 
-Аргумент `command` представляет собой JSON объект, в который JS report engine передаст следующие параметры:
+The `command` argument is the JSON object, where the Stimulsoft.Report.Engine will transfer the following parameters:
 
-* `command`: действие, которое вызывается в данный момент. Возможные значения:
-    "*TestConnection*": проверка соединения с базой данных из формы создания нового подключения
-    "*RetrieveSchema*": извлечение схемы данных, нужно для оптимизации запроса и не передачи только необходимого набора данных. Вызывается после создания подключения
-    "*RetrieveData*": запрос данных
-* `connectionString`: строка подключения к базе
-* `queryString`: строка SQL запроса
-* `database`: тип базы данных
-* `timeout`: время ожидания запроса, указанное в источнике данных
+* `command`: action, which is being invoked at the moment. Possible values:
+    "*TestConnection*": test the database connection from the new connection creation form
+    "*RetrieveSchema*": retrieving data schema is needed to optimize a request and not only to transfer necessary data set. It is invokes after connection creation
+    "*RetrieveData*": data request
+* `connectionString`: connection string
+* `queryString`: query string
+* `database`: database type
+* `timeout`: the time of request waiting, specified in the data source
 
-Аргумент `callback` является функцией, которую нужно вызвать для передачи подготовленных данных в JS report engine. В качестве аргумента`callback` функции необходимо передать JSON объект, имеющий указанные ниже параметры:
-* `success`: флаг успешного выполнения команды
-* `notice`: если флаг выполенния команты имеет значение false, то данный параметр должен содержать описание ошибки
-* `rows`: масив строк, каждый элемент - это масив из значений, индексом является номер колонки
-* `columns`: масив имен колонок, индексом является номер колонки
-* `types`: объект где имя поля это имя колонки а значение тип колонки {Column_Name : "string"}. Тип может принимать значения "*string*", "*number*", "*int*", "*boolean*", "*array*", "*datetime*". Если будет передан масив `columns`, то в `types` можно передать масив типов, индексом должен являться номер колонки. Не работает для "*RetrieveSchema*"
+The `callback` argument is the function, which should be invoked to transmit prepared data to the Stimulsoft.Report.Engine. As the `callback` argument to the functions you must pass a JSON object with the following parameters:
+* `success`: the flag of successful command execution
+* `notice`: if the flag of command execution has the false value, this parameter should contain an error description
+* `rows`: strings array, each element is the array from values, the index is the column number
+* `columns`: columns name array, the index is the column number
+* `types`: the object where field name is column name and the value is the type of the column {Column_Name : "string"}. The type can take the following values "*string*", "*number*", "*int*", "*boolean*", "*array*", "*datetime*". If the `columns` array will be transmitted, you will be able to transmit types array to the `types`, the index should be column number. It doesn`t work for the "*RetrieveSchema*"
 
-Если command = "*RetrieveSchema*", то помимо типов, в `types` необходимо передать имена таблиц.
+If the command = "*RetrieveSchema*", then in addition types you should transmit table names to the `types`.
 
-Пример запроса и ответа при получении схемы:
+The sample of a request and response when receiving a schema:
 ```js
 request = {
     command: "RetrieveSchema"
@@ -127,7 +127,7 @@ response = {
 }
 ```
 
-Пример запроса и ответа при получении данных:
+The sample of a request and response when getting data:
 ```js
 request = {
     command: "RetrieveData",
@@ -153,4 +153,4 @@ response = {
 }
 ```
 
-[Пример регистрации адаптера](https://github.com/stimulsoft/Samples-JS/blob/master/JavaScript/Working%20with%20report%20designer/08.%20Custom%20DataAdapter.html)
+[The example of adapter registration](https://github.com/stimulsoft/Samples-JS/blob/master/JavaScript/Working%20with%20report%20designer/08.%20Custom%20DataAdapter.html)
