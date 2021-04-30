@@ -105,7 +105,7 @@ namespace AspNetDataAdapters
 
                     if (value == null) value = "";
                     if (columnType == "datetime" && value is DateTime)
-                        row[index] = ((DateTime)value).ToString("YYYY-MM-DDTHH:mm:SSSZ");
+                        row[index] = ((DateTime)value).ToString("YYYY-MM-DDTHH:mm:ss.SSSZ");
                     else
                         row[index] = value.ToString();
                 }
