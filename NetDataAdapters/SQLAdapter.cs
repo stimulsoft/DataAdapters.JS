@@ -105,7 +105,7 @@ namespace AspNetDataAdapters
 
                     if (value == null) value = "";
                     if (columnType == "datetime" && value is DateTime)
-                        row[index] = ((DateTime)value).ToString("YYYY-MM-DDTHH:mm:ss.SSSZ");
+                        row[index] = ((DateTime)value).ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ss.fffK");
                     else
                         row[index] = value.ToString();
                 }
