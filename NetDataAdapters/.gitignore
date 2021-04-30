@@ -1,13 +1,13 @@
 # Folders
 .vs/
 /packages/
-/*/packages/
-/*/bin/
-/*/csx/
-/*/ecf/
-/*/obj/
-/*/obj.NS/
-/*/node_modules/
+packages/
+bin/
+csx/
+ecf/
+obj/
+obj.NS/
+node_modules/
 
 # Files
 /*/Stimulsoft.*.xml

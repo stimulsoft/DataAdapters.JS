@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.OracleClient;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -7,6 +9,9 @@ using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
+using FirebirdSql.Data.FirebirdClient;
+using MySql.Data.MySqlClient;
+using Npgsql;
 
 namespace AspNetDataAdapters
 {
@@ -108,11 +113,11 @@ namespace AspNetDataAdapters
 
                 switch (command.Database)
                 {
-                    case "MySQL": result = MySQLAdapter.Process(command); break;
-                    case "Firebird": result = FirebirdAdapter.Process(command); break;
-                    case "MS SQL": result = MSSQLAdapter.Process(command); break;
-                    case "PostgreSQL": result = PostgreSQLAdapter.Process(command); break;
-                    case "Oracle": result = OracleAdapter.Process(command); break;
+                    case "MySQL": result = SQLAdapter.Process(command, new MySqlConnection(command.ConnectionString)); break;
+                    case "Firebird": result = SQLAdapter.Process(command, new FbConnection(command.ConnectionString)); break;
+                    case "MS SQL": result = SQLAdapter.Process(command, new SqlConnection(command.ConnectionString)); break;
+                    case "PostgreSQL": result = SQLAdapter.Process(command, new NpgsqlConnection(command.ConnectionString)); break;
+                    case "Oracle": result = SQLAdapter.Process(command, new OracleConnection(command.ConnectionString)); break;
                     default: result.Success = false; result.Notice = $"Unknown database type [{command.Database}]"; break;
                 }
             }

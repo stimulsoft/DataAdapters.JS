@@ -1,16 +1,16 @@
-﻿using MySql.Data.MySqlClient;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.IO;
 using System.Linq;
 using System.Web;
 
 namespace AspNetDataAdapters
 {
-    public class MySQLAdapter
+    public class SQLAdapter
     {
-        private static MySqlConnection connection;
-        private static MySqlDataReader reader;
+        private static DbConnection connection;
+        private static DbDataReader reader;
         private static CommandJson command;
 
         private static Result End(Result result)
@@ -37,7 +37,6 @@ namespace AspNetDataAdapters
         {
             try
             {
-                connection = new MySqlConnection(command.ConnectionString);
                 connection.Open();
                 return OnConnect();
             }
@@ -78,7 +77,7 @@ namespace AspNetDataAdapters
             for (var index = 0; index < reader.FieldCount; index++)
             {
                 var columnName = reader.GetName(index);
-                var columnType = MySQLAdapter.GetType(reader.GetFieldType(index));
+                var columnType = GetType(reader.GetFieldType(index));
 
                 columns.Add(columnName);
                 types.Add(columnType);
@@ -90,7 +89,7 @@ namespace AspNetDataAdapters
                 for (var index = 0; index < reader.FieldCount; index++)
                 {
                     var columnName = reader.GetName(index);
-                    var columnType = MySQLAdapter.GetType(reader.GetFieldType(index));
+                    var columnType = GetType(reader.GetFieldType(index));
 
                     var columnIndex = columns.IndexOf(columnName);
                     if (types[columnIndex] != "array") types[columnIndex] = columnType;
@@ -99,13 +98,16 @@ namespace AspNetDataAdapters
                     {
                         if (columnType == "array")
                         {
-                            value = MySQLAdapter.GetBytes(index);
+                            value = GetBytes(index);
                         }
                         else value = reader.GetValue(index);
                     }
 
                     if (value == null) value = "";
-                    row[index] = value.ToString();
+                    if (columnType == "datetime" && value is DateTime)
+                        row[index] = ((DateTime)value).ToString("YYYY-MM-DDTHH:mm:SSSZ");
+                    else
+                        row[index] = value.ToString();
                 }
                 rows.Add(row);
             }
@@ -135,15 +137,37 @@ namespace AspNetDataAdapters
         {
             var typeCode = Type.GetTypeCode(columnType);
 
-            if ((int)typeCode >= 5 && (int)typeCode <= 15) return "number";
-            if ((int)typeCode == 1) return "array";
+            switch (typeCode)
+            {
+                case TypeCode.Boolean: return "boolean";
+                case TypeCode.DateTime: return "datetime";
+
+                case TypeCode.Decimal:
+                case TypeCode.Double:
+                case TypeCode.Single: return "float";
+
+                case TypeCode.Int16:
+                case TypeCode.Int32:
+                case TypeCode.Int64:
+                case TypeCode.UInt16:
+                case TypeCode.UInt32:
+                case TypeCode.UInt64:
+                case TypeCode.SByte:
+                case TypeCode.Byte: return "int";
+
+                case TypeCode.Object: return "array";
+
+                case TypeCode.Char:
+                case TypeCode.String: return "string";
+            }
 
             return "string";
         }
 
-        public static Result Process(CommandJson command)
+        public static Result Process(CommandJson command, DbConnection connection)
         {
-            MySQLAdapter.command = command;
+            SQLAdapter.connection = connection;
+            SQLAdapter.command = command;
             return Connect();
         }
     }
