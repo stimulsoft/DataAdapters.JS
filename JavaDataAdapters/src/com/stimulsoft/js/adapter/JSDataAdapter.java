@@ -10,6 +10,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -35,6 +36,7 @@ public class JSDataAdapter {
     private static final List<String> PORT_KEY = Arrays.asList(new String[] { "port" });
     private static final List<String> DATABASE_KEY = Arrays.asList(new String[] { "database", "database name", "databasename", "data source" });
     protected static final List<String> URL_KEYS = Arrays.asList(new String[] { "jdbc.url", "connectionurl", "url", "connection.url" });
+    private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss'Z'");
 
     private static String onError(Exception e) {
         HashMap<String, Object> result = new HashMap<String, Object>();
@@ -163,7 +165,9 @@ public class JSDataAdapter {
                     columns.add(rs.getMetaData().getColumnName(index));
                     types.add(getColumnType(rs.getMetaData().getColumnType(index)));
                 }
-                String value = rs.getString(index) != null ? rs.getString(index) : "";
+                String value = rs.getString(index) != null
+                        ? "datetime".equals(types.get(index - 1)) ? dateFormatter.format(rs.getDate(index)) : rs.getString(index)
+                        : "";
                 row.add(value);
             }
             rows.add(row);
