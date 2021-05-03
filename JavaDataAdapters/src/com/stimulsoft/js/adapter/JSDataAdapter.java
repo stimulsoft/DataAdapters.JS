@@ -13,10 +13,12 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TimeZone;
 
 import com.stimulsoft.base.json.JSONArray;
 import com.stimulsoft.base.json.JSONException;
@@ -37,6 +39,12 @@ public class JSDataAdapter {
     private static final List<String> DATABASE_KEY = Arrays.asList(new String[] { "database", "database name", "databasename", "data source" });
     protected static final List<String> URL_KEYS = Arrays.asList(new String[] { "jdbc.url", "connectionurl", "url", "connection.url" });
     private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss'Z'");
+    private static final TimeZone timeZone = TimeZone.getTimeZone("UTC");
+    private static final Calendar calendar = Calendar.getInstance(timeZone);
+
+    static {
+        dateFormatter.setTimeZone(timeZone);
+    }
 
     private static String onError(Exception e) {
         HashMap<String, Object> result = new HashMap<String, Object>();
@@ -165,9 +173,15 @@ public class JSDataAdapter {
                     columns.add(rs.getMetaData().getColumnName(index));
                     types.add(getColumnType(rs.getMetaData().getColumnType(index)));
                 }
-                String value = rs.getString(index) != null
-                        ? "datetime".equals(types.get(index - 1)) ? dateFormatter.format(rs.getDate(index)) : rs.getString(index)
-                        : "";
+                String value = "";
+                if (rs.getString(index) != null) {
+                    if ("datetime".equals(types.get(index - 1))) {
+                        calendar.setTime(rs.getTimestamp(index));
+                        value = dateFormatter.format(calendar.getTime());
+                    } else {
+                        value = rs.getString(index);
+                    }
+                }
                 row.add(value);
             }
             rows.add(row);
