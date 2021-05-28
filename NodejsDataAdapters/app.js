@@ -3,7 +3,6 @@ var MySQLAdapter = require('./MySQLAdapter');
 var FirebirdAdapter = require('./FirebirdAdapter');
 var MSSQLAdapter = require('./MSSQLAdapter');
 var PostgreSQLAdapter = require('./PostgreSQLAdapter');
-var OracleAdapter = require('./OracleAdapter');
 
 var connectionStringBuilder;
 var response;
@@ -35,7 +34,6 @@ function accept(req, res) {
         else if (command.database == "Firebird") FirebirdAdapter.process(command, onProcess);
         else if (command.database == "MS SQL") MSSQLAdapter.process(command, onProcess);
         else if (command.database == "PostgreSQL") PostgreSQLAdapter.process(command, onProcess);
-        else if (command.database == "Oracle") OracleAdapter.process(command, onProcess);
         else onResult({ success: false, notice: "Database '" + command.database + "' not supported!" });
     });
 }
