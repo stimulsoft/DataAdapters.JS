@@ -42,7 +42,7 @@ var applyQueryParameters = function (baseSqlCommand, parameters, escapeQueryPara
     if (baseSqlCommand == null || baseSqlCommand.indexOf("@") < 0) return baseSqlCommand;
 
     var result = "";
-    while (baseSqlCommand.indexOf("@") >= 0 && parameters != null) {
+    while (baseSqlCommand.indexOf("@") >= 0 && parameters != null && parameters.length > 0) {
         result += baseSqlCommand.substring(0, baseSqlCommand.indexOf("@"));
         baseSqlCommand = baseSqlCommand.substring(baseSqlCommand.indexOf("@") + 1);
 
@@ -72,7 +72,7 @@ var applyQueryParameters = function (baseSqlCommand, parameters, escapeQueryPara
             result += "@" + parameterName;
     }
 
-    return result;
+    return result + baseSqlCommand;
 }
 
 var onProcess = function (result) {
