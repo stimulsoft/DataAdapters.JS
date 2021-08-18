@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.OracleClient;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
@@ -12,6 +11,7 @@ using System.Web;
 using FirebirdSql.Data.FirebirdClient;
 using MySql.Data.MySqlClient;
 using Npgsql;
+using Oracle.ManagedDataAccess.Client;
 
 namespace AspNetDataAdapters
 {
@@ -149,7 +149,7 @@ namespace AspNetDataAdapters
             if (baseSqlCommand == null || baseSqlCommand.IndexOf("@") < 0) return baseSqlCommand;
 
             var result = "";
-            while (baseSqlCommand.IndexOf("@") >= 0 && parameters != null)
+            while (baseSqlCommand.IndexOf("@") >= 0 && parameters != null && parameters.Length > 0)
             {
                 result += baseSqlCommand.Substring(0, baseSqlCommand.IndexOf("@"));
                 baseSqlCommand = baseSqlCommand.Substring(baseSqlCommand.IndexOf("@") + 1);
@@ -185,7 +185,7 @@ namespace AspNetDataAdapters
                     result += "@" + parameterName;
             }
 
-            return result;
+            return result + baseSqlCommand;
         }
 
         public bool IsReusable
