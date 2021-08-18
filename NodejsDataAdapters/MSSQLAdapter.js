@@ -48,53 +48,41 @@
                 columns.push(column.name);
 
                 switch (column.type) {
-                    case sql.Bit:
-                    case sql.SmallInt:
-                    case sql.Int:
+                    case sql.UniqueIdentifier:
                     case sql.BigInt:
+                    case sql.timestamp:
+                    case sql.Int:
+                    case sql.SmallInt:
+                    case sql.TinyInt:
                         types[columnIndex] = "int"; break;
 
                     case sql.Decimal:
-                    case sql.Float:
                     case sql.Money:
-                    case sql.Numeric:
                     case sql.SmallMoney:
+                    case sql.Float:
                     case sql.Real:
                         types[columnIndex] = "number"; break;
 
-                    case sql.TinyInt:
-                        types[columnIndex] = "boolean"; break;
-
-                    case sql.Char:
-                    case sql.NChar:
-                    case sql.Text:
-                    case sql.NText:
-                    case sql.VarChar:
-                    case sql.NVarChar:
-                    case sql.Xml:
-                        types[columnIndex] = "string"; break;
-
-                    case sql.Time:
-                    case sql.Date:
                     case sql.DateTime:
+                    case sql.Date:
                     case sql.DateTime2:
-                    case sql.DateTimeOffset:
                     case sql.SmallDateTime:
                         types[columnIndex] = "datetime"; break;
 
-                    case sql.UniqueIdentifier:
-                        types[columnIndex] = "string"; break;
-                    case sql.Variant:
-                        types[columnIndex] = "string"; break;
+                    case sql.DateTimeOffset:
+                        types[columnIndex] = "datetimeZ"; break;
+
+                    case sql.Time:
+                        types[columnIndex] = "time"; break;
+
+                    case sql.Bit:
+                        types[columnIndex] = "boolean"; break;
 
                     case sql.Binary:
-                    case sql.VarBinary:
                     case sql.Image:
-                        types[columnIndex] = "string"; break;
+                        types[columnIndex] = "array"; break;
 
-                    case sql.UDT:
-                    case sql.Geography:
-                    case sql.Geometry:
+                    default:
                         types[columnIndex] = "string"; break;
                 }
             }
@@ -104,7 +92,6 @@
                 var row = [];
                 for (var columnName in recordset[recordIndex]) {
                     var columnIndex = columns.indexOf(columnName);
-                    if (types[columnIndex] != "array") types[columnIndex] = typeof recordset[recordIndex][columnName];
                     if (recordset[recordIndex][columnName] instanceof Uint8Array ||
                         recordset[recordIndex][columnName] instanceof Buffer) {
                         types[columnIndex] = "array";
@@ -112,13 +99,27 @@
                     }
 
                     if (recordset[recordIndex][columnName] != null && typeof recordset[recordIndex][columnName].toISOString === "function") {
-                        recordset[recordIndex][columnName] = recordset[recordIndex][columnName].toISOString();
-                        types[columnIndex] = "datetime";
+                        var dateTime = recordset[recordIndex][columnName].toISOString();
+                        if (types[columnIndex] == "time") {
+                            recordset[recordIndex][columnName] = dateTime.substr(dateTime.indexOf("T") + 1).replace("Z", "");
+                        }
+                        else if (types[columnIndex] == "datetimeZ") {
+                            var offset = "+00:00";
+                            recordset[recordIndex][columnName] = dateTime.replace("Z", "") + offset;
+                        }
+                        else {
+                            recordset[recordIndex][columnName] = dateTime.replace("Z", "");
+                            types[columnIndex] = "datetime";
+                        }
                     }
 
                     row[columnIndex] = recordset[recordIndex][columnName];
                 }
                 rows.push(row);
+            }
+
+            for (var typeIndex in types) {
+                if (types[typeIndex] == "datetimeZ") types[typeIndex] = "datetimeoffset";
             }
 
             end({ success: true, columns: columns, rows: rows, types: types });
@@ -147,7 +148,9 @@
 
         var getConnectionStringConfig = function (connectionString) {
             var config = {
-                options: {}
+                options: {
+                    trustServerCertificate: true
+                }
             };
 
             for (var propertyIndex in connectionString.split(";")) {
@@ -188,7 +191,7 @@
                                 break;
 
                             case "encrypt":
-                                config.options["encrypt"] = match[1];
+                                config.options["encrypt"] = !!match[1];
                                 break;
 
                             case "connectiontimeout":
@@ -204,7 +207,7 @@
                                 break;
 
                             case "trustservercertificate":
-                                config.options["trustServerCertificate"] = match[1];
+                                config.options["trustServerCertificate"] = !!match[1];
                                 break;
                         }
                     }

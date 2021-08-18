@@ -52,7 +52,8 @@
                         types[columnIndex] = "string";
                     }
                     if (recordset[recordIndex][columnName] != null && typeof recordset[recordIndex][columnName].toISOString === "function") {
-                        recordset[recordIndex][columnName] = recordset[recordIndex][columnName].toISOString();
+                        var dateTime = new Date(recordset[recordIndex][columnName].getTime() - (recordset[recordIndex][columnName].getTimezoneOffset() * 60000)).toISOString();
+                        recordset[recordIndex][columnName] = dateTime.replace("Z", "");
                         types[columnIndex] = "datetime";
                     }
 
