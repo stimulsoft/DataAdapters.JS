@@ -13,12 +13,13 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.stimulsoft.base.json.JSONArray;
 import com.stimulsoft.base.json.JSONException;
@@ -34,16 +35,16 @@ public class JSDataAdapter {
     private static final List<String> USERS_KEYS = Arrays.asList(
             new String[] { "jdbc.username", "username", "uid", "user", "user id", "userid", "connection.username" });
     private static final List<String> PASSWORD_KEYS = Arrays.asList(new String[] { "jdbc.password", "pwd", "password", "connection.password" });
-    private static final List<String> HOST_KEY = Arrays.asList(new String[] { "host", "server", "location" });
+    private static final List<String> HOST_KEY = Arrays.asList(new String[] { "host", "server", "location", "data source" });
     private static final List<String> PORT_KEY = Arrays.asList(new String[] { "port" });
-    private static final List<String> DATABASE_KEY = Arrays.asList(new String[] { "database", "database name", "databasename", "data source" });
+    private static final List<String> DATABASE_KEY = Arrays.asList(new String[] { "database", "database name", "databasename", "initial catalog", "sid" });
     protected static final List<String> URL_KEYS = Arrays.asList(new String[] { "jdbc.url", "connectionurl", "url", "connection.url" });
-    private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss'Z'");
+    private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss");
+    private static final SimpleDateFormat mysqlDateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss");
     private static final TimeZone timeZone = TimeZone.getTimeZone("UTC");
-    private static final Calendar calendar = Calendar.getInstance(timeZone);
 
     static {
-        dateFormatter.setTimeZone(timeZone);
+        mysqlDateFormatter.setTimeZone(timeZone);
     }
 
     private static String onError(Exception e) {
@@ -85,9 +86,17 @@ public class JSDataAdapter {
                 if (url == null) {
                     url = String.format("jdbc:postgresql://%s:%s/%s", getHost(params), getPort(params, "5432"), getDatabase(params));
                 }
+            } else if ("Oracle".equals(dbName)) {
+                Class.forName("oracle.jdbc.OracleDriver");
+                if (url == null) {
+                    Map<String, String> oracleParams = parseOracleConnectionString(params);
+                    if (oracleParams != null) {
+                        url = String.format("jdbc:oracle:thin:@%s:%s:%s", getHost(oracleParams), getPort(oracleParams, "1521"), getDatabase(oracleParams));
+                    }
+                }
             }
             con = DriverManager.getConnection(url, info);
-            return onConnect(command, con);
+            return onConnect(command, con, dbName);
         } catch (Exception e) {
             return onError(e);
         } finally {
@@ -97,10 +106,10 @@ public class JSDataAdapter {
         }
     }
 
-    private static String onConnect(JSONObject command, Connection con) throws JSONException {
+    private static String onConnect(JSONObject command, Connection con, String dbName) throws JSONException {
         if (command.has("queryString")) {
             return query(applyQueryParameters(command.getString("queryString"), command.has("parameters") ? command.getJSONArray("parameters") : null,
-                    command.has("escapeQueryParameters") ? command.getBoolean("escapeQueryParameters") : false), con);
+                    command.has("escapeQueryParameters") ? command.getBoolean("escapeQueryParameters") : false), con, dbName);
         } else {
             HashMap<String, Object> result = new HashMap<String, Object>();
             result.put("success", true);
@@ -151,17 +160,17 @@ public class JSDataAdapter {
         return result;
     }
 
-    private static String query(String queryString, Connection con) {
+    private static String query(String queryString, Connection con, String dbName) {
         try {
             PreparedStatement pstmt = con.prepareStatement(queryString);
             ResultSet rs = pstmt.executeQuery();
-            return onQuery(rs);
+            return onQuery(rs, dbName);
         } catch (Exception e) {
             return onError(e);
         }
     }
 
-    private static String onQuery(ResultSet rs) throws SQLException {
+    private static String onQuery(ResultSet rs, String dbName) throws SQLException {
         List<String> columns = new ArrayList<String>();
         List<List<String>> rows = new ArrayList<List<String>>();
         List<String> types = new ArrayList<String>();
@@ -176,8 +185,11 @@ public class JSDataAdapter {
                 String value = "";
                 if (rs.getString(index) != null) {
                     if ("datetime".equals(types.get(index - 1))) {
-                        calendar.setTime(rs.getTimestamp(index));
-                        value = dateFormatter.format(calendar.getTime());
+                        if ("MySQL".equals(dbName)) {
+                            value = mysqlDateFormatter.format(rs.getTimestamp(index));
+                        } else {
+                            value = dateFormatter.format(rs.getTimestamp(index));
+                        }
                     } else {
                         value = rs.getString(index);
                     }
@@ -220,8 +232,9 @@ public class JSDataAdapter {
         case StiSqlTypes.TIMESTAMP_WITH_ZONE:
         case StiSqlTypes.DATE:
         case StiSqlTypes.TIMESTAMP:
-        case StiSqlTypes.TIME:
             return "datetime";
+        case StiSqlTypes.TIME:
+            return "time";
         case StiSqlTypes.DECIMAL:
         case StiSqlTypes.DOUBLE:
         case StiSqlTypes.FLOAT:
@@ -243,7 +256,7 @@ public class JSDataAdapter {
         case StiSqlTypes.STRUCT:
             return "array";
         default:
-            throw new IllegalArgumentException("Undefined type - '" + columnType + "'");
+            return "object";
         }
 
     }
@@ -307,6 +320,20 @@ public class JSDataAdapter {
                 params.remove(key);
                 return value;
             }
+        }
+        return null;
+    }
+
+    private static Map<String, String> parseOracleConnectionString(Map<String, String> params) {
+        String dataSource = getHost(params);
+        if (dataSource != null) {
+            Pattern pattern = Pattern.compile("\\([^()]*\\)");
+            Matcher matcher = pattern.matcher(dataSource);
+            List<String> values = new ArrayList<String>();
+            while (matcher.find()) {
+                values.add(matcher.group().replaceAll("\\(|\\)", ""));
+            }
+            return parseParams(String.join(";", values));
         }
         return null;
     }
