@@ -40,6 +40,7 @@ In response, the Stimulsoft.Report.Engine expects a JSON object with data in the
 * `rows`: strings array, each element is the array of values, the index is the column number
 * `columns`: an array of column names, index is the column number
 * `types`: an array of column types, the index is the column number. It can take the values "*string*", "*number*", "*int*", "*boolean*", "*array*", "*datetime*"
+* `checkVersion`: an optional flag, which disables the check of the the data adapter version and the Stimulsoft.Report.Engine version.
 
 Request and response sample:
 ```js
@@ -70,8 +71,17 @@ response = {
     ]
 }
 ```
-  
 
+You can set additional parameters:
+```js
+StiOptions.WebServer.encryptData = false;
+```
+Disable the encryption of request from the Stimulsoft.Report.Engine to the data adapter.
+
+```js
+StiOptions.WebServer.checkDataAdaptersVersion = false;
+```
+Disable the check of the data adapter version and the Stimulsoft.Report.Engine version.
 
 ## CustomDataAdapter
 Also, you may register your data adapter. To do it you should invoke the following option:
