@@ -1,1 +1,1 @@
-﻿<%@ WebHandler Language="C#" CodeBehind="Handler.ashx.cs" Class="AspNetDataAdapters.Handler" %>
+<%@ WebHandler Language="C#" CodeBehind="Handler.ashx.cs" Class="AspNetDataAdapters.Handler" %>

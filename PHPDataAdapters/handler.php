@@ -1,4 +1,19 @@
+/*
+Stimulsoft.Reports.JS
+Version: 2021.4.1
+Build date: 2021.10.04
+License: https://www.stimulsoft.com/en/licensing/reports
+*/
+/*
+Stimulsoft.Reports.JS
+Version: 2021.4.1
+Build date: 2021.09.09
+License: https://www.stimulsoft.com/en/licensing/reports
+*/
 <?php
+
+$version = '2021.4.1';
+
 
 // Error handlers
 
@@ -137,10 +152,14 @@ $request = new StiRequest();
 $result = $request->parse();
 if ($result->success) {
 	$result = getDataAdapter($request);
+	$dataAdapter = $result->object;
 	if ($result->success) {
 		$result = $request->command == 'TestConnection'
-			? $result->object->test()
-			: $result->object->execute($request->queryString);
+			? $dataAdapter->test()
+			: $dataAdapter->execute($request->queryString);
+		$result->handlerVersion = $version;
+		$result->adapterVersion = $dataAdapter->version;
+		$result->checkVersion = $dataAdapter->checkVersion;
 	}
 }
 

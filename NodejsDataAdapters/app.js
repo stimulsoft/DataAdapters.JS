@@ -1,4 +1,10 @@
-﻿var http = require('http');
+/*
+Stimulsoft.Reports.JS
+Version: 2021.4.1
+Build date: 2021.10.04
+License: https://www.stimulsoft.com/en/licensing/reports
+*/
+var http = require('http');
 var MySQLAdapter = require('./MySQLAdapter');
 var FirebirdAdapter = require('./FirebirdAdapter');
 var MSSQLAdapter = require('./MSSQLAdapter');
@@ -76,6 +82,7 @@ var applyQueryParameters = function (baseSqlCommand, parameters, escapeQueryPara
 }
 
 var onProcess = function (result) {
+    result.handlerVersion = "2021.4.1";
     response.end(JSON.stringify(result));
 }
 

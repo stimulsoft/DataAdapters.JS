@@ -1,4 +1,10 @@
-﻿using System;
+/*
+Stimulsoft.Reports.JS
+Version: 2021.4.1
+Build date: 2021.10.04
+License: https://www.stimulsoft.com/en/licensing/reports
+*/
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
@@ -33,6 +39,12 @@ namespace AspNetDataAdapters
 
         [DataMember(Name = "types")]
         public string[] Types { get; set; }
+
+        [DataMember(Name = "adapterVersion")]
+        public string AdapterVersion { get; set; }
+
+        [DataMember(Name = "handlerVersion")]
+        public string HandlerVersion { get; set; }
     }
     #endregion
 
@@ -131,6 +143,8 @@ namespace AspNetDataAdapters
                 if (inputStream != context.Request.InputStream)
                     inputStream.Close();
             }
+
+            result.HandlerVersion = "2021.4.1";
 
             context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
             context.Response.Headers.Add("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Engaged-Auth-Token");

@@ -1,8 +1,14 @@
-﻿exports.process = function (command, onResult) {
-
+/*
+Stimulsoft.Reports.JS
+Version: 2021.4.1
+Build date: 2021.10.04
+License: https://www.stimulsoft.com/en/licensing/reports
+*/
+exports.process = function (command, onResult) {
     var end = function (result) {
         try {
             if (connection) connection.close();
+            result.adapterVersion = "2021.4.1";
             onResult(result);
         }
         catch (e) {
@@ -43,10 +49,10 @@
             var types = [];
             if (recordset.length > 0 && Array.isArray(recordset[0])) recordset = recordset[0];
             for (var columnName in recordset.columns) {
-                var column = recordset.columns[columnName]
-                var columnIndex = column.index;
+                var column = recordset.columns[columnName];
+                var columnIndex = columns.length;
                 columns.push(column.name);
-
+                
                 switch (column.type) {
                     case sql.UniqueIdentifier:
                     case sql.BigInt:
@@ -113,7 +119,17 @@
                         }
                     }
 
-                    row[columnIndex] = recordset[recordIndex][columnName];
+                    if (columnName == "" && Array.isArray(recordset[recordIndex][columnName])) {
+                        for (var i = 0; i < recordset[recordIndex][columnName].length; i++) {
+                            if (columns.length <= columnIndex + i && columns[columnIndex + i] != ""){
+                                columns.splice(columnIndex + i - 1, 0, columns[columnIndex]);
+                                types.splice(columnIndex + i - 1, 0, types[columnIndex]);
+                            }
+                            row[columnIndex + i] = recordset[recordIndex][columnName][i];
+                        }
+                    }
+                    else
+                        row[columnIndex] = recordset[recordIndex][columnName];
                 }
                 rows.push(row);
             }
@@ -149,7 +165,10 @@
         var getConnectionStringConfig = function (connectionString) {
             var config = {
                 options: {
-                    trustServerCertificate: true
+                    trustServerCertificate: true,
+                    cryptoCredentialsDetails: {
+                        minVersion: 'TLSv1'
+                    }
                 }
             };
 

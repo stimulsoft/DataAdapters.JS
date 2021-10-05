@@ -1,4 +1,10 @@
-﻿using FirebirdSql.Data.FirebirdClient;
+/*
+Stimulsoft.Reports.JS
+Version: 2021.4.1
+Build date: 2021.10.04
+License: https://www.stimulsoft.com/en/licensing/reports
+*/
+using FirebirdSql.Data.FirebirdClient;
 using MySql.Data.MySqlClient;
 using Npgsql;
 using Oracle.ManagedDataAccess.Client;
@@ -21,6 +27,7 @@ namespace AspNetDataAdapters
 
         private static Result End(Result result)
         {
+            result.AdapterVersion = "2021.4.1";
             try
             {
                 if (reader != null) reader.Close();

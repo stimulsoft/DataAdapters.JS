@@ -1,36 +1,13 @@
-package com.stimulsoft.js.adapter;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.TimeZone;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import com.stimulsoft.base.json.JSONArray;
-import com.stimulsoft.base.json.JSONException;
-import com.stimulsoft.base.json.JSONObject;
-import com.stimulsoft.base.system.StiSqlTypes;
-import com.stimulsoft.lib.base64.StiBase64DecoderUtil;
-
-/**
- * Copyright Stimulsoft
- */
+/*
+Stimulsoft.Reports.JS
+Version: 2021.4.1
+Build date: 2021.10.04
+License: https://www.stimulsoft.com/en/licensing/reports
+*/
 public class JSDataAdapter {
+
+    public static final String handlerVersion = "2021.4.1";
+    public static final String adapterVersion = "2021.4.1";
 
     private static final List<String> USERS_KEYS = Arrays.asList(
             new String[] { "jdbc.username", "username", "uid", "user", "user id", "userid", "connection.username" });
@@ -51,6 +28,8 @@ public class JSDataAdapter {
         HashMap<String, Object> result = new HashMap<String, Object>();
         result.put("success", false);
         result.put("notice", e.getMessage() + "<br>" + e.getStackTrace()[0]);
+        result.put("handlerVersion", handlerVersion);
+        result.put("adapterVersion", adapterVersion);
         e.printStackTrace();
         return new JSONObject(result).toString();
     }
@@ -113,6 +92,8 @@ public class JSDataAdapter {
         } else {
             HashMap<String, Object> result = new HashMap<String, Object>();
             result.put("success", true);
+            result.put("handlerVersion", handlerVersion);
+            result.put("adapterVersion", adapterVersion);
             return new JSONObject(result).toString();
         }
     }
@@ -204,6 +185,8 @@ public class JSDataAdapter {
         result.put("columns", columns);
         result.put("rows", rows);
         result.put("types", types);
+        result.put("handlerVersion", handlerVersion);
+        result.put("adapterVersion", adapterVersion);
         return new JSONObject(result).toString();
     }
 

@@ -1,8 +1,14 @@
+/*
+Stimulsoft.Reports.JS
+Version: 2021.4.1
+Build date: 2021.10.04
+License: https://www.stimulsoft.com/en/licensing/reports
+*/
 exports.process = function (command, onResult) {
-
     var end = function (result) {
         try {
             if (client) client.end();
+            result.adapterVersion = "2021.4.1";
             onResult(result);
         }
         catch (e) {
@@ -146,7 +152,7 @@ exports.process = function (command, onResult) {
                         }
                     }
 
-                    if (types[columnIndex] == "timeZ") {
+                    if (recordset.rows[recordIndex][columnName] != null && types[columnIndex] == "timeZ") {
                         var time = recordset.rows[recordIndex][columnName];
                         var offset = time.substr(time.indexOf("+"));
                         if (offset.indexOf(":") == -1) offset += ":00";

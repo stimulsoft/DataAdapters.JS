@@ -1,5 +1,20 @@
+/*
+Stimulsoft.Reports.JS
+Version: 2021.4.1
+Build date: 2021.10.04
+License: https://www.stimulsoft.com/en/licensing/reports
+*/
+/*
+Stimulsoft.Reports.JS
+Version: 2021.4.1
+Build date: 2021.09.09
+License: https://www.stimulsoft.com/en/licensing/reports
+*/
 <?php
 class StiOracleAdapter {
+	public $version = '2021.4.1';
+	public $checkVersion = true;
+	
 	private $info = null;
 	private $link = null;
 	

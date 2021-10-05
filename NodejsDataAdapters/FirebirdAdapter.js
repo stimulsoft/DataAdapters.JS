@@ -1,8 +1,14 @@
-﻿exports.process = function (command, onResult) {
-
+/*
+Stimulsoft.Reports.JS
+Version: 2021.4.1
+Build date: 2021.10.04
+License: https://www.stimulsoft.com/en/licensing/reports
+*/
+exports.process = function (command, onResult) {
     var end = function (result) {
         try {
             if (db) db.detach();
+            result.adapterVersion = "2021.4.1";
             onResult(result);
         }
         catch (e) {
