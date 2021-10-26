@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2021.4.1
-Build date: 2021.10.04
+Version: 2021.4.2
+Build date: 2021.10.25
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 /*
@@ -12,7 +12,7 @@ License: https://www.stimulsoft.com/en/licensing/reports
 */
 <?php
 
-$version = '2021.4.1';
+$version = '2021.4.2';
 
 
 // Error handlers
