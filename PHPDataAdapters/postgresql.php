@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2021.4.4
-Build date: 2021.11.18
+Version: 2022.1.1
+Build date: 2021.12.07
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 /*
@@ -12,7 +12,7 @@ License: https://www.stimulsoft.com/en/licensing/reports
 */
 <?php
 class StiPostgreSqlAdapter {
-	public $version = '2021.4.4';
+	public $version = '2022.1.1';
 	public $checkVersion = true;
 	
 	private $info = null;
