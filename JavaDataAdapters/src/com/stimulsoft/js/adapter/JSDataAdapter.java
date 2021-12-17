@@ -1,13 +1,13 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2022.1.1
-Build date: 2021.12.07
+Version: 2022.1.2
+Build date: 2021.12.15
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 public class JSDataAdapter {
 
-    public static final String handlerVersion = "2022.1.1";
-    public static final String adapterVersion = "2022.1.1";
+    public static final String handlerVersion = "2022.1.2";
+    public static final String adapterVersion = "2022.1.2";
 
     private static final List<String> USERS_KEYS = Arrays.asList(
             new String[] { "jdbc.username", "username", "uid", "user", "user id", "userid", "connection.username" });

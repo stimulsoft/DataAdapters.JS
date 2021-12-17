@@ -7,10 +7,10 @@ The database adapter is a software layer between the DBMS and the client script.
 To use this mechanism on the client side, you should specify the URL address of the host adapter, which processes requests to a required adapter
 
 Links to examples with ready data adapters, implemented for various platforms:  
-* [Node.js](https://github.com/stimulsoft/Samples-JS/tree/master/Node.js/Starting%20SQL%20adapters%20from%20the%20HTTP%20server)
-* [PHP](https://github.com/stimulsoft/Samples-JS/tree/master/PHP/Connecting%20to%20Databases)
-* [ASP.NET](https://github.com/stimulsoft/Samples-JS/tree/master/ASP.NET/Connecting%20to%20Databases)
-* [Java](https://github.com/stimulsoft/Samples-JS/tree/master/Java/Connecting%20to%20Databases)
+* [Node.js](https://github.com/stimulsoft/Samples-JS/tree/master/Node.js/04.%20Start%20SQL%20Adapters%20from%20Http%20Server)
+* [PHP](https://github.com/stimulsoft/Samples-JS/tree/master/PHP/02.%20Connect%20to%20databases)
+* [.NET](https://github.com/stimulsoft/Samples-JS/tree/master/ASP.NET/02.%20Connect%20to%20databases)
+* [Java](https://github.com/stimulsoft/Samples-JS/tree/master/Java/01.%20Data%20Adapter)
 
 ## How to use
 It`s easy to use an adapter.  
@@ -163,4 +163,4 @@ response = {
 }
 ```
 
-[The example of adapter registration](https://github.com/stimulsoft/Samples-JS/blob/master/JavaScript/Working%20with%20Designer/Using%20a%20Custom%20Data%20Adapter.html)
+[The example of adapter registration](https://github.com/stimulsoft/Samples-JS/blob/master/JavaScript/Working%20with%20report%20designer/08.%20Custom%20DataAdapter.html)
