@@ -1,12 +1,18 @@
 <?php
+# Stimulsoft.Reports.JS
+# Version: 2022.1.3
+# Build date: 2022.01.12
+# License: https://www.stimulsoft.com/en/licensing/reports
+?>
+<?php
 
 # Stimulsoft.Reports.JS
-# Version: 2022.1.2
-# Build date: 2021.12.15
+# Version: 2022.1.3
+# Build date: 2022.01.12
 # License: https://www.stimulsoft.com/en/licensing/reports
 
 class StiPostgreSqlAdapter {
-	public $version = '2022.1.2';
+	public $version = '2022.1.3';
 	public $checkVersion = true;
 	
 	private $info = null;
@@ -195,6 +201,9 @@ class StiPostgreSqlAdapter {
 	}
 	
 	public function getValue($type, $value) {
+		if ($value == null || strlen($value) == 0)
+			return null;
+		
 		switch ($type) {
 			case 'array':
 				return base64_encode($value);

@@ -1,13 +1,34 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2022.1.2
-Build date: 2021.12.15
+Version: 2022.1.3
+Build date: 2022.01.12
 License: https://www.stimulsoft.com/en/licensing/reports
 */
+
+package com.stimulsoft.js.adapter;
+
+import com.stimulsoft.base.json.JSONArray;
+import com.stimulsoft.base.json.JSONException;
+import com.stimulsoft.base.json.JSONObject;
+import com.stimulsoft.base.system.StiSqlTypes;
+import com.stimulsoft.lib.base64.StiBase64DecoderUtil;
+import com.stimulsoft.lib.base64.StiBase64EncoderUtil;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class JSDataAdapter {
 
-    public static final String handlerVersion = "2022.1.2";
-    public static final String adapterVersion = "2022.1.2";
+    public static final String handlerVersion = "2022.1.3";
+    public static final String adapterVersion = "2022.1.3";
 
     private static final List<String> USERS_KEYS = Arrays.asList(
             new String[] { "jdbc.username", "username", "uid", "user", "user id", "userid", "connection.username" });
