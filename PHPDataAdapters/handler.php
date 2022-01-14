@@ -1,17 +1,17 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2022.1.3
-# Build date: 2022.01.12
+# Version: 2022.1.4
+# Build date: 2022.01.14
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
 
 # Stimulsoft.Reports.JS
-# Version: 2022.1.3
-# Build date: 2022.01.12
+# Version: 2022.1.2
+# Build date: 2021.12.15
 # License: https://www.stimulsoft.com/en/licensing/reports
 
-$version = '2022.1.3';
+$version = '2022.1.4';
 
 
 // Error handlers

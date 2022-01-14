@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2022.1.3
-Build date: 2022.01.12
+Version: 2022.1.4
+Build date: 2022.01.14
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 
@@ -27,8 +27,8 @@ import java.util.regex.Pattern;
 
 public class JSDataAdapter {
 
-    public static final String handlerVersion = "2022.1.3";
-    public static final String adapterVersion = "2022.1.3";
+    public static final String handlerVersion = "2022.1.4";
+    public static final String adapterVersion = "2022.1.4";
 
     private static final List<String> USERS_KEYS = Arrays.asList(
             new String[] { "jdbc.username", "username", "uid", "user", "user id", "userid", "connection.username" });

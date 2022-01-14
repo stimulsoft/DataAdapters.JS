@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2022.1.3
-Build date: 2022.01.12
+Version: 2022.1.4
+Build date: 2022.01.14
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 var http = require('http');
@@ -10,8 +10,8 @@ var FirebirdAdapter = require('./FirebirdAdapter');
 var MSSQLAdapter = require('./MSSQLAdapter');
 var PostgreSQLAdapter = require('./PostgreSQLAdapter');
 
+var connectionStringBuilder;
 var response;
-
 function accept(req, res) {
     response = res;
     response.setHeader("Access-Control-Allow-Origin", "*");
@@ -25,33 +25,22 @@ function accept(req, res) {
     });
 
     req.on('end', function () {
-        var encryptResult = false;
-        if (!data.startsWith("{")) {
+        if (data.indexOf("{") != 0) {
             data = Buffer.from(data.replace(/[A-Za-z]/g, function (c) {
                 return String.fromCharCode(c.charCodeAt(0) + (c.toUpperCase() <= "M" ? 13 : -13));
             }), "base64").toString("ascii");
-            encryptResult = true;
-        }
 
-        var onProcessHandler = onProcess.bind(null, encryptResult);
+        }
 
         command = JSON.parse(data.toString());
 
-        if (command.command === "GetSupportedAdapters") {
-            let result = {
-                success: true,
-                types: ["MySQL", "MS SQL", "Firebird", "PostgreSQL"]
-            };
-            onProcessHandler(result);
-        } else {
-            command.queryString = applyQueryParameters(command.queryString, command.parameters, command.escapeQueryParameters);
+        command.queryString = applyQueryParameters(command.queryString, command.parameters, command.escapeQueryParameters);
 
-            if (command.database == "MySQL") MySQLAdapter.process(command, onProcessHandler);
-            else if (command.database == "Firebird") FirebirdAdapter.process(command, onProcessHandler);
-            else if (command.database == "MS SQL") MSSQLAdapter.process(command, onProcessHandler);
-            else if (command.database == "PostgreSQL") PostgreSQLAdapter.process(command, onProcessHandler);
-            else onProcessHandler({ success: false, notice: "Database '" + command.database + "' not supported!" });
-        }
+        if (command.database == "MySQL") MySQLAdapter.process(command, onProcess);
+        else if (command.database == "Firebird") FirebirdAdapter.process(command, onProcess);
+        else if (command.database == "MS SQL") MSSQLAdapter.process(command, onProcess);
+        else if (command.database == "PostgreSQL") PostgreSQLAdapter.process(command, onProcess);
+        else onResult({ success: false, notice: "Database '" + command.database + "' not supported!" });
     });
 }
 
@@ -92,15 +81,9 @@ var applyQueryParameters = function (baseSqlCommand, parameters, escapeQueryPara
     return result + baseSqlCommand;
 }
 
-var onProcess = function (encryptData, result) {
-    result.handlerVersion = "2022.1.3";
-    result = JSON.stringify(result);
-    if (encryptData) {
-        result = Buffer.from(result).toString("base64").replace(/[A-Za-z]/g, function (c) {
-            return String.fromCharCode(c.charCodeAt(0) + (c.toUpperCase() <= "M" ? 13 : -13));
-        });
-    }
-    response.end(result);
+var onProcess = function (result) {
+    result.handlerVersion = "2022.1.4";
+    response.end(JSON.stringify(result));
 }
 
 http.createServer(accept).listen(9615);

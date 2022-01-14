@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2022.1.3
-# Build date: 2022.01.12
+# Version: 2022.1.4
+# Build date: 2022.01.14
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -12,7 +12,7 @@
 # License: https://www.stimulsoft.com/en/licensing/reports
 
 class StiMsSqlAdapter {
-	public $version = '2022.1.3';
+	public $version = '2022.1.4';
 	public $checkVersion = true;
 	
 	private $info = null;
