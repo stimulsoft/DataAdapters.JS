@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2022.1.4
-Build date: 2022.01.14
+Version: 2022.1.5
+Build date: 2022.01.27
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 var http = require('http');
@@ -82,7 +82,7 @@ var applyQueryParameters = function (baseSqlCommand, parameters, escapeQueryPara
 }
 
 var onProcess = function (result) {
-    result.handlerVersion = "2022.1.4";
+    result.handlerVersion = "2022.1.5";
     response.end(JSON.stringify(result));
 }
 
