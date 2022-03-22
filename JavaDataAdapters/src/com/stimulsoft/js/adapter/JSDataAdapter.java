@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2022.1.6
-Build date: 2022.02.11
+Version: 2022.2.1
+Build date: 2022.03.21
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 
@@ -27,16 +27,17 @@ import java.util.regex.Pattern;
 
 public class JSDataAdapter {
 
-    public static final String handlerVersion = "2022.1.6";
-    public static final String adapterVersion = "2022.1.6";
+    public static final String handlerVersion = "2022.2.1";
+    public static final String adapterVersion = "2022.2.1";
+    public static final boolean checkVersion = true;
 
     private static final List<String> USERS_KEYS = Arrays.asList(
-            new String[] { "jdbc.username", "username", "uid", "user", "user id", "userid", "connection.username" });
-    private static final List<String> PASSWORD_KEYS = Arrays.asList(new String[] { "jdbc.password", "pwd", "password", "connection.password" });
-    private static final List<String> HOST_KEY = Arrays.asList(new String[] { "host", "server", "location", "data source" });
-    private static final List<String> PORT_KEY = Arrays.asList(new String[] { "port" });
-    private static final List<String> DATABASE_KEY = Arrays.asList(new String[] { "database", "database name", "databasename", "initial catalog", "sid" });
-    protected static final List<String> URL_KEYS = Arrays.asList(new String[] { "jdbc.url", "connectionurl", "url", "connection.url" });
+            "jdbc.username", "username", "uid", "user", "user id", "userid", "connection.username");
+    private static final List<String> PASSWORD_KEYS = Arrays.asList("jdbc.password", "pwd", "password", "connection.password");
+    private static final List<String> HOST_KEY = Arrays.asList("host", "server", "location", "data source", "datasource");
+    private static final List<String> PORT_KEY = Collections.singletonList("port");
+    private static final List<String> DATABASE_KEY = Arrays.asList("database", "database name", "databasename", "initial catalog", "sid");
+    protected static final List<String> URL_KEYS = Arrays.asList("jdbc.url", "connectionurl", "url", "connection.url");
     private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss");
     private static final SimpleDateFormat mysqlDateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss");
     private static final TimeZone timeZone = TimeZone.getTimeZone("UTC");
@@ -46,11 +47,12 @@ public class JSDataAdapter {
     }
 
     private static String onError(Exception e) {
-        HashMap<String, Object> result = new HashMap<String, Object>();
+        HashMap<String, Object> result = new HashMap<>();
         result.put("success", false);
         result.put("notice", e.getMessage() + "<br>" + e.getStackTrace()[0]);
         result.put("handlerVersion", handlerVersion);
         result.put("adapterVersion", adapterVersion);
+        result.put("checkVersion", checkVersion);
         e.printStackTrace();
         return new JSONObject(result).toString();
     }
@@ -64,7 +66,8 @@ public class JSDataAdapter {
             Properties info = new Properties();
             info.setProperty("user", getUser(params));
             info.setProperty("password", getPassword(params));
-            if (!(connectionString.contains("Encoding") || connectionString.contains("encoding")) || params.containsKey("characterEncoding")) {
+            if (!(connectionString.contains("Encoding") || connectionString.contains("encoding"))
+                    || params.containsKey("characterencoding") || params.containsKey("charset")) {
                 info.setProperty("useUnicode", "true");
                 info.setProperty("characterEncoding", "UTF-8");
             }
@@ -72,7 +75,7 @@ public class JSDataAdapter {
             String url = getUrl(params);
 
             if ("MySQL".equals(dbName)) {
-                Class.forName("com.mysql.jdbc.Driver");
+                Class.forName("com.mysql.cj.jdbc.Driver");
                 if (url == null) {
                     url = String.format("jdbc:mysql://%s:%s/%s", getHost(params), getPort(params, "3306"), getDatabase(params));
                 }
@@ -86,6 +89,13 @@ public class JSDataAdapter {
                 if (url == null) {
                     url = String.format("jdbc:postgresql://%s:%s/%s", getHost(params), getPort(params, "5432"), getDatabase(params));
                 }
+            } else if ("Firebird".equals(dbName)) {
+                Class.forName("org.firebirdsql.jdbc.FBDriver");
+                if (url == null) {
+                    url = String.format("jdbc:firebirdsql://%s:%s/%s", getHost(params), getPort(params, "3050"), getDatabase(params));
+                }
+                String charSet = params.get("charset");
+                info.setProperty("encoding", charSet == null? "UTF8": charSet);
             } else if ("Oracle".equals(dbName)) {
                 Class.forName("oracle.jdbc.OracleDriver");
                 if (url == null) {
@@ -95,6 +105,7 @@ public class JSDataAdapter {
                     }
                 }
             }
+            //noinspection ConstantConditions
             con = DriverManager.getConnection(url, info);
             return onConnect(command, con, dbName);
         } catch (Exception e) {
@@ -109,24 +120,25 @@ public class JSDataAdapter {
     private static String onConnect(JSONObject command, Connection con, String dbName) throws JSONException {
         if (command.has("queryString")) {
             return query(applyQueryParameters(command.getString("queryString"), command.has("parameters") ? command.getJSONArray("parameters") : null,
-                    command.has("escapeQueryParameters") ? command.getBoolean("escapeQueryParameters") : false), con, dbName);
+                    command.has("escapeQueryParameters") && command.getBoolean("escapeQueryParameters")), con, dbName);
         } else {
-            HashMap<String, Object> result = new HashMap<String, Object>();
+            HashMap<String, Object> result = new HashMap<>();
             result.put("success", true);
             result.put("handlerVersion", handlerVersion);
             result.put("adapterVersion", adapterVersion);
+            result.put("checkVersion", checkVersion);
             return new JSONObject(result).toString();
         }
     }
 
     private static String applyQueryParameters(String baseSqlCommand, JSONArray parameters, Boolean escapeQueryParameters) throws JSONException {
-        if (baseSqlCommand == null || baseSqlCommand.indexOf("@") < 0) {
+        if (baseSqlCommand == null || !baseSqlCommand.contains("@")) {
             return baseSqlCommand;
         }
 
-        String result = "";
-        while (baseSqlCommand.indexOf("@") >= 0 && parameters != null) {
-            result += baseSqlCommand.substring(0, baseSqlCommand.indexOf("@"));
+        StringBuilder result = new StringBuilder();
+        while (baseSqlCommand.contains("@") && parameters != null) {
+            result.append(baseSqlCommand, 0, baseSqlCommand.indexOf("@"));
             baseSqlCommand = baseSqlCommand.substring(baseSqlCommand.indexOf("@") + 1);
 
             String parameterName = "";
@@ -150,16 +162,16 @@ public class JSDataAdapter {
             if (parameter != null) {
                 if (!parameter.tryGetString("typeGroup").equals("number")) {
                     if (escapeQueryParameters)
-                        result += "'" + parameter.tryGetString("value").replace("\\", "\\\\").replace("'", "\\'").replace("\"", "\\\"") + "'";
+                        result.append("'").append(parameter.tryGetString("value").replace("\\", "\\\\").replace("'", "\\'").replace("\"", "\\\"")).append("'");
                     else
-                        result += "'" + parameter.tryGetString("value") + "'";
+                        result.append("'").append(parameter.tryGetString("value")).append("'");
                 } else
-                    result += parameter.tryGetString("value");
+                    result.append(parameter.tryGetString("value"));
             } else
-                result += "@" + parameterName;
+                result.append("@").append(parameterName);
         }
 
-        return result;
+        return result.toString();
     }
 
     private static String query(String queryString, Connection con, String dbName) {
@@ -173,25 +185,28 @@ public class JSDataAdapter {
     }
 
     private static String onQuery(ResultSet rs, String dbName) throws SQLException {
-        List<String> columns = new ArrayList<String>();
-        List<List<String>> rows = new ArrayList<List<String>>();
-        List<String> types = new ArrayList<String>();
+        List<String> columns = new ArrayList<>();
+        List<List<String>> rows = new ArrayList<>();
+        List<String> types = new ArrayList<>();
         boolean isColumnsFill = false;
         while (rs.next()) {
-            List<String> row = new ArrayList<String>();
+            List<String> row = new ArrayList<>();
             for (int index = 1; index <= rs.getMetaData().getColumnCount(); index++) {
                 if (!isColumnsFill) {
                     columns.add(rs.getMetaData().getColumnName(index));
                     types.add(getColumnType(rs.getMetaData().getColumnType(index)));
                 }
+                String columnType = types.get(index - 1);
                 String value = "";
                 if (rs.getString(index) != null) {
-                    if ("datetime".equals(types.get(index - 1))) {
+                    if ("datetime".equals(columnType)) {
                         if ("MySQL".equals(dbName)) {
                             value = mysqlDateFormatter.format(rs.getTimestamp(index));
                         } else {
                             value = dateFormatter.format(rs.getTimestamp(index));
                         }
+                    } else if ("array".equals(columnType)) {
+                        value = new String(StiBase64EncoderUtil.encode(rs.getBytes(index)));
                     } else {
                         value = rs.getString(index);
                     }
@@ -201,13 +216,14 @@ public class JSDataAdapter {
             rows.add(row);
             isColumnsFill = true;
         }
-        HashMap<String, Object> result = new HashMap<String, Object>();
+        HashMap<String, Object> result = new HashMap<>();
         result.put("success", true);
         result.put("columns", columns);
         result.put("rows", rows);
         result.put("types", types);
         result.put("handlerVersion", handlerVersion);
         result.put("adapterVersion", adapterVersion);
+        result.put("checkVersion", checkVersion);
         return new JSONObject(result).toString();
     }
 
@@ -268,20 +284,39 @@ public class JSDataAdapter {
     public static String process(InputStream is) throws IOException, SQLException, JSONException {
         BufferedReader r = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
         StringBuilder command = new StringBuilder();
-        String str = null;
+        String str;
         while ((str = r.readLine()) != null) {
             command.append(str);
         }
+        boolean encryptData = false;
         if (command.charAt(0) != '{') {
             byte[] decoded = StiBase64DecoderUtil.decode(rot13(command).toString());
-            command = new StringBuilder(new String(decoded, "UTF-8"));
+            command = new StringBuilder(new String(decoded, StandardCharsets.UTF_8));
+            encryptData = true;
         }
-        return connect(new JSONObject(command.toString()));
+
+        JSONObject commandData = new JSONObject(command.toString());
+        String result;
+        if (commandData.getString("command").equals("GetSupportedAdapters")) {
+            JSONObject resultData = new JSONObject();
+            resultData.put("success", true);
+            resultData.put("types", new String[] {
+                "MySQL", "MS SQL", "PostgreSQL", "Oracle", "Firebird"
+            });
+            result = resultData.toString();
+        } else {
+            result = connect(commandData);
+        }
+
+        if (encryptData) {
+            result = rot13(new StringBuilder(StiBase64EncoderUtil.encode(result))).toString();
+        }
+        return result;
     }
 
     private static Map<String, String> parseParams(String string) {
         String[] keyValues = string.split(";");
-        Map<String, String> result = new HashMap<String, String>();
+        Map<String, String> result = new HashMap<>();
         for (String element : keyValues) {
             String[] keyValue = element.split("=", 2);
             String originalKey = keyValue[0];
@@ -333,9 +368,9 @@ public class JSDataAdapter {
         if (dataSource != null) {
             Pattern pattern = Pattern.compile("\\([^()]*\\)");
             Matcher matcher = pattern.matcher(dataSource);
-            List<String> values = new ArrayList<String>();
+            List<String> values = new ArrayList<>();
             while (matcher.find()) {
-                values.add(matcher.group().replaceAll("\\(|\\)", ""));
+                values.add(matcher.group().replaceAll("[()]", ""));
             }
             return parseParams(String.join(";", values));
         }

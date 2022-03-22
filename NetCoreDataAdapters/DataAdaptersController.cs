@@ -1,13 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2022.1.3
-Build date: 2022.01.12
-License: https://www.stimulsoft.com/en/licensing/reports
-*/
-﻿/*
-Stimulsoft.Reports.JS
-Version: 2022.1.1
-Build date: 2021.12.21
+Version: 2022.2.1
+Build date: 2022.03.21
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 using FirebirdSql.Data.FirebirdClient;
@@ -42,6 +36,8 @@ namespace NetCoreDataAdapters
         public string AdapterVersion { get; set; }
 
         public string HandlerVersion { get; set; }
+
+        public bool CheckVersion { get; set; }
     }
 
     public class CommandJson
@@ -90,7 +86,7 @@ namespace NetCoreDataAdapters
         private Regex serverCertificateRegex = new Regex(@"Trust\s*Server\s*Certificate\s*=", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private async Task ProcessRequest()
-        {        
+        {
             var result = new Result { Success = true };
             var encodeResult = false;
 
@@ -116,7 +112,7 @@ namespace NetCoreDataAdapters
                     result.Success = true;
                     result.Types = new string[] { "MySQL", "Firebird", "MS SQL", "PostgreSQL", "Oracle" };
                 }
-                else 
+                else
                 {
                     command.QueryString = ApplyQueryParameters(command.QueryString, command.Parameters, command.EscapeQueryParameters);
 
@@ -127,7 +123,7 @@ namespace NetCoreDataAdapters
                         case "MS SQL":
                             if (!serverCertificateRegex.IsMatch(command.ConnectionString))
                                 command.ConnectionString += (command.ConnectionString.TrimEnd().EndsWith(";") ? "" : ";") + "TrustServerCertificate=true;";
-                            result = SQLAdapter.Process(command, new SqlConnection(command.ConnectionString)); 
+                            result = SQLAdapter.Process(command, new SqlConnection(command.ConnectionString));
                             break;
                         case "PostgreSQL": result = SQLAdapter.Process(command, new NpgsqlConnection(command.ConnectionString)); break;
                         case "Oracle": result = SQLAdapter.Process(command, new OracleConnection(command.ConnectionString)); break;
@@ -141,7 +137,8 @@ namespace NetCoreDataAdapters
                 result.Notice = e.Message;
             }
 
-            result.HandlerVersion = "2022.1.3";
+            result.HandlerVersion = "2022.2.1";
+            result.CheckVersion = true;
 
             var contentType = "application/json";
             var resultText = JsonSerializer.Serialize(result, jsonOptions);

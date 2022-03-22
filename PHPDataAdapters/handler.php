@@ -1,17 +1,12 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2022.1.6
-# Build date: 2022.02.11
+# Version: 2022.2.1
+# Build date: 2022.03.21
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
 
-# Stimulsoft.Reports.JS
-# Version: 2022.1.2
-# Build date: 2021.12.15
-# License: https://www.stimulsoft.com/en/licensing/reports
-
-$version = '2022.1.6';
+$version = '2022.2.1';
 
 
 // Error handlers
@@ -86,9 +81,11 @@ class StiRequest {
 	
 	public function parse() {
 		$input = file_get_contents('php://input');
-		
-		if (strlen($input) > 0 && mb_substr($input, 0, 1) != '{')
-			$input = base64_decode(str_rot13($input));
+
+        if (strlen($input) > 0 && mb_substr($input, 0, 1) != '{') {
+            $input = base64_decode(str_rot13($input));
+            StiResponse::$encodeResponse = true;
+        }
 		
 		$obj = json_decode($input);
 		if ($obj == null) {
@@ -100,25 +97,32 @@ class StiRequest {
 		}
 		
 		if (isset($obj->command)) $this->command = $obj->command;
-		if ($this->command != 'TestConnection' && $this->command != 'ExecuteQuery')
-			return StiResult::error('Unknown command ['.$this->command.']');
-		
-		if (isset($obj->connectionString)) $this->connectionString = $obj->connectionString;
-		if (isset($obj->queryString)) $this->queryString = $obj->queryString;
-		if (isset($obj->database)) $this->database = $obj->database;
-		if (isset($obj->dataSource)) $this->dataSource = $obj->dataSource;
-		if (isset($obj->connection)) $this->connection = $obj->connection;
-		if (isset($obj->timeout)) $this->timeout = $obj->timeout;
-		
-		return StiResult::success(null, $this);
+        if ($this->command != 'GetSupportedAdapters') {
+            if ($this->command != 'TestConnection' && $this->command != 'ExecuteQuery')
+                return StiResult::error('Unknown command ['.$this->command.']');
+
+            if (isset($obj->connectionString)) $this->connectionString = $obj->connectionString;
+            if (isset($obj->queryString)) $this->queryString = $obj->queryString;
+            if (isset($obj->database)) $this->database = $obj->database;
+            if (isset($obj->dataSource)) $this->dataSource = $obj->dataSource;
+            if (isset($obj->connection)) $this->connection = $obj->connection;
+            if (isset($obj->timeout)) $this->timeout = $obj->timeout;
+        }
+
+        return StiResult::success(null, $this);
 	}
 }
 
 class StiResponse {
+    public static $encodeResponse = false;
+
 	public static function json($result, $exit = true) {
 		unset($result->object);
-		if (defined('JSON_UNESCAPED_SLASHES')) echo json_encode($result, JSON_UNESCAPED_SLASHES);
-		else echo json_encode($result);
+        $result = defined('JSON_UNESCAPED_SLASHES') ? json_encode($result, JSON_UNESCAPED_SLASHES) : json_encode($result);
+		if (StiResponse::$encodeResponse) {
+            $result = str_rot13(base64_encode($result));
+        }
+        echo $result;
 		if ($exit) exit;
 	}
 }
@@ -150,16 +154,21 @@ function getDataAdapter($request) {
 $request = new StiRequest();
 $result = $request->parse();
 if ($result->success) {
-	$result = getDataAdapter($request);
-	$dataAdapter = $result->object;
-	if ($result->success) {
-		$result = $request->command == 'TestConnection'
-			? $dataAdapter->test()
-			: $dataAdapter->execute($request->queryString);
-		$result->handlerVersion = $version;
-		$result->adapterVersion = $dataAdapter->version;
-		$result->checkVersion = $dataAdapter->checkVersion;
-	}
+    if ($result->object->command == 'GetSupportedAdapters') {
+        $result = array(
+            'success' => true,
+            'types' => ['MySQL', 'MS SQL', 'Firebird', 'PostgreSQL', 'Oracle', 'ODBC']
+        );
+    } else {
+        $result = getDataAdapter($request);
+        $dataAdapter = $result->object;
+        $result = $request->command == 'TestConnection'
+            ? $dataAdapter->test()
+            : $dataAdapter->execute($request->queryString);
+        $result->handlerVersion = $version;
+        $result->adapterVersion = $dataAdapter->version;
+        $result->checkVersion = $dataAdapter->checkVersion;
+    }
 }
 
 StiResponse::json($result);

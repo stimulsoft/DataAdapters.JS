@@ -1,18 +1,12 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2022.1.6
-# Build date: 2022.02.11
+# Version: 2022.2.1
+# Build date: 2022.03.21
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
-
-# Stimulsoft.Reports.JS
-# Version: 2022.1.2
-# Build date: 2021.12.15
-# License: https://www.stimulsoft.com/en/licensing/reports
-
 class StiMsSqlAdapter {
-	public $version = '2022.1.6';
+	public $version = '2022.2.1';
 	public $checkVersion = true;
 	
 	private $info = null;
@@ -284,7 +278,7 @@ class StiMsSqlAdapter {
 	}
 	
 	public function getValue($type, $value) {
-		if ($value == null || strlen($value) == 0)
+		if (is_null($value) || strlen($value) == 0)
 			return null;
 		
 		switch ($type) {
@@ -292,15 +286,24 @@ class StiMsSqlAdapter {
 				return base64_encode($value);
 			
 			case 'datetime':
-				return date("Y-m-d\TH:i:s.v", strtotime($value));
+				$timestamp = strtotime($value);
+				$format = date("Y-m-d\TH:i:s.v", $timestamp);
+				if (strpos($format, '.v') > 0) $format = date("Y-m-d\TH:i:s.000", $timestamp);
+				return $format;
 				
 			case 'datetimeoffset':
 				$offset = substr($value, strpos($value, '+'));
 				$value = substr($value, 0, strpos($value, '+'));
-				return date("Y-m-d\TH:i:s.v", strtotime($value)).$offset;
+				$timestamp = strtotime($value);
+				$format = date("Y-m-d\TH:i:s.v", $timestamp);
+				if (strpos($format, '.v') > 0) $format = date("Y-m-d\TH:i:s.000", $timestamp);
+				return $format.$offset;
 			
 			case 'time':
-				return date("H:i:s.v", strtotime($value));
+				$timestamp = strtotime($value);
+				$format = date("H:i:s.v", $timestamp);
+				if (strpos($format, '.v') > 0) $format = date("H:i:s.000", $timestamp);
+				return $format;
 		}
 		
 		return $value;
