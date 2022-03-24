@@ -15,4 +15,4 @@ StiOptions.WebServer.url = "http://localhost/handler.php";
 
 In the handler.php file, you can change all parameters passed from the JS client-side.
 
-A [sample](https://github.com/stimulsoft/Samples-JS/tree/master/PHP/02.%20Connect%20to%20databases) shows how to run an adapter.
+A [sample](https://github.com/stimulsoft/Samples-JS/tree/master/PHP/Connecting%20to%20Databases) shows how to run an adapter.

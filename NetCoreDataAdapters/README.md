@@ -5,9 +5,9 @@ Then, in your code, you should specify the address to the DataAdaptersController
 
 index.html
 ```js
-StiOptions.WebServer.url = "https://localhost:44355";
+StiOptions.WebServer.url = "https://localhost:44355/DataAdapters";
 ```
 
 In the DataAdaptersController.cs file, you can change all parameters passed from the JS client-side.
 
-A [sample](https://github.com/stimulsoft/Samples-JS/tree/master/ASP.NET Core/Connect%20to%20databases) shows how to run an adapter.
+A [sample](https://github.com/stimulsoft/Samples-JS/tree/master/ASP.NET%20Core/Connecting%20to%20Databases) shows how to run an adapter.

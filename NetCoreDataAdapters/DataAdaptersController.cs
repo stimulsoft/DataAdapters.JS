@@ -66,7 +66,7 @@ namespace NetCoreDataAdapters
         public string TypeGroup { get; set; }
     }
 
-    [Route("/")]
+    [Route("/DataAdapters")]
     [ApiController]
     public class DataAdaptersController : ControllerBase
     {
