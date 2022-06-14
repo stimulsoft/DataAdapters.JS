@@ -1,6 +1,6 @@
 {
     "name": "stimulsoft-data-adapter",
-    "version": "2022.2.6",
+    "version": "2022.3.1",
     "description": "Nodejs data adapter for Stimulsoft Reports.JS",
     "main": "index.js",
     "scripts": {
@@ -12,7 +12,7 @@
     },
     "dependencies": {
         "mssql": "^6.2.1",
-        "mysql": "^2.15.0",
+        "mysql2": "^2.3.3",
         "node-firebird": "^0.9.8",
         "pg": "^8.3.3",
         "tzdata": "^1.0.25"
