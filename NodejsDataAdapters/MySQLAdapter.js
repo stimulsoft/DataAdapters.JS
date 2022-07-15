@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2022.3.2
-Build date: 2022.06.23
+Version: 2022.3.3
+Build date: 2022.07.15
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 exports.process = function (command, onResult) {
@@ -10,7 +10,7 @@ exports.process = function (command, onResult) {
             if (connection) {
                 connection.end();
             }
-            result.adapterVersion = "2022.3.2";
+            result.adapterVersion = "2022.3.3";
             onResult(result);
         }
         catch (e) {
@@ -122,9 +122,14 @@ exports.process = function (command, onResult) {
                     }
 
                     if (recordset[recordIndex][columnName] != null && typeof recordset[recordIndex][columnName].toISOString === "function") {
-                        var dateTime = new Date(recordset[recordIndex][columnName].getTime() - (recordset[recordIndex][columnName].getTimezoneOffset() * 60000)).toISOString();
-                        recordset[recordIndex][columnName] = dateTime.replace("Z", "");
+                        var time = recordset[recordIndex][columnName].getTime();
                         types[columnIndex] = "datetime";
+                        if (isNaN(time)) {
+                            recordset[recordIndex][columnName] = null;
+                        } else {
+                            var dateTime = new Date(time - (recordset[recordIndex][columnName].getTimezoneOffset() * 60000)).toISOString();
+                            recordset[recordIndex][columnName] = dateTime.replace("Z", "");
+                        }
                     }
 
                     row[columnIndex] = recordset[recordIndex][columnName];

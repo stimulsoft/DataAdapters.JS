@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2022.3.2
-Build date: 2022.06.23
+Version: 2022.3.3
+Build date: 2022.07.15
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 
@@ -100,13 +100,13 @@ function getResponse(result) {
     return result
 }
 function onProcess(onResult, encryptData, result) {
-    result.handlerVersion = "2022.3.2";
+    result.handlerVersion = "2022.3.3";
     result.checkVersion = true;
     result.encryptData = encryptData;
     onResult(result);
 }
 
-module.exports = { getCommand, process };
+module.exports = { getCommand, process, getResponse };
 
 if (require.main === module) {
     var http = require('http');
