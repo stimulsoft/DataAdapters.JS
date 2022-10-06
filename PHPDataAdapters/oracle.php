@@ -1,12 +1,12 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2022.4.1
-# Build date: 2022.09.26
+# Version: 2022.4.2
+# Build date: 2022.10.04
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
 class StiOracleAdapter {
-	public $version = '2022.4.1';
+	public $version = '2022.4.2';
 	public $checkVersion = true;
 	
 	private $info = null;
