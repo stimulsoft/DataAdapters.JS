@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2022.4.5
-Build date: 2022.11.17
+Version: 2023.1.1
+Build date: 2022.12.07
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 
@@ -27,7 +27,11 @@ function process(command, onResult) {
     if (command.command === "GetSupportedAdapters") {
         onProcessHandler({ success: true, types: ["MySQL", "MS SQL", "Firebird", "PostgreSQL"] });
     } else {
-        command.queryString = applyQueryParameters(command.queryString, command.parameters, command.escapeQueryParameters);
+        if (command.parameters){
+            command.parameters.forEach(parameter => {
+                if (parameter.name.length > 1 && parameter.name[0] == "@") parameter.name = parameter.name.substring(1);
+            })
+        }
 
         if (command.database == "MySQL") {
             var MySQLAdapter = require('./MySQLAdapter');
@@ -49,43 +53,6 @@ function process(command, onResult) {
     }
 }
 
-function applyQueryParameters(baseSqlCommand, parameters, escapeQueryParameters) {
-    if (baseSqlCommand == null || baseSqlCommand.indexOf("@") < 0) return baseSqlCommand;
-
-    var result = "";
-    while (baseSqlCommand.indexOf("@") >= 0 && parameters != null && parameters.length > 0) {
-        result += baseSqlCommand.substring(0, baseSqlCommand.indexOf("@"));
-        baseSqlCommand = baseSqlCommand.substring(baseSqlCommand.indexOf("@") + 1);
-
-        var parameterName = "";
-
-        while (baseSqlCommand.length > 0) {
-            var char = baseSqlCommand.charAt(0);
-            if (char.length === 1 && char.match(/[a-zA-Z0-9_-]/i)) {
-                parameterName += char;
-                baseSqlCommand = baseSqlCommand.substring(1);
-            }
-            else break;
-        }
-
-        var parameter = parameters.find(parameter => parameter.name.toLowerCase() == parameterName.toLowerCase());
-        if (parameter) {
-            if (parameter.typeGroup != "number") {
-                if (escapeQueryParameters)
-                    result += "'" + parameter.value.toString().replace(/\\/gi, "\\\\").replace(/\'/gi, "\\\'").replace(/\"/gi, "\\\"") + "'";
-                else
-                    result += "'" + parameter.value.toString() + "'";
-            }
-            else
-                result += parameter.value.toString();
-        }
-        else
-            result += "@" + parameterName;
-    }
-
-    return result + baseSqlCommand;
-}
-
 function getResponse(result) {
     let encryptData = result.encryptData;
     delete result.encryptData;
@@ -100,7 +67,7 @@ function getResponse(result) {
     return result
 }
 function onProcess(onResult, encryptData, result) {
-    result.handlerVersion = "2022.4.5";
+    result.handlerVersion = "2023.1.1";
     result.checkVersion = true;
     result.encryptData = encryptData;
     onResult(result);

@@ -1,14 +1,14 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2022.4.5
-Build date: 2022.11.17
+Version: 2023.1.1
+Build date: 2022.12.07
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 exports.process = function (command, onResult) {
     var end = function (result) {
         try {
             if (client) client.end();
-            result.adapterVersion = "2022.4.5";
+            result.adapterVersion = "2023.1.1";
             onResult(result);
         }
         catch (e) {
@@ -27,8 +27,8 @@ exports.process = function (command, onResult) {
             });
         }
 
-        var query = function (queryString) {
-            client.query(queryString, function (error, recordset) {
+        var query = function (queryString, parameters) {
+            client.query(queryString, parameters, function (error, recordset) {
                 if (error) onError(error.message);
                 else {
                     onQuery(recordset);
@@ -37,7 +37,13 @@ exports.process = function (command, onResult) {
         }
 
         var onConnect = function () {
-            if (command.queryString) query(command.queryString);
+            if (command.queryString) {
+                if (command.command == "Execute")
+                    command.queryString = "CALL " + command.queryString + "(" + command.parameters.map(parameter => "@" + parameter.name).join(", ") +")";
+                    
+                var {queryString, parameters}  = applyQueryParameters(command.queryString, command.parameters, command.escapeQueryParameters);
+                query(queryString, parameters);
+            }
             else end({ success: true });
         }
 
@@ -226,6 +232,42 @@ exports.process = function (command, onResult) {
 
             return info;
         };
+
+        var applyQueryParameters = function (baseSqlCommand, baseParameters, escapeQueryParameters) {
+            var parameters = [];
+            var result = "";
+
+            if (baseSqlCommand != null && baseSqlCommand.indexOf("@") > -1) {
+                while (baseSqlCommand.indexOf("@") >= 0 && baseParameters != null && baseParameters.length > 0) {
+                    result += baseSqlCommand.substring(0, baseSqlCommand.indexOf("@"));
+                    baseSqlCommand = baseSqlCommand.substring(baseSqlCommand.indexOf("@") + 1);
+
+                    var parameterName = "";
+
+                    while (baseSqlCommand.length > 0) {
+                        var char = baseSqlCommand.charAt(0);
+                        if (char.length === 1 && char.match(/[a-zA-Z0-9_-]/i)) {
+                            parameterName += char;
+                            baseSqlCommand = baseSqlCommand.substring(1);
+                        }
+                        else break;
+                    }
+
+                    var parameter = baseParameters.find(parameter => parameter.name.toLowerCase() == parameterName.toLowerCase());
+                    if (parameter) {
+                        if (parameter.index == null) {
+                            parameters.push(parameter.value);
+                            parameter.index = parameters.length;
+                        }
+                        result += '"' + parameter.name +'" := $' + parameter.index.toString();
+                    }
+                    else
+                        result += "@" + parameterName;
+                }
+            }
+
+            return { queryString: result + baseSqlCommand, parameters };
+        }
 
         var pg = require('pg');
         if (command.connectionString.startsWith("postgres://")) command.postgreConnectionString = command.connectionString

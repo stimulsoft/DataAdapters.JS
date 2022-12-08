@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2022.4.5
-# Build date: 2022.11.15
+# Version: 2023.1.1
+# Build date: 2022.12.06
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -14,7 +14,7 @@ use Stimulsoft\Enums\StiDataCommand;
 
 class StiDataHandler
 {
-    public $version = '2022.4.5';
+    public $version = '2023.1.1';
 
     private function stiErrorHandler($errNo, $errStr, $errFile, $errLine)
     {
@@ -72,8 +72,9 @@ class StiDataHandler
         return $result;
     }
 
-    public function __construct()
+    public function __construct($registerErrorHandlers = true)
     {
-        $this->registerErrorHandlers();
+        if ($registerErrorHandlers)
+            $this->registerErrorHandlers();
     }
 }

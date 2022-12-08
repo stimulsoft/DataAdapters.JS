@@ -1,4 +1,4 @@
-﻿{
+{
   "iisSettings": {
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
@@ -9,14 +9,13 @@
   },
   "profiles": {
     "IIS Express": {
-      "commandName": "IISExpress",      
+      "commandName": "IISExpress",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
     "NetCoreDataAdapters": {
       "commandName": "Project",
-      "dotnetRunMessages": "true",
       "applicationUrl": "https://localhost:44355;http://localhost:17186",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
