@@ -84,21 +84,33 @@ StiOptions.WebServer.checkDataAdaptersVersion = false;
 ```
 Disable the check of the data adapter version and the Stimulsoft.Report.Engine version.
 
-## CustomDataAdapter
-Also, you may register your data adapter. To do it you should invoke the following option:
+## Custom Database
+Also, you may register your database type. To do it you should invoke function with the options:
+
 ```js
 Stimulsoft.Report.Dictionary.StiCustomDatabase.registerCustomDatabase(options);
 ```
 
 The options are the set of properties and the `process()` function, which will be invoked when requesting data:
-* `serviceName`: adapter name which will be displayed in the designer when creating a new connection
+* `serviceName`: database name which will be displayed in the designer when creating a new connection
 * `sampleConnectionString`: the sample of a connection string that is inserted in the form of setting up a new connection
 * `process`: the function, which will be invoked to prepare and transmit data to the Stimulsoft.Report.Engine
-            
-Two arguments are transmitted to the input of the `process()` function: `command` and` callback`. 
+
+Two arguments are transmitted to the input of the `process()` function: `command` and` callback`.
+Sample:
+```js
+var options = {
+    serviceName: "MyDatabase",
+    sampleConnectionString: "MyConnectionString",
+    process: function (command, callback) {
+        if (command.command == "TestConnection") callback({ success: false, notice: "Error" });
+        if (command.command == "RetrieveSchema") callback({ success: true, types: demoDataTypes });
+        if (command.command == "RetrieveData") callback({ success: true, rows: demoDataRows, columns: demoDataColumns, types: demoDataTypes] });
+    }
+}
+```
 
 The `command` argument is the JSON object, where the Stimulsoft.Report.Engine will transfer the following parameters:
-
 * `command`: action, which is being invoked at the moment. Possible values:
     "*TestConnection*": test the database connection from the new connection creation form
     "*RetrieveSchema*": retrieving data schema is needed to optimize a request and not only to transfer necessary data set. It is invokes after connection creation
@@ -108,12 +120,25 @@ The `command` argument is the JSON object, where the Stimulsoft.Report.Engine wi
 * `database`: database type
 * `timeout`: the time of request waiting, specified in the data source
 
+Sample:
+```js
+command = {
+    command: "RetrieveData",
+    connectionString: "MyConnectionString",
+    queryString: "MyQuery",
+    database: "MyDatabase",
+    timeout: 30
+}
+```
+
 The `callback` argument is the function, which should be invoked to transmit prepared data to the Stimulsoft.Report.Engine. As the `callback` argument to the functions you must pass a JSON object with the following parameters:
 * `success`: the flag of successful command execution
 * `notice`: if the flag of command execution has the false value, this parameter should contain an error description
 * `rows`: strings array, each element is the array from values, the index is the column number
 * `columns`: columns name array, the index is the column number
-* `types`: the object where field name is column name and the value is the type of the column {Column_Name : "string"}. The type can take the following values "*string*", "*number*", "*int*", "*boolean*", "*array*", "*datetime*". If the `columns` array will be transmitted, you will be able to transmit types array to the `types`, the index should be column number. It doesn't work for the "*RetrieveSchema*"
+* `types`: the object where field name is column name and the value is the type of the column {Column_Name : "string"}. The type can take the following values "*string*", "*number*", "*int*", "*boolean*", "*array*", "*datetime*". If the 
+
+`columns` array will be transmitted, you will be able to transmit types array to the `types`, the index should be column number. It doesn't work for the "*RetrieveSchema*"
 
 If the command = "*RetrieveSchema*", then in addition types you should transmit table names to the `types`.
 
@@ -161,6 +186,14 @@ response = {
         "string",
         "number"
     ]
+}
+```
+
+The sample of a response when error:
+```js
+response = {
+    success: false,
+    notice: "Error message"
 }
 ```
 
