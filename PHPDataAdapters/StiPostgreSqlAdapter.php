@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
 # Version: 2023.1.6
-# Build date: 2023.01.24
+# Build date: 2023.01.25
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -171,6 +171,12 @@ class StiPostgreSqlAdapter extends StiDataAdapter
         }
 
         return $value;
+    }
+
+    public function makeQuery($procedure, $parameters)
+    {
+        $paramsString = parent::makeQuery($procedure, $parameters);
+        return "CALL $procedure ($paramsString)";
     }
 
     protected function executeNative($queryString, $result)
