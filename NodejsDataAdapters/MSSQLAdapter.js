@@ -1,14 +1,14 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2023.1.8
-Build date: 2023.02.22
+Version: 2023.2.1
+Build date: 2023.03.22
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 exports.process = function (command, onResult) {
     var end = function (result) {
         try {
             if (connection) connection.close();
-            result.adapterVersion = "2023.1.8";
+            result.adapterVersion = "2023.2.1";
             onResult(result);
         }
         catch (e) {
@@ -27,40 +27,31 @@ exports.process = function (command, onResult) {
             });
         }
 
-        var query = function (queryString) {
-            var request = connection.request();
-            request.query(queryString, function (error, recordset) {
-                if (error) onError(error.message);
-                else {
-                    onQuery(recordset);
-                }
-            });
-        }
-
-        var execute = function (queryString, parameters) {
+        var query = function (queryString, parameters) {
             var request = connection.request();
 
             for (var index in parameters) {
                 var parameter = parameters[index];
+                if (parameter.type == 4) parameter.value = new Date(parameter.value);
                 request.input(parameter.name, sql[parameter.typeName], parameter.value);
             }
 
-            request.execute(queryString, function (error, recordset) {
+            var onExecute = function (error, recordset) {
                 if (error) onError(error.message);
                 else {
                     onQuery(recordset);
                 }
-            });
+            };
+
+            if (command.command == "Execute")
+                request.execute(queryString, onExecute);
+            else
+                request.query(queryString, onExecute);
         }
 
         var onConnect = function () {
             if (command.queryString) {
-                if (command.command == "Execute")
-                    execute(command.queryString, command.parameters);
-                else {
-                    var queryString = applyQueryParameters(command.queryString, command.parameters, command.escapeQueryParameters);
-                    query(queryString);
-                }
+                query(command.queryString, command.parameters);
             }
             else end({ success: true });
         }
@@ -164,42 +155,6 @@ exports.process = function (command, onResult) {
             end({ success: true, columns: columns, rows: rows, types: types });
         }
 
-        var applyQueryParameters = function (baseSqlCommand, parameters, escapeQueryParameters) {
-            if (baseSqlCommand == null || baseSqlCommand.indexOf("@") < 0) return baseSqlCommand;
-
-            var result = "";
-            while (baseSqlCommand.indexOf("@") >= 0 && parameters != null && parameters.length > 0) {
-                result += baseSqlCommand.substring(0, baseSqlCommand.indexOf("@"));
-                baseSqlCommand = baseSqlCommand.substring(baseSqlCommand.indexOf("@") + 1);
-
-                var parameterName = "";
-
-                while (baseSqlCommand.length > 0) {
-                    var char = baseSqlCommand.charAt(0);
-                    if (char.length === 1 && char.match(/[a-zA-Z0-9_-]/i)) {
-                        parameterName += char;
-                        baseSqlCommand = baseSqlCommand.substring(1);
-                    }
-                    else break;
-                }
-
-                var parameter = parameters.find(parameter => parameter.name.toLowerCase() == parameterName.toLowerCase());
-                if (parameter) {
-                    if (parameter.typeGroup != "number") {
-                        if (escapeQueryParameters)
-                            result += "'" + parameter.value.toString().replace(/\\/gi, "\\\\").replace(/\'/gi, "\\\'").replace(/\"/gi, "\\\"") + "'";
-                        else
-                            result += "'" + parameter.value.toString() + "'";
-                    }
-                    else
-                        result += parameter.value.toString();
-                }
-                else
-                    result += "@" + parameterName;
-            }
-
-            return result + baseSqlCommand;
-        }
         var getHostInfo = function (host) {
             const info = {};
             const regexPort = /(.*),([0-9]+)/;
