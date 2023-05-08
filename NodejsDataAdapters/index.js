@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2023.2.2
-Build date: 2023.04.05
+Version: 2023.2.3
+Build date: 2023.05.08
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 
@@ -10,7 +10,7 @@ function getCommand(data) {
     if (typeof data === "string" && !data.startsWith("{")) {
         data = Buffer.from(data.replace(/[A-Za-z]/g, function (c) {
             return String.fromCharCode(c.charCodeAt(0) + (c.toUpperCase() <= "M" ? 13 : -13));
-        }), "base64").toString("ascii");
+        }), "base64").toString("utf8");
         encryptResult = true;
     }
 
@@ -67,7 +67,7 @@ function getResponse(result) {
     return result
 }
 function onProcess(onResult, encryptData, result) {
-    result.handlerVersion = "2023.2.2";
+    result.handlerVersion = "2023.2.3";
     result.checkVersion = true;
     result.encryptData = encryptData;
     onResult(result);
