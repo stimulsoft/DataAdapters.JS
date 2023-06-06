@@ -21,6 +21,7 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -30,12 +31,11 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.stimulsoft.base.json.JSONArray;
-import com.stimulsoft.base.json.JSONException;
-import com.stimulsoft.base.json.JSONObject;
-import com.stimulsoft.base.system.StiSqlTypes;
-import com.stimulsoft.lib.base64.StiBase64DecoderUtil;
-import com.stimulsoft.lib.base64.StiBase64EncoderUtil;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.stimulsoft.js.StiSqlTypes;
 
 public class JSDataAdapter {
 
@@ -166,7 +166,7 @@ public class JSDataAdapter {
             JSONObject parameter = null;
             for (int i = 0; i < parameters.length(); i++) {
                 JSONObject currParameter = parameters.getJSONObject(i);
-                if (parameterName.equalsIgnoreCase(currParameter.tryGetString("name"))) {
+                if (currParameter.has("name") && parameterName.equalsIgnoreCase(currParameter.get("name").toString())) {
                     parameter = currParameter;
                     break;
                 }
@@ -175,8 +175,9 @@ public class JSDataAdapter {
             if (parameter == null) {
                 result.append('@').append(parameterName);
             } else {
-                String value = parameter.tryGetString("value");
-                if (!parameter.tryGetString("typeGroup").equals("number")) {
+                String value = parameter.has("value") ? parameter.get("value").toString() : "";
+                String typeGroup = parameter.has("typeGroup") ? parameter.get("typeGroup").toString() : "";
+                if (!typeGroup.equals("number")) {
                     if (escapeQueryParameters) {
                         value = value.replace("\\", "\\\\").replace("'", "\\'").replace("\"", "\\\"");
                     }
@@ -229,7 +230,7 @@ public class JSDataAdapter {
                             value = dateFormatter.format(rs.getTimestamp(index));
                         }
                     } else if ("array".equals(columnType)) {
-                        value = new String(StiBase64EncoderUtil.encode(rs.getBytes(index)));
+                        value = Base64.getEncoder().encodeToString(rs.getBytes(index));
                     } else {
                         value = rs.getString(index);
                     }
@@ -253,7 +254,7 @@ public class JSDataAdapter {
     public static String getColumnType(int columnType) {
         // Description http://msdn.microsoft.com/en-us/library/ms131092.aspx
         switch (columnType) {
-        case StiSqlTypes.VARCHAR:
+        case 12:
         case StiSqlTypes.CHAR:
         case StiSqlTypes.CLOB:
         case StiSqlTypes.LONGNVARCHAR:
@@ -313,7 +314,7 @@ public class JSDataAdapter {
         }
         boolean encryptData = false;
         if (command.charAt(0) != '{') {
-            byte[] decoded = StiBase64DecoderUtil.decode(rot13(command).toString());
+            byte[] decoded = Base64.getDecoder().decode(rot13(command).toString().getBytes(StandardCharsets.UTF_8));
             command = new StringBuilder(new String(decoded, StandardCharsets.UTF_8));
             encryptData = true;
         }
@@ -330,7 +331,7 @@ public class JSDataAdapter {
         }
 
         if (encryptData) {
-            byte[] encodedData = StiBase64EncoderUtil.encode(result.getBytes(StandardCharsets.UTF_8));
+            byte[] encodedData = Base64.getEncoder().encode(result.getBytes(StandardCharsets.UTF_8));
             result = rot13(new StringBuilder(new String(encodedData, StandardCharsets.US_ASCII))).toString();
         }
         return result;
