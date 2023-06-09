@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2023.2.5
-# Build date: 2023.05.20
+# Version: 2023.2.6
+# Build date: 2023.06.09
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -131,6 +131,9 @@ class StiDataAdapter
 
     protected function detectType($value)
     {
+        if (empty($value))
+            return 'string';
+
         if (preg_match('~[^\x20-\x7E\t\r\n]~', $value) > 0)
             return 'array';
 
