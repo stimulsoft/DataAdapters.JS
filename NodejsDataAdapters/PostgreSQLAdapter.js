@@ -1,14 +1,14 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2023.2.7
-Build date: 2023.06.12
+Version: 2023.2.8
+Build date: 2023.06.27
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 exports.process = function (command, onResult) {
     var end = function (result) {
         try {
             if (client) client.end();
-            result.adapterVersion = "2023.2.7";
+            result.adapterVersion = "2023.2.8";
             onResult(result);
         }
         catch (e) {
@@ -39,9 +39,9 @@ exports.process = function (command, onResult) {
         var onConnect = function () {
             if (command.queryString) {
                 if (command.command == "Execute")
-                    command.queryString = "CALL " + command.queryString + "(" + command.parameters.map(parameter => "@" + parameter.name).join(", ") +")";
-                    
-                var {queryString, parameters}  = applyQueryParameters(command.queryString, command.parameters, command.escapeQueryParameters);
+                    command.queryString = "CALL " + command.queryString + "(" + command.parameters.map(parameter => "@" + parameter.name).join(", ") + ")";
+
+                var { queryString, parameters } = applyQueryParameters(command.queryString, command.parameters, command.escapeQueryParameters);
                 query(queryString, parameters);
             }
             else end({ success: true });
@@ -256,10 +256,12 @@ exports.process = function (command, onResult) {
                     var parameter = baseParameters.find(parameter => parameter.name.toLowerCase() == parameterName.toLowerCase());
                     if (parameter) {
                         if (parameter.index == null) {
-                            parameters.push(parameter.value);
+                            if (parameter.typeGroup == "number") parameters.push(+parameter.value);
+                            else if (parameter.typeGroup == "datetime") parameters.push(new Date(parameter.value));
+                            else parameters.push(parameter.value);
                             parameter.index = parameters.length;
                         }
-                        result += '"' + parameter.name +'" := $' + parameter.index.toString();
+                        result += '"' + parameter.name + '" := $' + parameter.index.toString();
                     }
                     else
                         result += "@" + parameterName;

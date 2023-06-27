@@ -1,6 +1,6 @@
 {
     "name": "stimulsoft-data-adapter",
-    "version": "2023.2.7",
+    "version": "2023.2.8",
     "description": "Nodejs data adapter for Stimulsoft Reports.JS",
     "main": "index.js",
     "scripts": {
