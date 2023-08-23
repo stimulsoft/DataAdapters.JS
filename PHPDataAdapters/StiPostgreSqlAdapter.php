@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2023.3.2
-# Build date: 2023.08.12
+# Version: 2023.3.3
+# Build date: 2023.08.23
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -13,7 +13,7 @@ use Stimulsoft\StiResult;
 
 class StiPostgreSqlAdapter extends StiDataAdapter
 {
-    public $version = '2023.3.2';
+    public $version = '2023.3.3';
     public $checkVersion = true;
 
     protected $driverName = 'pgsql';

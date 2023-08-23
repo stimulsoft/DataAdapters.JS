@@ -1,14 +1,14 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2023.3.2
-Build date: 2023.08.12
+Version: 2023.3.3
+Build date: 2023.08.23
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 exports.process = function (command, onResult) {
     var end = function (result) {
         try {
             if (client) client.end();
-            result.adapterVersion = "2023.3.2";
+            result.adapterVersion = "2023.3.3";
             onResult(result);
         }
         catch (e) {
