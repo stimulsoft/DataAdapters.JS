@@ -1,14 +1,14 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2023.3.3
-Build date: 2023.08.23
+Version: 2023.3.4
+Build date: 2023.09.12
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 exports.process = function (command, onResult) {
     var end = function (result) {
         try {
             if (client) client.end();
-            result.adapterVersion = "2023.3.3";
+            result.adapterVersion = "2023.3.4";
             onResult(result);
         }
         catch (e) {
@@ -210,7 +210,7 @@ exports.process = function (command, onResult) {
                             case "uid":
                             case "user":
                             case "user id":
-                                info["userId"] = match[1];
+                                info["user"] = match[1];
                                 break;
 
                             case "pwd":
@@ -272,15 +272,15 @@ exports.process = function (command, onResult) {
         }
 
         var pg = require('pg');
-        if (command.connectionString.startsWith("postgres://")) command.postgreConnectionString = command.connectionString
+        if (command.connectionString.startsWith("postgres://")) {
+            var parse = require('pg-connection-string').parse;
+            command.connectionStringInfo = parse(command.connectionString);
+        }
         else {
             command.connectionStringInfo = getConnectionStringInfo(command.connectionString);
-
-            command.postgreConnectionString = "postgres://" + command.connectionStringInfo.userId + ":" + command.connectionStringInfo.password + "@" + command.connectionStringInfo.host;
-            if (command.connectionStringInfo.port != null) command.postgreConnectionString += ":" + command.connectionStringInfo.port;
-            command.postgreConnectionString += "/" + command.connectionStringInfo.database;
         }
-        var client = new pg.Client(command.postgreConnectionString);
+
+        var client = new pg.Client(command.connectionStringInfo);
 
         connect();
     }
