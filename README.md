@@ -57,7 +57,7 @@ response = {
 
     rows: [
         ["value1", 1, false],
-        ["value2", 1, true]
+        ["value2", 1, true],
         ["value3", 2, false]
     ],
     columns: [
@@ -175,7 +175,7 @@ response = {
     
     rows: [
         ["value1", 1],
-        ["value2", 1]
+        ["value2", 1],
         ["value3", 2]
     ],
     columns:[
