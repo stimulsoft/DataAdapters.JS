@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2023.3.4
-Build date: 2023.09.12
+Version: 2023.4.1
+Build date: 2023.10.06
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 using FirebirdSql.Data.FirebirdClient;
@@ -26,7 +26,7 @@ namespace NetCoreDataAdapters
 
         private static Result End(Result result)
         {
-            result.AdapterVersion = "2023.3.4";
+            result.AdapterVersion = "2023.4.1";
             try
             {
                 if (reader != null) reader.Close();
@@ -159,6 +159,8 @@ namespace NetCoreDataAdapters
         private static string GetBytes(int index)
         {
             var size = reader.GetBytes(index, 0, null, 0, 0);
+            if (size == 0) return "";
+
             var destination = new MemoryStream();
             var buffer = new byte[8040];
             long offset = 0;

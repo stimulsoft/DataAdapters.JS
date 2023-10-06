@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2023.3.4
-# Build date: 2023.09.12
+# Version: 2023.4.1
+# Build date: 2023.10.06
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -58,12 +58,13 @@ class StiDataRequest
         if (isset($obj->command))
             $this->command = $obj->command;
 
-        if ($this->command == StiDataCommand::GetSupportedAdapters)
+        $reflectionClass = new \ReflectionClass('\Stimulsoft\StiDataCommand');
+        $commands = $reflectionClass->getConstants();
+        $values = array_values($commands);
+
+        if (in_array($this->command, $values))
             return StiResult::success(null, $this);
 
-        if ($this->command != StiDataCommand::TestConnection && $this->command != StiDataCommand::Execute && $this->command != StiDataCommand::ExecuteQuery)
-            return StiResult::error('Unknown command [' . $this->command . ']');
-
-        return StiResult::success(null, $this);
+        return StiResult::error('Unknown command [' . $this->command . ']');
     }
 }

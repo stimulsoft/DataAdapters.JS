@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2023.3.4
-# Build date: 2023.09.12
+# Version: 2023.4.1
+# Build date: 2023.10.06
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -13,18 +13,17 @@ use Stimulsoft\StiResult;
 
 class StiOracleAdapter extends StiDataAdapter
 {
-    public $version = '2023.3.4';
+    public $version = '2023.4.1';
     public $checkVersion = true;
 
     protected $driverName = 'oci';
 
-    protected function getLastErrorResult()
+    protected function getLastErrorResult($message = 'An unknown error has occurred.')
     {
         if ($this->driverType == 'PDO')
-            return parent::getLastErrorResult();
+            return parent::getLastErrorResult($message);
 
         $code = 0;
-        $message = 'Unknown';
         $error = oci_error();
         if ($error !== false) {
             $code = $error['code'];
@@ -44,10 +43,16 @@ class StiOracleAdapter extends StiDataAdapter
         if (!function_exists('oci_connect'))
             return StiResult::error('Oracle driver not found. Please configure your PHP server to work with Oracle.');
 
-        if ($this->info->privilege == '') $this->link = oci_connect($this->info->userId, $this->info->password, $this->info->database, $this->info->charset);
-        else $this->link = oci_pconnect($this->info->userId, $this->info->password, $this->info->database, $this->info->charset, $this->info->privilege);
+        if ($this->connectionInfo->privilege == '')
+            $this->connectionLink = oci_connect(
+                $this->connectionInfo->userId, $this->connectionInfo->password, $this->connectionInfo->database,
+                $this->connectionInfo->charset);
+        else
+            $this->connectionLink = oci_pconnect(
+                $this->connectionInfo->userId, $this->connectionInfo->password, $this->connectionInfo->database,
+                $this->connectionInfo->charset, $this->connectionInfo->privilege);
 
-        if (!$this->link)
+        if (!$this->connectionLink)
             return $this->getLastErrorResult();
 
         return StiDataResult::success();
@@ -57,9 +62,9 @@ class StiOracleAdapter extends StiDataAdapter
     {
         if ($this->driverType == 'PDO')
             parent::disconnect();
-        else if ($this->link) {
-            oci_close($this->link);
-            $this->link = null;
+        else if ($this->connectionLink) {
+            oci_close($this->connectionLink);
+            $this->connectionLink = null;
         }
     }
 
@@ -68,8 +73,8 @@ class StiOracleAdapter extends StiDataAdapter
         if (parent::parse($connectionString))
             return true;
 
-        $this->info->port = 3306;
-        $this->info->charset = 'AL32UTF8';
+        $this->connectionInfo->port = 3306;
+        $this->connectionInfo->charset = 'AL32UTF8';
 
         $parameterNames = array(
             'database' => ['database', 'data source', 'dbname'],
@@ -78,7 +83,7 @@ class StiOracleAdapter extends StiDataAdapter
             'charset' => ['charset']
         );
 
-        return $this->parseParameters($connectionString, $parameterNames);
+        return $this->parseParameters($parameterNames);
     }
 
     protected function parseUnknownParameter($parameter, $name, $value)
@@ -87,9 +92,9 @@ class StiOracleAdapter extends StiDataAdapter
 
         if ($name == 'dba privilege' || $name == 'privilege') {
             $value = strtolower($value);
-            $this->info->privilege = OCI_DEFAULT;
-            if ($value == 'sysoper' || $value == 'oci_sysoper') $this->info->privilege = OCI_SYSOPER;
-            if ($value == 'sysdba' || $value == 'oci_sysdba') $this->info->privilege = OCI_SYSDBA;
+            $this->connectionInfo->privilege = OCI_DEFAULT;
+            if ($value == 'sysoper' || $value == 'oci_sysoper') $this->connectionInfo->privilege = OCI_SYSOPER;
+            if ($value == 'sysdba' || $value == 'oci_sysdba') $this->connectionInfo->privilege = OCI_SYSDBA;
         }
     }
 
@@ -134,6 +139,9 @@ class StiOracleAdapter extends StiDataAdapter
 
     protected function getValue($type, $value)
     {
+        if (is_null($value))
+            return null;
+
         if ($type == 'blob' || $type == 'clob') {
             try {
                 $data = $value->load();
@@ -144,7 +152,7 @@ class StiOracleAdapter extends StiDataAdapter
             }
         }
 
-        if (is_null($value) || strlen($value) == 0)
+        if (strlen($value) == 0)
             return null;
 
         switch ($type) {
@@ -152,9 +160,12 @@ class StiOracleAdapter extends StiDataAdapter
                 return base64_encode($value);
 
             case 'datetime':
-                $timestamp = \DateTime::createFromFormat("d#M#y H#i#s*A", $value);
-                if ($timestamp === false) $timestamp = strtotime($value);
-                $format = date("Y-m-d\TH:i:s.v", $timestamp);
+                $dateTime = \DateTime::createFromFormat("d#M#y H#i#s*A", $value);
+                if ($dateTime !== false) $format = $dateTime->format("Y-m-d\TH:i:s.v");
+                else {
+                    $timestamp = strtotime($value);
+                    $format = date("Y-m-d\TH:i:s.v", $timestamp);
+                }
                 if (strpos($format, '.v') > 0) $format = date("Y-m-d\TH:i:s.000", $timestamp);
                 return $format;
         }
@@ -170,7 +181,7 @@ class StiOracleAdapter extends StiDataAdapter
 
     protected function executeNative($queryString, $result)
     {
-        $query = oci_parse($this->link, $queryString);
+        $query = oci_parse($this->connectionLink, $queryString);
         if (!$query || !oci_execute($query))
             return $this->getLastErrorResult();
 

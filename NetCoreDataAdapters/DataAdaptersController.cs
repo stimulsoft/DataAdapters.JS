@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2023.3.4
-Build date: 2023.09.12
+Version: 2023.4.1
+Build date: 2023.10.06
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 using FirebirdSql.Data.FirebirdClient;
@@ -49,6 +49,8 @@ namespace NetCoreDataAdapters
         public string Database { get; set; }
 
         public string QueryString { get; set; }
+
+        public string DataSource { get; set; }
 
         public int Timeout { get; set; }
 
@@ -117,7 +119,7 @@ namespace NetCoreDataAdapters
                 if (command.Command == "GetSupportedAdapters")
                 {
                     result.Success = true;
-                    result.Types = new string[] { "MySQL", "Firebird", "MS SQL", "PostgreSQL", "Oracle" };
+                    result.Types = new string[] { "MySQL", "Firebird", "MS SQL", "PostgreSQL", "Oracle", "MongoDB" };
                 }
                 else
                 {
@@ -135,6 +137,7 @@ namespace NetCoreDataAdapters
                             break;
                         case "PostgreSQL": result = SQLAdapter.Process(command, new NpgsqlConnection(command.ConnectionString)); break;
                         case "Oracle": result = SQLAdapter.Process(command, new OracleConnection(command.ConnectionString)); break;
+                        case "MongoDB": result = MongoDbAdapter.Process(command); break;
                         default: result.Success = false; result.Notice = $"Unknown database type [{command.Database}]"; break;
                     }
                 }
@@ -145,7 +148,7 @@ namespace NetCoreDataAdapters
                 result.Notice = e.Message;
             }
 
-            result.HandlerVersion = "2023.3.4";
+            result.HandlerVersion = "2023.4.1";
             result.CheckVersion = true;
 
             var contentType = "application/json";

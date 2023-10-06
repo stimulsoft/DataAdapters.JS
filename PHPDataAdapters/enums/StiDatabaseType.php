@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2023.3.4
-# Build date: 2023.09.12
+# Version: 2023.4.1
+# Build date: 2023.10.06
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -16,4 +16,11 @@ class StiDatabaseType
     const Firebird = 'Firebird';
     const Oracle = 'Oracle';
     const ODBC = 'ODBC';
+    const MongoDB = 'MongoDB';
+
+    public static function getTypes() {
+        $reflectionClass = new \ReflectionClass('\Stimulsoft\StiDatabaseType');
+        $databases = $reflectionClass->getConstants();
+        return array_values($databases);
+    }
 }

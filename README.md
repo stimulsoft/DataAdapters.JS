@@ -7,11 +7,11 @@ The database adapter is a software layer between the DBMS and the client script.
 To use this mechanism on the client side, you should specify the URL address of the host adapter, which processes requests to a required adapter
 
 Links to examples with ready data adapters, implemented for various platforms:  
-* [Node.js](https://github.com/stimulsoft/DataAdapters.JS/tree/main/NodejsDataAdapters)
-* [PHP](https://github.com/stimulsoft/DataAdapters.JS/tree/main/PHPDataAdapters)
-* [.NET Framework](https://github.com/stimulsoft/DataAdapters.JS/tree/main/NetDataAdapters)
-* [.NET Core](https://github.com/stimulsoft/DataAdapters.JS/tree/main/NetCoreDataAdapters)
-* [Java](https://github.com/stimulsoft/DataAdapters.JS/tree/main/JavaDataAdapters)
+* [Node.js](https://github.com/stimulsoft/Samples-JS/tree/master/Node.js/Starting%20SQL%20adapters%20from%20the%20HTTP%20server)
+* [PHP](https://github.com/stimulsoft/Samples-JS/tree/master/PHP/Connecting%20to%20Databases)
+* [.NET](https://github.com/stimulsoft/Samples-JS/tree/master/ASP.NET/Connecting%20to%20Databases)
+* [.NET Core](https://github.com/stimulsoft/Samples-JS/tree/master/ASP.NET%20Core/Connecting%20to%20Databases)
+* [Java](https://github.com/stimulsoft/Samples-JS/tree/master/Java/Connecting%20to%20Databases)
 
 ## How to use
 It`s easy to use an adapter.  
@@ -57,7 +57,7 @@ response = {
 
     rows: [
         ["value1", 1, false],
-        ["value2", 1, true],
+        ["value2", 1, true]
         ["value3", 2, false]
     ],
     columns: [
@@ -175,7 +175,7 @@ response = {
     
     rows: [
         ["value1", 1],
-        ["value2", 1],
+        ["value2", 1]
         ["value3", 2]
     ],
     columns:[

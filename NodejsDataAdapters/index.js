@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2023.3.4
-Build date: 2023.09.12
+Version: 2023.4.1
+Build date: 2023.10.06
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 
@@ -25,9 +25,9 @@ function process(command, onResult) {
     var onProcessHandler = onProcess.bind(null, onResult, command.encryptResult);
 
     if (command.command === "GetSupportedAdapters") {
-        onProcessHandler({ success: true, types: ["MySQL", "MS SQL", "Firebird", "PostgreSQL"] });
+        onProcessHandler({ success: true, types: ["MySQL", "MS SQL", "Firebird", "PostgreSQL", "MongoDB", "Oracle"] });
     } else {
-        if (command.parameters){
+        if (command.parameters) {
             command.parameters.forEach(parameter => {
                 if (parameter.name.length > 1 && parameter.name[0] == "@") parameter.name = parameter.name.substring(1);
             })
@@ -49,6 +49,14 @@ function process(command, onResult) {
             var PostgreSQLAdapter = require('./PostgreSQLAdapter');
             PostgreSQLAdapter.process(command, onProcessHandler);
         }
+        else if (command.database == "MongoDB") {
+            var MongoDBAdapter = require('./MongoDBAdapter');
+            MongoDBAdapter.process(command, onProcessHandler);
+        }
+        else if (command.database == "Oracle") {
+            var OracleAdapter = require('./OracleAdapter');
+            OracleAdapter.process(command, onProcessHandler);
+        }
         else onProcessHandler({ success: false, notice: "Database '" + command.database + "' not supported!" });
     }
 }
@@ -67,7 +75,7 @@ function getResponse(result) {
     return result
 }
 function onProcess(onResult, encryptData, result) {
-    result.handlerVersion = "2023.3.4";
+    result.handlerVersion = "2023.4.1";
     result.checkVersion = true;
     result.encryptData = encryptData;
     onResult(result);

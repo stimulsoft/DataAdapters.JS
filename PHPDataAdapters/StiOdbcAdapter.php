@@ -1,24 +1,24 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2023.3.4
-# Build date: 2023.09.12
+# Version: 2023.4.1
+# Build date: 2023.10.06
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
 
 namespace Stimulsoft\Adapters;
 
+use Stimulsoft\StiConnectionInfo;
 use Stimulsoft\StiDataResult;
 use Stimulsoft\StiResult;
 
 class StiOdbcAdapter extends StiDataAdapter
 {
-    public $version = '2023.3.4';
+    public $version = '2023.4.1';
     public $checkVersion = true;
 
-    protected function getLastErrorResult()
+    protected function getLastErrorResult($message = 'An unknown error has occurred.')
     {
-        $message = 'Unknown';
         $code = odbc_error();
         $error = odbc_errormsg();
         if ($error) $message = $error;
@@ -28,9 +28,9 @@ class StiOdbcAdapter extends StiDataAdapter
 
     protected function connect()
     {
-        $this->link = odbc_connect($this->info->dsn, $this->info->userId, $this->info->password);
+        $this->connectionLink = odbc_connect($this->connectionInfo->dsn, $this->connectionInfo->userId, $this->connectionInfo->password);
 
-        if (!$this->link)
+        if (!$this->connectionLink)
             return $this->getLastErrorResult();
 
         return StiDataResult::success();
@@ -38,20 +38,23 @@ class StiOdbcAdapter extends StiDataAdapter
 
     protected function disconnect()
     {
-        if ($this->link) {
-            odbc_close($this->link);
-            $this->link = null;
+        if ($this->connectionLink) {
+            odbc_close($this->connectionLink);
+            $this->connectionLink = null;
         }
     }
 
     public function parse($connectionString)
     {
+        $this->connectionInfo = new StiConnectionInfo();
+        $this->connectionString = trim($connectionString);
+
         $parameterNames = array(
             'userId' => ['uid', 'user', 'username', 'userid', 'user id'],
             'password' => ['pwd', 'password']
         );
 
-        return $this->parseParameters($connectionString, $parameterNames);
+        return $this->parseParameters($parameterNames);
     }
 
     protected function parseType($meta)
@@ -158,7 +161,7 @@ class StiOdbcAdapter extends StiDataAdapter
     {
         $result = $this->connect();
         if ($result->success) {
-            $query = odbc_exec($this->link, $queryString);
+            $query = odbc_exec($this->connectionLink, $queryString);
             if (!$query)
                 return $this->getLastErrorResult();
 

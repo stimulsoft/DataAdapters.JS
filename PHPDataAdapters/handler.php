@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2023.3.4
-# Build date: 2023.09.12
+# Version: 2023.4.1
+# Build date: 2023.10.06
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -21,6 +21,7 @@ require_once 'classes\StiDataHandler.php';
 // Data adapters for supported database types
 require_once 'StiDataAdapter.php';
 require_once 'StiFirebirdAdapter.php';
+require_once 'StiMongoDbAdapter.php';
 require_once 'StiMsSqlAdapter.php';
 require_once 'StiMySqlAdapter.php';
 require_once 'StiOdbcAdapter.php';

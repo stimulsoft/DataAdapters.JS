@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2023.3.4
-Build date: 2023.09.12
+Version: 2023.4.1
+Build date: 2023.10.06
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 using System;
@@ -67,6 +67,10 @@ namespace AspNetDataAdapters
 
         [DataMember(Name = "queryString")]
         public string QueryString { get; set; }
+
+        [DataMember(Name = "dataSource")]
+        public string DataSource { get; set; }
+
 
         [DataMember(Name = "timeout")]
         public int Timeout { get; set; }
@@ -138,11 +142,11 @@ namespace AspNetDataAdapters
 
                 var deserializer = new DataContractJsonSerializer(typeof(CommandJson));
                 var command = (CommandJson)deserializer.ReadObject(inputStream);
-                
+
                 if (command.Command == "GetSupportedAdapters")
                 {
                     result.Success = true;
-                    result.Types = new string[] { "MySQL", "Firebird", "MS SQL", "PostgreSQL", "Oracle" };
+                    result.Types = new string[] { "MySQL", "Firebird", "MS SQL", "PostgreSQL", "Oracle", "MongoDB" };
                 }
                 else
                 {
@@ -160,6 +164,7 @@ namespace AspNetDataAdapters
                             break;
                         case "PostgreSQL": result = SQLAdapter.Process(command, new NpgsqlConnection(command.ConnectionString)); break;
                         case "Oracle": result = SQLAdapter.Process(command, new OracleConnection(command.ConnectionString)); break;
+                        case "MongoDB": result = MongoDbAdapter.Process(command); break;
                         default: result.Success = false; result.Notice = $"Unknown database type [{command.Database}]"; break;
                     }
                 }
@@ -175,9 +180,9 @@ namespace AspNetDataAdapters
                     inputStream.Close();
             }
 
-            result.HandlerVersion = "2023.3.4";
+            result.HandlerVersion = "2023.4.1";
             result.CheckVersion = true;
-            
+
             context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
             context.Response.Headers.Add("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Engaged-Auth-Token");
             context.Response.Headers.Add("Cache-Control", "no-cache");
@@ -187,7 +192,7 @@ namespace AspNetDataAdapters
             {
                 context.Response.ContentType = "text/plain";
                 using (var tmpStream = new MemoryStream())
-                {                    
+                {
                     serializer.WriteObject(tmpStream, result);
                     context.Response.Write(ROT13(Convert.ToBase64String(tmpStream.ToArray())));
                 }
@@ -197,9 +202,15 @@ namespace AspNetDataAdapters
                 context.Response.ContentType = "application/json";
                 serializer.WriteObject(context.Response.OutputStream, result);
             }
-            
-            context.Response.OutputStream.Flush();
-            context.Response.End();
+
+            try
+            {
+                context.Response.OutputStream.Flush();
+                context.Response.End();
+            }
+            catch (Exception e)
+            {
+            }
         }
 
         public bool IsReusable
