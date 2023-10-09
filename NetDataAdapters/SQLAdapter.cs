@@ -160,6 +160,8 @@ namespace AspNetDataAdapters
         private static string GetBytes(int index)
         {
             var size = reader.GetBytes(index, 0, null, 0, 0);
+            if (size == 0) return "";
+
             var destination = new MemoryStream();
             var buffer = new byte[8040];
             long offset = 0;
