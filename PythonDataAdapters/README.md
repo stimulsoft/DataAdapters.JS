@@ -78,7 +78,7 @@ class Handler(RequestHandler):
         handler = StiBaseHandler()
         handler.processRequest(self.request)
         response = handler.getResponse()
-        self.set_header("Content-Type", response.contentType)
+        self.set_header('Content-Type', response.contentType)
         self.write(response.data)
 ```
 

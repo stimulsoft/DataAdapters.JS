@@ -1,14 +1,19 @@
 """
 Stimulsoft.Reports.JS
-Version: 2023.4.1
-Build date: 2023.10.06
+Version: 2023.4.2
+Build date: 2023.10.18
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
 class StiEvent:
 
+### Private
+
     __handlers: list = None
     __name: str = None
+
+
+### Properties
 
     @property
     def count(self):
@@ -19,19 +24,22 @@ class StiEvent:
         return self.__name
     
     @property
-    def jsHandlers(self):
-        return [handler for handler in self.__handlers if type(handler) == str or handler is True]
+    def handlers(self):
+        return self.__handlers
     
+
+### Override
+
     def __iadd__(self, handler):
-        self.__handlers.append(handler)
+        self.handlers.append(handler)
         return self
     
     def __isub__(self, handler):
-        self.__handlers.remove(handler)
+        self.handlers.remove(handler)
         return self
 
     def __call__(self, *args, **keywargs):
-        for handler in self.__handlers:
+        for handler in self.handlers:
             if (callable(handler)):
                 handler(*args, **keywargs)
 

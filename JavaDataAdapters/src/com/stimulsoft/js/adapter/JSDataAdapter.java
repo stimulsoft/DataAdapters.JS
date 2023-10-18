@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2023.4.1
-Build date: 2023.10.06
+Version: 2023.4.2
+Build date: 2023.10.18
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 
@@ -31,16 +31,14 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.stimulsoft.js.StiSqlTypes;
 
 public class JSDataAdapter {
 
-    public static final String handlerVersion = "2023.4.1";
-    public static final String adapterVersion = "2023.4.1";
+    public static final String handlerVersion = "2023.4.2";
+    public static final String adapterVersion = "2023.4.2";
     public static final boolean checkVersion = true;
 
     private static final List<String> USERS_KEYS = Arrays.asList("jdbc.username", "username", "uid", "user", "user id", "userid", "connection.username");
@@ -65,20 +63,19 @@ public class JSDataAdapter {
         result.put("adapterVersion", adapterVersion);
         result.put("checkVersion", checkVersion);
         e.printStackTrace();
-        return new JSONObject(result).toString();
+        return new Gson().toJson(result);
     }
 
-    private static String connect(JSONObject command) throws SQLException {
+    private static String connect(CommandJson command) throws SQLException {
         Connection con = null;
         try {
-            String dbName = command.getString("database");
-            String connectionString = command.getString("connectionString");
+            String dbName = command.getDatabase();
+            String connectionString = command.getConnectionString();
             Map<String, String> params = parseParams(connectionString);
             Properties info = new Properties();
             info.setProperty("user", getUser(params));
             info.setProperty("password", getPassword(params));
-            if (!(connectionString.contains("Encoding") || connectionString.contains("encoding")) || params.containsKey("characterencoding")
-                    || params.containsKey("charset")) {
+            if (!(connectionString.contains("Encoding") || connectionString.contains("encoding")) || params.containsKey("characterencoding") || params.containsKey("charset")) {
                 info.setProperty("useUnicode", "true");
                 info.setProperty("characterEncoding", "UTF-8");
             }
@@ -93,6 +90,7 @@ public class JSDataAdapter {
                 }
             } else if ("MS SQL".equals(dbName)) {
                 Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                info.setProperty("TrustServerCertificate", "true");
                 if (url == null) {
                     url = String.format("jdbc:sqlserver://%s:%s;databaseName=%s", getHost(params), getPort(params, "1433"), getDatabase(params));
                 }
@@ -129,12 +127,9 @@ public class JSDataAdapter {
         }
     }
 
-    private static String onConnect(JSONObject command, Connection con, String dbName) throws JSONException {
-        if (command.has("queryString")) {
-            JSONArray params = command.has("parameters") ? command.getJSONArray("parameters") : null;
-            boolean escapeParams = command.has("escapeQueryParameters") && command.getBoolean("escapeQueryParameters");
-
-            String queryText = applyQueryParameters(command.getString("queryString"), params, escapeParams, dbName);
+    private static String onConnect(CommandJson command, Connection con, String dbName) {
+        if (command.getQueryString() != null && command.getQueryString().length() > 0) {
+            String queryText = applyQueryParameters(command.getQueryString(), command.getParameters(), command.isEscapeQueryParameters(), dbName);
             return query(queryText, con, dbName);
         } else {
             HashMap<String, Object> result = new HashMap<>();
@@ -142,14 +137,14 @@ public class JSDataAdapter {
             result.put("handlerVersion", handlerVersion);
             result.put("adapterVersion", adapterVersion);
             result.put("checkVersion", checkVersion);
-            return new JSONObject(result).toString();
+            return new Gson().toJson(result);
         }
     }
 
     private static final Pattern QueryParamRegexp = Pattern.compile("@[a-zA-Z0-9_-]+");
     private static final Pattern OracleQueryParamRegexp = Pattern.compile("[@|:][a-zA-Z0-9_-]+");
 
-    private static String applyQueryParameters(String baseSqlCommand, JSONArray parameters, Boolean escapeQueryParameters, String dbName) throws JSONException {
+    private static String applyQueryParameters(String baseSqlCommand, ParameterJson[] parameters, Boolean escapeQueryParameters, String dbName) {
         if (baseSqlCommand == null || !(baseSqlCommand.contains("@") || ("Oracle".equals(dbName) && baseSqlCommand.contains(":")))) {
             return baseSqlCommand;
         }
@@ -163,10 +158,10 @@ public class JSDataAdapter {
 
             String parameterName = baseSqlCommand.substring(matcher.start() + 1, matcher.end());
 
-            JSONObject parameter = null;
-            for (int i = 0; i < parameters.length(); i++) {
-                JSONObject currParameter = parameters.getJSONObject(i);
-                if (currParameter.has("name") && parameterName.equalsIgnoreCase(currParameter.get("name").toString())) {
+            ParameterJson parameter = null;
+            for (int i = 0; i < parameters.length; i++) {
+                ParameterJson currParameter = parameters[i];
+                if (parameterName.equalsIgnoreCase(currParameter.getName())) {
                     parameter = currParameter;
                     break;
                 }
@@ -175,9 +170,8 @@ public class JSDataAdapter {
             if (parameter == null) {
                 result.append('@').append(parameterName);
             } else {
-                String value = parameter.has("value") ? parameter.get("value").toString() : "";
-                String typeGroup = parameter.has("typeGroup") ? parameter.get("typeGroup").toString() : "";
-                if (!typeGroup.equals("number")) {
+                String value = parameter.getValue().toString();
+                if (!"number".equals(parameter.getTypeGroup())) {
                     if (escapeQueryParameters) {
                         value = value.replace("\\", "\\\\").replace("'", "\\'").replace("\"", "\\\"");
                     }
@@ -248,7 +242,7 @@ public class JSDataAdapter {
         result.put("handlerVersion", handlerVersion);
         result.put("adapterVersion", adapterVersion);
         result.put("checkVersion", checkVersion);
-        return new JSONObject(result).toString();
+        return new Gson().toJson(result);
     }
 
     public static String getColumnType(int columnType) {
@@ -305,7 +299,7 @@ public class JSDataAdapter {
 
     }
 
-    public static String process(InputStream is) throws IOException, SQLException, JSONException {
+    public static String process(InputStream is) throws IOException, SQLException {
         BufferedReader r = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
         StringBuilder command = new StringBuilder();
         String str;
@@ -319,15 +313,17 @@ public class JSDataAdapter {
             encryptData = true;
         }
 
-        JSONObject commandData = new JSONObject(command.toString());
+        Gson gson = new GsonBuilder().create();
+        CommandJson commandJson = gson.fromJson(command.toString(), CommandJson.class);
+
         String result;
-        if (commandData.getString("command").equals("GetSupportedAdapters")) {
-            JSONObject resultData = new JSONObject();
+        if (commandJson.getCommand().equals("GetSupportedAdapters")) {
+            Map<String, Object> resultData = new HashMap<String, Object>();
             resultData.put("success", true);
             resultData.put("types", new String[] { "MySQL", "MS SQL", "PostgreSQL", "Oracle", "Firebird" });
-            result = resultData.toString();
+            result = new Gson().toJson(resultData);
         } else {
-            result = connect(commandData);
+            result = connect(commandJson);
         }
 
         if (encryptData) {
@@ -415,6 +411,139 @@ public class JSDataAdapter {
             result.append(c);
         }
         return result;
+    }
+
+    public class CommandJson {
+        private String command;
+        private String connectionString;
+        private String database;
+        private String queryString;
+        private String dataSource;
+        private int timeout;
+        private ParameterJson[] parameters;
+        private boolean escapeQueryParameters;
+
+        public String getCommand() {
+            return command;
+        }
+
+        public void setCommand(String command) {
+            this.command = command;
+        }
+
+        public String getConnectionString() {
+            return connectionString;
+        }
+
+        public void setConnectionString(String connectionString) {
+            this.connectionString = connectionString;
+        }
+
+        public String getDatabase() {
+            return database;
+        }
+
+        public void setDatabase(String database) {
+            this.database = database;
+        }
+
+        public String getQueryString() {
+            return queryString;
+        }
+
+        public void setQueryString(String queryString) {
+            this.queryString = queryString;
+        }
+
+        public String getDataSource() {
+            return dataSource;
+        }
+
+        public void setDataSource(String dataSource) {
+            this.dataSource = dataSource;
+        }
+
+        public int getTimeout() {
+            return timeout;
+        }
+
+        public void setTimeout(int timeout) {
+            this.timeout = timeout;
+        }
+
+        public ParameterJson[] getParameters() {
+            return parameters;
+        }
+
+        public void setParameters(ParameterJson[] parameters) {
+            this.parameters = parameters;
+        }
+
+        public boolean isEscapeQueryParameters() {
+            return escapeQueryParameters;
+        }
+
+        public void setEscapeQueryParameters(boolean escapeQueryParameters) {
+            this.escapeQueryParameters = escapeQueryParameters;
+        }
+
+    }
+
+    private class ParameterJson {
+        private String name;
+        private Object value;
+        private String typeGroup;
+        private String typeName;
+        private int netType;
+        private int size;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+
+        public void setValue(Object value) {
+            this.value = value;
+        }
+
+        public String getTypeGroup() {
+            return typeGroup;
+        }
+
+        public void setTypeGroup(String typeGroup) {
+            this.typeGroup = typeGroup;
+        }
+
+        public String getTypeName() {
+            return typeName;
+        }
+
+        public void setTypeName(String typeName) {
+            this.typeName = typeName;
+        }
+
+        public int getNetType() {
+            return netType;
+        }
+
+        public void setNetType(int netType) {
+            this.netType = netType;
+        }
+
+        public int getSize() {
+            return size;
+        }
+
+        public void setSize(int size) {
+            this.size = size;
+        }
     }
 
 }

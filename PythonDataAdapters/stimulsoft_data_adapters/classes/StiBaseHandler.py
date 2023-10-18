@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2023.4.1
-Build date: 2023.10.06
+Version: 2023.4.2
+Build date: 2023.10.18
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -23,7 +23,7 @@ class StiBaseHandler:
     The incoming request is processed, a data adapter is created and all necessary actions are performed.
     """
 
-    version: str = '2023.4.1'
+    version: str = '2023.4.2'
     checkDataAdaptersVersion: bool = True
     framework: str = StiFrameworkType.DEFAULT
     origin: str = None
@@ -112,10 +112,13 @@ class StiBaseHandler:
     def __processParameters(self):
         parameters = []
         if self.request.queryString != None and self.request.parameters != None and len(self.request.parameters) > 0:
+            pass
+            """
             for item in self.request.parameters:
                 name = item.name.find('@') == 0 or item.name.find(':') == 0 if item.name[1] else item.name
                 parameters[name] = item
                 del item.name
+            """
 
         self.request.parameters = parameters
     
@@ -158,6 +161,9 @@ class StiBaseHandler:
     def _createRequest(self):
         return StiBaseRequest()
     
+    def _checkEvent(self):
+        return self.request.event == 'BeginProcessData'
+    
     def _checkCommand(self):
         commands = [getattr(StiDataCommand, field) for field in dir(StiDataCommand) if not callable(getattr(StiDataCommand, field)) and not field.startswith('_')]
         if self.request.command in commands:
@@ -189,6 +195,10 @@ class StiBaseHandler:
         self.request.process(self.query, self.body)
         if len(self.request.error or '') > 0:
             self.error = self.request.error
+            return False
+        
+        if not self._checkEvent():
+            self.error = f'Unknown event: {self.request.command}'
             return False
         
         if not self._checkCommand():

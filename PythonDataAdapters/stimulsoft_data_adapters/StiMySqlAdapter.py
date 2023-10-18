@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2023.4.1
-Build date: 2023.10.06
+Version: 2023.4.2
+Build date: 2023.10.18
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -13,7 +13,7 @@ from mysql.connector import FieldType
 from mysql.connector import FieldFlag
 
 class StiMySqlAdapter(StiDataAdapter):
-    version: str = '2023.4.1'
+    version: str = '2023.4.2'
     checkVersion: bool = True
     connectionLink: MySQLConnection
     
