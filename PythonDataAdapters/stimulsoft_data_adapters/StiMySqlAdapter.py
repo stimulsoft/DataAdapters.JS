@@ -1,30 +1,28 @@
 """
 Stimulsoft.Reports.JS
-Version: 2023.4.2
-Build date: 2023.10.18
+Version: 2023.4.3
+Build date: 2023.11.02
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
-from .StiDataAdapter import StiDataAdapter
 from .classes.StiDataResult import StiDataResult
-from mysql.connector.connection import MySQLConnection
-from mysql.connector import Error
-from mysql.connector import FieldType
-from mysql.connector import FieldFlag
+from .classes.StiBaseResult import StiBaseResult
+from .StiDataAdapter import StiDataAdapter
+
 
 class StiMySqlAdapter(StiDataAdapter):
-    version: str = '2023.4.2'
+    version: str = '2023.4.3'
     checkVersion: bool = True
-    connectionLink: MySQLConnection
     
     def connect(self):
-        if (self.connectionInfo.driver):
+        if self.connectionInfo.driver:
             return self.connectOdbc()
         
-        if (not self.connectionInfo.charset):
+        if not self.connectionInfo.charset:
             self.connectionInfo.charset = 'utf8'
         
         try:
+            from mysql.connector.connection import MySQLConnection
             self.connectionLink = MySQLConnection(
                 user = self.connectionInfo.userId,
                 password = self.connectionInfo.password,
@@ -32,13 +30,13 @@ class StiMySqlAdapter(StiDataAdapter):
                 database = self.connectionInfo.database,
                 port = self.connectionInfo.port,
                 charset = self.connectionInfo.charset)
-        except Error as error:
-            return StiDataResult.getError(self, f'[{error.errno}] {error.msg}')
+        except Exception as e:
+            return StiDataResult.getError(self, str(e))
         
         return StiDataResult.getSuccess(self)
     
     def process(self):
-        if (not super().process()):
+        if not super().process():
             return False
 
         self.connectionInfo.port = 3306
@@ -56,8 +54,10 @@ class StiMySqlAdapter(StiDataAdapter):
         return self.parseParameters(parameterNames)
 
     def parseType(self, meta: tuple):
-        if (self.connectionInfo.driver):
+        if self.connectionInfo.driver:
             return super().parseType(meta)
+        
+        from mysql.connector import FieldFlag, FieldType
 
         types = {
             'tiny': [FieldType.TINY],
@@ -71,10 +71,10 @@ class StiMySqlAdapter(StiDataAdapter):
         }
 
         for key, array in types.items():
-            if (meta[1] in array):
-                if (key == 'tiny'):
+            if meta[1] in array:
+                if key == 'tiny':
                     return 'int'  # boolean?
-                if (key == 'blob'):
+                if key == 'blob':
                     return 'array' if meta[7] & FieldFlag.BINARY else 'string'
                 return key
 

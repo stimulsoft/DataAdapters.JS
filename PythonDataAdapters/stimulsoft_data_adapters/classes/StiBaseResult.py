@@ -1,11 +1,12 @@
 """
 Stimulsoft.Reports.JS
-Version: 2023.4.2
-Build date: 2023.10.18
+Version: 2023.4.3
+Build date: 2023.11.02
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
 from __future__ import annotations
+
 
 class StiBaseResult:
     """
@@ -14,7 +15,6 @@ class StiBaseResult:
     """
     
     handlerVersion: str = None
-    adapterVersion: str = None
     checkVersion: bool = True
     success: bool = True
     notice: str = None

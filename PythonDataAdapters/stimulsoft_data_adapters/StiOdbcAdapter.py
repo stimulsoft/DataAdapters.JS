@@ -1,34 +1,35 @@
 """
 Stimulsoft.Reports.JS
-Version: 2023.4.2
-Build date: 2023.10.18
+Version: 2023.4.3
+Build date: 2023.11.02
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
-from .StiDataAdapter import StiDataAdapter
-from .classes.StiDataResult import StiDataResult
 import pyodbc
 from pyodbc import Connection
 
+from .classes.StiDataResult import StiDataResult
+from .StiDataAdapter import StiDataAdapter
+
+
 class StiOdbcAdapter(StiDataAdapter):
-    version: str = '2023.4.2'
+    version: str = '2023.4.3'
     checkVersion: bool = True
     connectionLink: Connection
 
     def connect(self):
         try:
             self.connectionLink = pyodbc.connect(self.connectionString)
-            if (self.connectionInfo.charset):
+            if self.connectionInfo.charset:
                 self.connectionLink.setdecoding(pyodbc.SQL_CHAR, self.connectionInfo.charset)
                 self.connectionLink.setdecoding(pyodbc.SQL_WCHAR, self.connectionInfo.charset)
         except Exception as e:
-            message = str(e)
-            return StiDataResult.getError(self, message)
+            return StiDataResult.getError(self, str(e))
         
         return StiDataResult.getSuccess(self)
     
     def process(self):
-        if (not super().process()):
+        if not super().process():
             return False
 
         parameterNames = {

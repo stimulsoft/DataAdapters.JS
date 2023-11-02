@@ -1,24 +1,23 @@
 """
 Stimulsoft.Reports.JS
-Version: 2023.4.2
-Build date: 2023.10.18
+Version: 2023.4.3
+Build date: 2023.11.02
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
-from .StiDataAdapter import StiDataAdapter
 from .classes.StiDataResult import StiDataResult
-import psycopg
-from psycopg import Column
+from .StiDataAdapter import StiDataAdapter
+
 
 class StiPostgreSqlAdapter(StiDataAdapter):
-    version: str = '2023.4.2'
+    version: str = '2023.4.3'
     checkVersion: bool = True
 
     def connect(self):
-        if (self.connectionInfo.driver):
+        if self.connectionInfo.driver:
             return self.connectOdbc()
         
-        if (not self.connectionInfo.charset):
+        if not self.connectionInfo.charset:
             self.connectionInfo.charset = 'utf8'
         
         connectionString: str = \
@@ -30,15 +29,15 @@ class StiPostgreSqlAdapter(StiDataAdapter):
             f"options='--client_encoding={self.connectionInfo.charset}' "
 
         try:
+            import psycopg
             self.connectionLink = psycopg.connect(connectionString)
         except Exception as e:
-            message = str(e)
-            return StiDataResult.getError(self, message)
+            return StiDataResult.getError(self, str(e))
         
         return StiDataResult.getSuccess(self)
     
     def process(self):
-        if (not super().process()):
+        if not super().process():
             return False
 
         self.connectionInfo.port = 5432
@@ -55,9 +54,12 @@ class StiPostgreSqlAdapter(StiDataAdapter):
 
         return self.parseParameters(parameterNames)
     
-    def parseType(self, meta: Column):
-        if (self.connectionInfo.driver):
+    def parseType(self, meta: tuple):
+        if self.connectionInfo.driver:
             return super().parseType(meta)
+        
+        import psycopg
+        column: psycopg.Column = meta
         
         types = {
             'int': ['int', 'int2', 'int4', 'int8', 'smallint', 'bigint', 'tinyint', 'integer', 'numeric', 'uniqueidentifier'],
@@ -69,8 +71,8 @@ class StiPostgreSqlAdapter(StiDataAdapter):
         }
 
         for key, array in types.items():
-            typeName = psycopg.adapters.types[meta.type_code].name
-            if (typeName in array):
+            typeName = psycopg.adapters.types[column.type_code].name
+            if typeName in array:
                 return key
 
         return 'string'

@@ -1,17 +1,19 @@
 """
 Stimulsoft.Reports.JS
-Version: 2023.4.2
-Build date: 2023.10.18
+Version: 2023.4.3
+Build date: 2023.11.02
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
 from __future__ import annotations
 
-from .StiBaseResult import StiBaseResult
 import typing
+
+from .StiBaseResult import StiBaseResult
 
 if typing.TYPE_CHECKING:
     from ..StiDataAdapter import StiDataAdapter
+
 
 class StiDataResult(StiBaseResult):
     """
@@ -19,6 +21,7 @@ class StiDataResult(StiBaseResult):
     The result contains a collection of data, message about the result of the command execution, and other technical information.
     """
 
+    adapterVersion: str = None
     types: list = None
     columns: list = None
     rows: list = None

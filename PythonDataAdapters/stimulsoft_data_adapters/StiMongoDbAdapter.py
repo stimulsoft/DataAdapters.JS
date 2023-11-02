@@ -1,31 +1,31 @@
 """
 Stimulsoft.Reports.JS
-Version: 2023.4.2
-Build date: 2023.10.18
+Version: 2023.4.3
+Build date: 2023.11.02
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
-from .StiDataAdapter import StiDataAdapter
-from .classes.StiDataResult import StiDataResult
 from urllib.parse import urlparse
-from pymongo import MongoClient
+
+from .classes.StiDataResult import StiDataResult
+from .StiDataAdapter import StiDataAdapter
+
 
 class StiMongoDbAdapter(StiDataAdapter):
-    version: str = '2023.4.2'
+    version: str = '2023.4.3'
     checkVersion: bool = True
-    connectionLink: MongoClient
 
     def connect(self):
         try:
+            from pymongo import MongoClient
             self.connectionLink = MongoClient(self.connectionString)
         except Exception as e:
-            message = str(e)
-            return StiDataResult.getError(self, message)
+            return StiDataResult.getError(self, str(e))
         
         return StiDataResult.getSuccess(self)
     
     def process(self):
-        if (not super().process()):
+        if not super().process():
             return False
         
         url = urlparse(self.connectionString)
@@ -53,28 +53,31 @@ class StiMongoDbAdapter(StiDataAdapter):
 
         type = str(meta)
         for key, array in types.items():
-            if (type in array):
+            if type in array:
                 return key
 
         return 'string'
     
     def getValue(self, value: object, valueType: str):
-        if (value is None):
+        if value is None:
             return None
 
-        if (valueType == 'string'):
+        if valueType == 'string':
             return value if type(value) == str else str(value)
 
         return super().getValue(value, valueType)
     
     def executeNative(self, queryString: str, result: StiDataResult):
-        if (not queryString):
+        if not queryString:
             return self.retrieveSchema(result)
 
         return self.retrieveData(result, queryString)
     
     def retrieveSchema(self, result: StiDataResult):
-        database = self.connectionLink.get_database(self.connectionInfo.database)
+        from pymongo import MongoClient
+        connectionLink: MongoClient = self.connectionLink
+
+        database = connectionLink.get_database(self.connectionInfo.database)
         collectionNames = database.list_collection_names()
 
         schema: dict[str, dict] = {}
@@ -107,16 +110,19 @@ class StiMongoDbAdapter(StiDataAdapter):
         return result
 
     def retrieveData(self, result: StiDataResult, queryString: str):
+        from pymongo import MongoClient
+        connectionLink: MongoClient = self.connectionLink
+
         result = self.retrieveSchema(result)
         for item in result.rows:
-            if (item[0] == queryString):
+            if item[0] == queryString:
                 result.columns.append(item[1])
                 result.types.append(item[2])
 
         result.count = len(result.columns)
         result.rows = []
 
-        database = self.connectionLink.get_database(self.connectionInfo.database)
+        database = connectionLink.get_database(self.connectionInfo.database)
         collection = database.get_collection(queryString)
         cursor = collection.find()
         for document in cursor:

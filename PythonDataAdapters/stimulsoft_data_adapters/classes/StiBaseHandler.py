@@ -1,21 +1,24 @@
 """
 Stimulsoft.Reports.JS
-Version: 2023.4.2
-Build date: 2023.10.18
+Version: 2023.4.3
+Build date: 2023.11.02
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
-from .StiBaseResult import StiBaseResult
-from .StiBaseRequest import StiBaseRequest
-from .StiBaseResponse import StiBaseResponse
-from ..enums.StiDataCommand import StiDataCommand
-from ..enums.StiDatabaseType import StiDatabaseType
-from ..enums.StiFrameworkType import StiFrameworkType
-from ..StiDataAdapter import StiDataAdapter
-from ..events.StiEvent import StiEvent
-from ..events.StiDataEventArgs import StiDataEventArgs
 import codecs
 import urllib.parse
+
+from ..classes.StiParameter import StiParameter
+from ..enums.StiDatabaseType import StiDatabaseType
+from ..enums.StiDataCommand import StiDataCommand
+from ..enums.StiFrameworkType import StiFrameworkType
+from ..events.StiDataEventArgs import StiDataEventArgs
+from ..events.StiEvent import StiEvent
+from ..StiDataAdapter import StiDataAdapter
+from .StiBaseRequest import StiBaseRequest
+from .StiBaseResponse import StiBaseResponse
+from .StiBaseResult import StiBaseResult
+
 
 class StiBaseHandler:
     """
@@ -23,7 +26,7 @@ class StiBaseHandler:
     The incoming request is processed, a data adapter is created and all necessary actions are performed.
     """
 
-    version: str = '2023.4.2'
+    version: str = '2023.4.3'
     checkDataAdaptersVersion: bool = True
     framework: str = StiFrameworkType.DEFAULT
     origin: str = None
@@ -110,20 +113,16 @@ class StiBaseHandler:
         return result
     
     def __processParameters(self):
-        parameters = []
-        if self.request.queryString != None and self.request.parameters != None and len(self.request.parameters) > 0:
-            pass
-            """
+        parameters = dict()
+        if len(self.request.queryString or '') > 0 and len(self.request.parameters or '') > 0:
             for item in self.request.parameters:
-                name = item.name.find('@') == 0 or item.name.find(':') == 0 if item.name[1] else item.name
-                parameters[name] = item
-                del item.name
-            """
+                name = item['name'][1:] if item['name'][0] == '@' or item['name'][0] == ':' else item['name']
+                parameters[name] = StiParameter(name, item['type'], item['typeName'], item['typeGroup'], item['size'], item['value'])
 
         self.request.parameters = parameters
     
     def __getDataAdapterResult(self):
-        args = StiDataEventArgs(self, self.request)
+        args = StiDataEventArgs(self.request)
         self.onBeginProcessData(args)
 
         self.dataAdapter = StiDataAdapter.getDataAdapter(args.database, args.connectionString)
@@ -162,7 +161,7 @@ class StiBaseHandler:
         return StiBaseRequest()
     
     def _checkEvent(self):
-        return self.request.event == 'BeginProcessData'
+        return self.request.event == None or self.request.event == 'BeginProcessData'
     
     def _checkCommand(self):
         commands = [getattr(StiDataCommand, field) for field in dir(StiDataCommand) if not callable(getattr(StiDataCommand, field)) and not field.startswith('_')]
@@ -247,6 +246,6 @@ class StiBaseHandler:
 ### Constructor
 
     def __init__(self, url: str = None):
-        self.onBeginProcessData = StiEvent('onBeginProcessData')
-        self.onEndProcessData = StiEvent('onEndProcessData')
+        self.onBeginProcessData = StiEvent(self, 'onBeginProcessData')
+        self.onEndProcessData = StiEvent(self, 'onEndProcessData')
         self.__url = url

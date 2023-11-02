@@ -1,24 +1,23 @@
 """
 Stimulsoft.Reports.JS
-Version: 2023.4.2
-Build date: 2023.10.18
+Version: 2023.4.3
+Build date: 2023.11.02
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
-from .enums.StiDatabaseType import StiDatabaseType
-from .classes.StiDataResult import StiDataResult
-from .classes.StiConnectionInfo import StiConnectionInfo
-from datetime import timedelta
-from datetime import date
-from datetime import time
-from datetime import datetime
+import codecs
+from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 from uuid import UUID
-import re
-import codecs
+
+from .classes.StiConnectionInfo import StiConnectionInfo
+from .classes.StiDataResult import StiDataResult
+from .classes.StiParameter import StiParameter
+from .enums.StiDatabaseType import StiDatabaseType
+
 
 class StiDataAdapter:
-    version: str = '2023.4.2'
+    version: str = '2023.4.3'
     checkVersion: bool = False
 
     connectionString: str = None
@@ -49,13 +48,13 @@ class StiDataAdapter:
         return result
 
     def disconnect(self):
-        if (not self.connectionLink is None):
+        if self.connectionLink != None:
             self.connectionLink.close()
         self.connectionLink = None
 
     def test(self):
         result = self.connect()
-        if (result.success):
+        if result.success:
             self.disconnect()
         return result
     
@@ -69,20 +68,20 @@ class StiDataAdapter:
         for parameter in parameters:
             name = ''
             value = parameter
-            if (parameter.find('=') >= 0):
+            if parameter.find('=') >= 0:
                 pos = parameter.find('=')
                 name = parameter[0:pos].strip().lower()
                 value = parameter[pos + 1:].strip()
 
             unknown = True
-            if (len(parameterNames) > 0):
+            if len(parameterNames) > 0:
                 for key, names in parameterNames.items():
-                    if (name in names):
+                    if name in names:
                         setattr(self.connectionInfo, key, value)
                         unknown = False
                         break
 
-            if (unknown):
+            if unknown:
                 self.parseUnknownParameter(parameter, name, value)
 
         return True
@@ -102,7 +101,7 @@ class StiDataAdapter:
         }
 
         for key, array in types.items():
-            if (meta[1] in array):
+            if meta[1] in array:
                 return key
 
         return 'string'
@@ -111,28 +110,28 @@ class StiDataAdapter:
         return types[index]
 
     def getValue(self, value: object, valueType: str):
-        if (value is None):
+        if value is None:
             return None
 
-        if (valueType == 'array'):
+        if valueType == 'array':
             valueBytes = value.encode() if type(value) == str else value
             return codecs.encode(valueBytes, 'base64').decode()
         
-        if (valueType == 'datetime'):
+        if valueType == 'datetime':
             valueDateTime: datetime = value
             return valueDateTime.strftime('%Y-%m-%dT%H:%M:%S.000')
         
-        if (valueType == 'time'):
+        if valueType == 'time':
             valueDelta: timedelta = value
             hours = int(valueDelta.seconds / 3600) + valueDelta.days * 24
             minutes = int(valueDelta.seconds / 60) % 60
             seconds = int(valueDelta.seconds) % 60
             return '{:02d}:'.format(hours) + '{:02d}:'.format(minutes) + '{:02d}.000'.format(seconds)
         
-        if (type(value) == Decimal):
+        if type(value) == Decimal:
             return float(value)
         
-        if (type(value) == UUID):
+        if type(value) == UUID:
             return str(value)
         
         return value
@@ -140,7 +139,7 @@ class StiDataAdapter:
     def makeQuery(self, procedure: str, parameters: list):
         paramsString: str = ''
         for name in parameters:
-            if (len(paramsString) > 0):
+            if len(paramsString) > 0:
                 paramsString += ', '
             paramsString += '@' + name
 
@@ -148,7 +147,7 @@ class StiDataAdapter:
     
     def executeQuery(self, queryString: str):
         result = self.connect()
-        if (result.success):
+        if result.success:
             result.types = []
             result.columns = []
             result.rows = []
@@ -221,42 +220,36 @@ class StiDataAdapter:
         
         return None
     
-    def applyQueryParameters(query: str, parameters: list, escape: bool):
+    def applyQueryParameters(query: str, parameters: dict[str, StiParameter], escape: bool) -> str:
         result: str = ''
 
-        while (query.find('@') >= 0):
+        while query.find('@') >= 0:
             result += query[0:query.find('@')]
             query = query[query.find('@') + 1:]
 
-            parameterName: str = ''
-            while (len(query) > 0):
-                char = query[0];
-                if (re.search('/[a-zA-Z0-9_-]/', char) is None):
+            parameterName = ''
+            while len(query) > 0:
+                char = query[0]
+                if not char.isalnum() and char != '_':
                     break
 
                 parameterName += char
                 query = query[1:]
 
             replaced: bool = False
-            '''foreach ($parameters as $key => $item) {
-                if (strtolower($key) == strtolower($parameterName)) {
-                    switch ($item->typeGroup) {
-                        case 'number':
-                            $result .= floatval($item->value);
-                            break;
-
-                        case 'datetime':
-                            $result .= "'" . $item->value . "'";
-                            break;
-
-                        default:
-                            $result .= "'" . ($escape ? addcslashes($item->value, "\\\"'") : $item->value) . "'";
-                            break;
-                    }
-
-                    $replaced = true;
-                }
-            }'''
+            for key, item in parameters.items():
+                if key.lower() == parameterName.lower():
+                    stringValue = str(item.value)
+                    if item.typeGroup == 'number':
+                        result += stringValue
+                    elif item.typeGroup == 'datetime':
+                        result += "'" + stringValue + "'"
+                    elif escape:
+                        result += "'" + stringValue.translate(str.maketrans({'\\':  r'\\', "'": r"\'", '"': r'\"'})) + "'"
+                    else:
+                        result += "'" + stringValue + "'"
+                    
+                    replaced = True
 
             if (replaced == False):
                 result += '@' + parameterName

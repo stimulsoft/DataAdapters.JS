@@ -1,17 +1,16 @@
 """
 Stimulsoft.Reports.JS
-Version: 2023.4.2
-Build date: 2023.10.18
+Version: 2023.4.3
+Build date: 2023.11.02
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
-from .StiDataAdapter import StiDataAdapter
 from .classes.StiDataResult import StiDataResult
-import oracledb
-from oracledb import FetchInfo
+from .StiDataAdapter import StiDataAdapter
+
 
 class StiOracleAdapter(StiDataAdapter):
-    version: str = '2023.4.2'
+    version: str = '2023.4.3'
     checkVersion: bool = True
 
     def getOdbcConnectionString(self):
@@ -24,10 +23,11 @@ class StiOracleAdapter(StiDataAdapter):
         return connectionString
 
     def connect(self):
-        if (self.connectionInfo.driver):
+        if self.connectionInfo.driver:
             return self.connectOdbc()
         
         try:
+            import oracledb
             oracledb.init_oracle_client()
             self.connectionLink = oracledb.connect(
                 user = self.connectionInfo.userId,
@@ -36,15 +36,16 @@ class StiOracleAdapter(StiDataAdapter):
                 encoding = self.connectionInfo.charset,
                 mode = self.connectionInfo.privilege)
         except Exception as e:
-            message = str(e)
-            return StiDataResult.getError(self, message)
+            return StiDataResult.getError(self, str(e))
         
         return StiDataResult.getSuccess(self)
     
     def process(self):
-        if (not super().process()):
+        import oracledb
+        
+        if not super().process():
             return False
-
+        
         self.connectionInfo.port = 3306
         self.connectionInfo.privilege = oracledb.AUTH_MODE_DEFAULT
 
@@ -59,18 +60,23 @@ class StiOracleAdapter(StiDataAdapter):
         return self.parseParameters(parameterNames)
     
     def parseUnknownParameter(self, parameter: str, name: str, value: str):
-        super().parseUnknownParameter(parameter, name, value)
+        import oracledb
         
-        if (name.lower() == 'dba privilege' or name.lower() == 'privilege'):
+        super().parseUnknownParameter(parameter, name, value)
+
+        if name.lower() == 'dba privilege' or name.lower() == 'privilege':
             value = value.lower()
-            if (value == 'sysoper' or value == 'oci_sysoper'):
+            if value == 'sysoper' or value == 'oci_sysoper':
                 self.connectionInfo.privilege = oracledb.AUTH_MODE_SYSOPER
-            if (value == 'sysdba' or value == 'oci_sysdba'):
+            if value == 'sysdba' or value == 'oci_sysdba':
                 self.connectionInfo.privilege = oracledb.AUTH_MODE_SYSDBA
 
-    def parseType(self, meta: FetchInfo):
-        if (self.connectionInfo.driver):
+    def parseType(self, meta: tuple):
+        if self.connectionInfo.driver:
             return super().parseType(meta)
+        
+        import oracledb
+        info: oracledb.FetchInfo = meta
         
         types = {
             'int': [oracledb.DB_TYPE_NUMBER],
@@ -84,21 +90,23 @@ class StiOracleAdapter(StiDataAdapter):
         }
 
         for key, array in types.items():
-            if (meta.type in array):
-                if (key == 'int'):
-                    return 'number' if meta.scale > 0 else 'int'
-                if (key == 'blob'):
+            if info.type in array:
+                if key == 'int':
+                    return 'number' if info.scale > 0 else 'int'
+                if key == 'blob':
                     return 'array'
                 return key
 
         return 'string'
     
     def getValue(self, value: object, valueType: str):
-        if (value is None):
+        import oracledb
+        
+        if value is None:
             return None
-
-        if (valueType == 'array'):
-            if (type(value) == oracledb.LOB):
+        
+        if valueType == 'array':
+            if type(value) == oracledb.LOB:
                 value = value.read()
 
         return super().getValue(value, valueType)

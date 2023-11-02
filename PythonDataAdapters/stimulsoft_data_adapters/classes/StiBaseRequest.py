@@ -1,13 +1,15 @@
 """
 Stimulsoft.Reports.JS
-Version: 2023.4.2
-Build date: 2023.10.18
+Version: 2023.4.3
+Build date: 2023.11.02
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
-from .StiBaseResult import StiBaseResult
-import json
 import codecs
+import json
+
+from .StiBaseResult import StiBaseResult
+
 
 class StiBaseRequest:
     """Contains all set request parameters passed to the event handler."""
@@ -17,7 +19,7 @@ class StiBaseRequest:
     encryptData: bool = False
     connectionString: str = None
     queryString: str = None
-    parameters: list = None
+    parameters: dict[str, object] = None
     database: str = None
     dataSource: str = None
     connection: str = None

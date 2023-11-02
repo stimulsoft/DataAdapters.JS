@@ -1,20 +1,22 @@
 """
 Stimulsoft.Reports.JS
-Version: 2023.4.2
-Build date: 2023.10.18
+Version: 2023.4.3
+Build date: 2023.11.02
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
 from __future__ import annotations
 
-from .StiBaseResult import StiBaseResult
-from ..enums.StiFrameworkType import StiFrameworkType
 import codecs
 import json
 import typing
 
+from ..enums.StiFrameworkType import StiFrameworkType
+from .StiBaseResult import StiBaseResult
+
 if typing.TYPE_CHECKING:
     from .StiBaseHandler import StiBaseHandler
+
 
 class StiBaseResponse:
     """

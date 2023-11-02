@@ -1,12 +1,14 @@
 """
 Stimulsoft.Reports.JS
-Version: 2023.4.2
-Build date: 2023.10.18
+Version: 2023.4.3
+Build date: 2023.11.02
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
-from .StiEventArgs import StiEventArgs
 from ..classes.StiDataResult import StiDataResult
+from ..classes.StiParameter import StiParameter
+from .StiEventArgs import StiEventArgs
+
 
 class StiDataEventArgs(StiEventArgs):
 
@@ -28,7 +30,7 @@ class StiDataEventArgs(StiEventArgs):
     queryString: str = None
     """The SQL query that will be executed to get the data array of the current data source."""
 
-    parameters: list = None
+    parameters: dict[str, StiParameter] = None
     """A set of parameters for the current SQL query."""
 
     result: StiDataResult = None

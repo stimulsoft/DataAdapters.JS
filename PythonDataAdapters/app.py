@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2023.4.2
-Build date: 2023.10.18
+Version: 2023.4.3
+Build date: 2023.11.02
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -16,7 +16,9 @@ def index():
 
 @app.route('/handler', methods = ['GET', 'POST'])
 def handler():
-    return StiBaseHandler(request).getFrameworkResponse()
+    handler = StiBaseHandler()
+    handler.processRequest(request)
+    return handler.getFrameworkResponse()
 
 if __name__ == "__main__":
     app.run(debug=True, port=8040)

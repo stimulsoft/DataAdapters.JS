@@ -1,20 +1,19 @@
 """
 Stimulsoft.Reports.JS
-Version: 2023.4.2
-Build date: 2023.10.18
+Version: 2023.4.3
+Build date: 2023.11.02
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
-from .StiDataAdapter import StiDataAdapter
-from .classes.StiDataResult import StiDataResult
-import pymssql
-from datetime import datetime
-from datetime import date
-from datetime import time
+from datetime import date, datetime, time
 from uuid import UUID
 
+from .classes.StiDataResult import StiDataResult
+from .StiDataAdapter import StiDataAdapter
+
+
 class StiMsSqlAdapter(StiDataAdapter):
-    version: str = '2023.4.2'
+    version: str = '2023.4.3'
     checkVersion: bool = True
     trustServerCertificate: str = None
     integratedSecurity: str = None
@@ -27,22 +26,23 @@ class StiMsSqlAdapter(StiDataAdapter):
             f'Uid={self.connectionInfo.userId};' \
             f'Pwd={self.connectionInfo.password};'
         
-        if (self.trustServerCertificate):
+        if self.trustServerCertificate:
             connectionString += f'TrustServerCertificate={self.trustServerCertificate};'
 
-        if (self.integratedSecurity):
+        if self.integratedSecurity:
             connectionString += f'Integrated Security={self.integratedSecurity};'
         
         return connectionString
 
     def connect(self):
-        if (self.connectionInfo.driver):
+        if self.connectionInfo.driver:
             return self.connectOdbc()
         
-        if (not self.connectionInfo.charset):
+        if not self.connectionInfo.charset:
             self.connectionInfo.charset = 'utf8'
 
         try:
+            import pymssql
             self.connectionLink = pymssql.connect(
                 server = self.connectionInfo.host,
                 user = self.connectionInfo.userId,
@@ -52,13 +52,12 @@ class StiMsSqlAdapter(StiDataAdapter):
                 host = self.connectionInfo.host,
                 port = self.connectionInfo.port)
         except Exception as e:
-            message = str(e)
-            return StiDataResult.getError(self, message)
+            return StiDataResult.getError(self, str(e))
         
         return StiDataResult.getSuccess(self)
     
     def process(self):
-        if (not super().process()):
+        if not super().process():
             return False
         
         self.connectionInfo.port = 1433
@@ -77,9 +76,9 @@ class StiMsSqlAdapter(StiDataAdapter):
     def parseUnknownParameter(self, parameter: str, name: str, value: str):
         super().parseUnknownParameter(parameter, name, value)
         
-        if (name.lower() == 'trustservercertificate'):
+        if name.lower() == 'trustservercertificate':
             self.trustServerCertificate = value
-        if (name.lower() == 'integrated security'):
+        if name.lower() == 'integrated security':
             self.integratedSecurity = value
     
     def makeQuery(self, procedure: str, parameters: list):
@@ -87,7 +86,9 @@ class StiMsSqlAdapter(StiDataAdapter):
         return f'EXEC {procedure} {paramsString}'
 
     def parseType(self, meta: tuple):
-        if (self.connectionInfo.driver):
+        import pymssql
+
+        if self.connectionInfo.driver:
             return super().parseType(meta)
 
         types = {
@@ -99,16 +100,16 @@ class StiMsSqlAdapter(StiDataAdapter):
         }
 
         for key, array in types.items():
-            if (meta[1] in array):
+            if meta[1] in array:
                 return key
 
         return 'string'
     
     def getValueType(self, value: object, index: int, types: list):
-        if (types[index] == 'array' and (type(value) == datetime or type(value) == date or type(value) == time)):
+        if types[index] == 'array' and (type(value) == datetime or type(value) == date or type(value) == time):
             types[index] = 'datetime'
 
-        if (types[index] == 'array' and type(value) == UUID):
+        if types[index] == 'array' and type(value) == UUID:
             types[index] = 'string'
         
         return super().getValueType(value, index, types)
