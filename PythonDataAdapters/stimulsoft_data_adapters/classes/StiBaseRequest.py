@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2023.4.3
-Build date: 2023.11.02
+Version: 2023.4.4
+Build date: 2023.11.21
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -35,7 +35,13 @@ class StiBaseRequest:
         for prop in obj:
             field = prop[4:] if prefix and prop[0:4] == 'sti_' else prop
             if field in fields:
-                setattr(self, field, obj[prop])
+                self._setField(field, obj[prop])
+
+
+### Protected
+
+    def _setField(self, name, value):
+        setattr(self, name, value)
 
 
 ### Public

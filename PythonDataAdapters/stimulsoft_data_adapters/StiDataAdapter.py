@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2023.4.3
-Build date: 2023.11.02
+Version: 2023.4.4
+Build date: 2023.11.21
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -17,7 +17,7 @@ from .enums.StiDatabaseType import StiDatabaseType
 
 
 class StiDataAdapter:
-    version: str = '2023.4.3'
+    version: str = '2023.4.4'
     checkVersion: bool = False
 
     connectionString: str = None

@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2023.4.3
-Build date: 2023.11.02
+Version: 2023.4.4
+Build date: 2023.11.21
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -13,7 +13,7 @@ from .StiDataAdapter import StiDataAdapter
 
 
 class StiOdbcAdapter(StiDataAdapter):
-    version: str = '2023.4.3'
+    version: str = '2023.4.4'
     checkVersion: bool = True
     connectionLink: Connection
 

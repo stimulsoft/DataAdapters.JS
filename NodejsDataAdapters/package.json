@@ -1,6 +1,6 @@
 {
     "name": "stimulsoft-data-adapter",
-    "version": "2023.4.3",
+    "version": "2023.4.4",
     "description": "Nodejs data adapter for Stimulsoft Reports.JS",
     "main": "index.js",
     "scripts": {
@@ -27,7 +27,8 @@
         "MSSQLAdapter.js",
         "MySQLAdapter.js",
         "PostgreSQLAdapter.js",
-        "OracleAdapter.js"
+        "OracleAdapter.js",
+        "MongoDBAdapter.js"
     ],
     "author": {
         "name": "Stimulsoft",

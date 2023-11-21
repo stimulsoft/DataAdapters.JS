@@ -101,7 +101,8 @@ def handler():
 The handler provides two events: **onBeginProcessData** and **onEndProcessData**, which occur before connecting to the database and after receiving data.
 
 ```
-from stimulsoft_data_adapters import StiBaseHandler, StiDataEventArgs
+from stimulsoft_data_adapters import StiBaseHandler
+from stimulsoft_data_adapters.events import StiDataEventArgs
 
 @app.route('/handler', methods = ['GET', 'POST'])
 def handler():
