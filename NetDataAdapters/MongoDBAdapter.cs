@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2023.4.4
-Build date: 2023.11.21
+Version: 2024.1.1
+Build date: 2023.12.08
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 ﻿/*
@@ -131,9 +131,11 @@ namespace AspNetDataAdapters
                         columns.Add(field.Name);
                         types.Add(GetType(field.Value.ToString()));
                     }
+                    
+                    var query = string.IsNullOrEmpty(command.QueryString) ? FilterDefinition<BsonDocument>.Empty : BsonSerializer.Deserialize<BsonDocument>(command.QueryString);
 
                     CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
-                    foreach (var record in collection.Find(new BsonDocument()).ToEnumerable())
+                    foreach (var record in collection.Find(query).ToEnumerable())
                     {
                         var row = new string[columns.Count];
                         foreach (var field in record)
@@ -168,7 +170,7 @@ namespace AspNetDataAdapters
                 };
             }
 
-            result.AdapterVersion = "2023.4.4";
+            result.AdapterVersion = "2024.1.1";
             return result;
         }
     }

@@ -1,13 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2023.4.4
-Build date: 2023.11.21
-License: https://www.stimulsoft.com/en/licensing/reports
-*/
-/*
-Stimulsoft.Reports.JS
-Version: 2023.3.3
-Build date: 2023.08.23
+Version: 2024.1.1
+Build date: 2023.12.08
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 exports.process = function (command, onResult) {
@@ -65,7 +59,7 @@ exports.process = function (command, onResult) {
         var result = { success: false };
 
         try {
-	    var { MongoClient } = require("mongodb");
+            var { MongoClient } = require("mongodb");
             var uri = command.connectionString;
             var client = new MongoClient(uri);
 
@@ -80,7 +74,7 @@ exports.process = function (command, onResult) {
                 var rows = [];
 
                 for (var collection of collections) {
-                    if (command.dataSource && command.dataSource != collection.name) 
+                    if (command.dataSource && command.dataSource != collection.name)
                         continue;
 
                     collection = db.collection(collection.name);
@@ -105,7 +99,9 @@ exports.process = function (command, onResult) {
                     types.push(getType(schema[name]));
                 }
 
-                var records = await collection.find({}).toArray();
+                var query = command.queryString ? JSON.parse(command.queryString.replace(/(['"])?([a-z0-9A-Z_]+)(['"])?:/g, '"$2": ')) : {};
+
+                var records = await collection.find(query).toArray();
                 for (var record of records) {
                     var row = [];
                     for (var columnName in record) {
@@ -130,7 +126,7 @@ exports.process = function (command, onResult) {
         }
 
         client.close();
-        result.adapterVersion = "2023.4.4";
+        result.adapterVersion = "2024.1.1";
         onResult(result);
     });
 }
