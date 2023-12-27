@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.1.1
-Build date: 2023.12.08
+Version: 2024.1.2
+Build date: 2023.12.21
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -26,7 +26,7 @@ class StiBaseHandler:
     The incoming request is processed, a data adapter is created and all necessary actions are performed.
     """
 
-    version: str = '2024.1.1'
+    version: str = '2024.1.2'
     checkDataAdaptersVersion: bool = True
     framework: str = StiFrameworkType.DEFAULT
     origin: str = None
