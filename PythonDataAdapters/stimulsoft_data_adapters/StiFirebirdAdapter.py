@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.1.3
-Build date: 2024.01.18
+Version: 2024.1.4
+Build date: 2024.02.14
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -10,7 +10,7 @@ from .StiDataAdapter import StiDataAdapter
 
 
 class StiFirebirdAdapter(StiDataAdapter):
-    version: str = '2024.1.3'
+    version: str = '2024.1.4'
     checkVersion: bool = True
 
     def getOdbcConnectionString(self):

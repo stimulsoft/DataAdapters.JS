@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2024.1.3
-# Build date: 2024.01.18
+# Version: 2024.1.4
+# Build date: 2024.02.14
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -14,7 +14,7 @@ use Stimulsoft\StiResult;
 
 class StiOdbcAdapter extends StiDataAdapter
 {
-    public $version = '2024.1.3';
+    public $version = '2024.1.4';
     public $checkVersion = true;
 
     protected function getLastErrorResult($message = 'An unknown error has occurred.')
