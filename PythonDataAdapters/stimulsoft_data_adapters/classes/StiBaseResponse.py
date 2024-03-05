@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.1.4
-Build date: 2024.02.14
+Version: 2024.2.1
+Build date: 2024.03.04
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -65,11 +65,9 @@ class StiBaseResponse:
 
 ### Public
 
-    def getFrameworkResponse(self):
+    def getFrameworkResponse(self, handler = None):
         """
-        Returns a response intended for one of the supported frameworks specified in the arguments. 
-        The supported frameworks are in the 'StiFrameworkType' enum. 
-        If the framework is not specified, it will be determined based on the request.
+        Returns a response intended for one of the supported frameworks.
         """
         
         if self.handler.framework == StiFrameworkType.DJANGO:
@@ -93,7 +91,13 @@ class StiBaseResponse:
             
         if self.handler.framework == StiFrameworkType.TORNADO:
             try:
-                return self.data
+                from tornado.web import RequestHandler as TornadoRequestHandler
+                if isinstance(handler, TornadoRequestHandler):
+                    handler.set_header('Content-Type', self.contentType)
+                    handler.write(self.data)
+                    return None
+
+                return self
             except:
                 return self
 

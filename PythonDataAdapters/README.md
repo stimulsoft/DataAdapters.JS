@@ -1,16 +1,17 @@
-# About
+# Stimulsoft data adapters for Python.
 
-This project is a simple Web server written in Python using a Flask framework (any one can be used).
+This project is a simple Web server written in Python using a Flask framework. You can use any web server and framework, the code examples below show how to use Flask, Django, and Tornado.
 
-# Prepare to Start
 
-To install the **Stimulsoft Data Adapters for Python**, you can use the specified command:
+## Prepare to Start
+
+To install the **Stimulsoft data adapters for Python**, you can use the specified command:
 ```
 python -m pip install stimulsoft-data-adapters
 ```
 All supported data adapters will be installed, as well as the universal **pyodbc** data driver, which supports most databases. If necessary, you can install any additional native data driver from the list below.
 
-To install **Stimulsoft Data Adapters for Python** with all the necessary data drivers, you can use the following command:
+To install **Stimulsoft data adapters for Python** with all the necessary data drivers, you can use the following command:
 ```
 python -m pip install stimulsoft-data-adapters[ext]
 ```
@@ -21,7 +22,7 @@ python -m pip install Flask
 ```
 
 
-# Start the Project
+## Start the project
 
 To start the web server, it is enough to execute the specified command:
 ```
@@ -36,7 +37,8 @@ The data adapter event handler runs on the following address, which must be conf
 http://127.0.0.1:8040/handler
 ```
 
-# Working with Data Adapters
+
+## Working with data adapters
 
 To start working with data adapters, it is enough to define the **StiBaseHandler** class, call **processRequest()** function which accepts HTTP request data as input, and generates a response that needs to be passed to the report generator.
 
@@ -74,12 +76,10 @@ from tornado.web import Application, RequestHandler
 from stimulsoft_data_adapters import StiBaseHandler
 
 class Handler(RequestHandler):
-    def get(self):
+    def post(self):
         handler = StiBaseHandler()
         handler.processRequest(self.request)
-        response = handler.getResponse()
-        self.set_header('Content-Type', response.contentType)
-        self.write(response.data)
+        return handler.getFrameworkResponse(self)
 ```
 
 For all other cases, it is enough to pass query vars and the request body to the handler. After that, you can get a response from the handler, which will contain the data and the necessary information.
@@ -96,7 +96,7 @@ def handler():
     mimetype = response.mimetype
 ```
 
-# Data Adapter events
+## Data adapter events
 
 The handler provides two events: **onBeginProcessData** and **onEndProcessData**, which occur before connecting to the database and after receiving data.
 
@@ -138,7 +138,8 @@ def endProcessData(args: StiDataEventArgs):
     args.result.rows
 ```
 
-# Install Database Drivers
+
+## Install database drivers
 
 By default, without extras, only the data adapters will be installed. All required database drivers must be installed manually. This may be useful for some cases and certain operating systems, or for installing only the necessary drivers.
 

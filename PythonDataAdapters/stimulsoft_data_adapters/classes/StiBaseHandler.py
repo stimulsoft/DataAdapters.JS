@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.1.4
-Build date: 2024.02.14
+Version: 2024.2.1
+Build date: 2024.03.04
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -26,7 +26,7 @@ class StiBaseHandler:
     The incoming request is processed, a data adapter is created and all necessary actions are performed.
     """
 
-    version: str = '2024.1.4'
+    version: str = '2024.2.1'
     checkDataAdaptersVersion: bool = True
     framework: str = StiFrameworkType.DEFAULT
     origin: str = None
@@ -206,14 +206,12 @@ class StiBaseHandler:
         
         return True
 
-    def getFrameworkResponse(self) -> object:
+    def getFrameworkResponse(self, handler = None) -> object:
         """
-        Returns a response intended for one of the supported frameworks specified in the arguments. 
-        The supported frameworks are in the 'StiFrameworkType' enum. 
-        If the framework is not specified, it will be determined based on the request.
+        Returns a response intended for one of the supported frameworks.
         """
 
-        return self.getResponse().getFrameworkResponse()
+        return self.getResponse().getFrameworkResponse(handler)
 
     def getResponse(self) -> StiBaseResponse:
         """

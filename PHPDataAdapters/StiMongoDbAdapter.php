@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2024.1.4
-# Build date: 2024.02.14
+# Version: 2024.2.1
+# Build date: 2024.03.04
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -14,7 +14,7 @@ use Stimulsoft\StiResult;
 
 class StiMongoDbAdapter extends StiDataAdapter
 {
-    public $version = '2024.1.4';
+    public $version = '2024.2.1';
     public $checkVersion = true;
 
     protected $driverName = 'mongodb';
