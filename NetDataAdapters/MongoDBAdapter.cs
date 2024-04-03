@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2024.2.2
-Build date: 2024.03.11
+Version: 2024.2.3
+Build date: 2024.04.02
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 ﻿/*
@@ -11,6 +11,7 @@ Build date: 2023.08.23
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
@@ -170,7 +171,7 @@ namespace AspNetDataAdapters
                 };
             }
 
-            result.AdapterVersion = "2024.2.2";
+            result.AdapterVersion = "2024.2.3";
             return result;
         }
     }
