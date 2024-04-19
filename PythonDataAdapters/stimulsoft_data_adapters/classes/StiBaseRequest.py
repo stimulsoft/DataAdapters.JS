@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.2.3
-Build date: 2024.04.02
+Version: 2024.2.4
+Build date: 2024.04.18
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -47,10 +47,10 @@ class StiBaseRequest:
 ### Public
 
     def process(self, query: dict, body: str) -> bool:
-        if len(query) > 0:
+        if len(query or '') > 0:
             self.__populateVars(query, True)
 
-        if len(body) > 0:
+        if len(body or '') > 0:
             if body[0] != '{':
                 try:
                     body = codecs.decode(body, 'rot_13')

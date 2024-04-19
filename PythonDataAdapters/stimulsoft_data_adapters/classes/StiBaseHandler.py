@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.2.3
-Build date: 2024.04.02
+Version: 2024.2.4
+Build date: 2024.04.18
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -26,7 +26,7 @@ class StiBaseHandler:
     The incoming request is processed, a data adapter is created and all necessary actions are performed.
     """
 
-    version: str = '2024.2.3'
+    version: str = '2024.2.4'
     checkDataAdaptersVersion: bool = True
     framework: str = StiFrameworkType.DEFAULT
     origin: str = None
@@ -77,8 +77,9 @@ class StiBaseHandler:
                 self.framework = StiFrameworkType.DJANGO
                 return True
         except Exception as e:
-            self.error = 'Request: ' + str(e)
-            return False
+            if not isinstance(e, ModuleNotFoundError):
+                self.error = 'Request: ' + str(e)
+                return False
 
         try:
             from flask import Request as FlaskRequest
@@ -89,8 +90,9 @@ class StiBaseHandler:
                 self.framework = StiFrameworkType.FLASK
                 return True
         except Exception as e:
-            self.error = 'Request: ' + str(e)
-            return False
+            if not isinstance(e, ModuleNotFoundError):
+                self.error = 'Request: ' + str(e)
+                return False
 
         try:
             from tornado.httputil import HTTPServerRequest as TornadoRequest
@@ -101,10 +103,12 @@ class StiBaseHandler:
                 self.framework = StiFrameworkType.TORNADO
                 return True
         except Exception as e:
-            self.error = 'Request: ' + str(e)
-            return False
+            if not isinstance(e, ModuleNotFoundError):
+                self.error = 'Request: ' + str(e)
+                return False
         
-        return True
+        self.error = 'Unsupported request: ' + str(request.__class__)
+        return False
 
     def __getSupportedDataAdaptersResult(self) -> StiBaseResult:
         result = StiBaseResult.getSuccess()
