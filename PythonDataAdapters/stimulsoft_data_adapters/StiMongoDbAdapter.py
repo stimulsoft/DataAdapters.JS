@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.2.4
-Build date: 2024.04.18
+Version: 2024.2.5
+Build date: 2024.05.06
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -12,7 +12,7 @@ from .StiDataAdapter import StiDataAdapter
 
 
 class StiMongoDbAdapter(StiDataAdapter):
-    version: str = '2024.2.4'
+    version: str = '2024.2.5'
     checkVersion: bool = True
 
     def connect(self):

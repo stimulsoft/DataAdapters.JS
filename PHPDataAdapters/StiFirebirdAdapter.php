@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2024.2.4
-# Build date: 2024.04.18
+# Version: 2024.2.5
+# Build date: 2024.05.06
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -13,7 +13,7 @@ use Stimulsoft\StiResult;
 
 class StiFirebirdAdapter extends StiDataAdapter
 {
-    public $version = '2024.2.4';
+    public $version = '2024.2.5';
     public $checkVersion = true;
 
     protected $driverName = 'firebird';
