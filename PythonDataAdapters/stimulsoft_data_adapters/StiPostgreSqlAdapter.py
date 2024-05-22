@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.2.5
-Build date: 2024.05.06
+Version: 2024.2.6
+Build date: 2024.05.20
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -10,7 +10,7 @@ from .StiDataAdapter import StiDataAdapter
 
 
 class StiPostgreSqlAdapter(StiDataAdapter):
-    version: str = '2024.2.5'
+    version: str = '2024.2.6'
     checkVersion: bool = True
 
     def connect(self):
