@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.2.6
-Build date: 2024.05.20
+Version: 2024.3.1
+Build date: 2024.06.13
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -13,9 +13,15 @@ from .StiDataAdapter import StiDataAdapter
 
 
 class StiOdbcAdapter(StiDataAdapter):
-    version: str = '2024.2.6'
-    checkVersion: bool = True
+
+### Properties
+
+    version = '2024.3.1'
+    checkVersion = True
     connectionLink: Connection
+
+
+### Methods
 
     def connect(self):
         try:
@@ -24,13 +30,13 @@ class StiOdbcAdapter(StiDataAdapter):
                 self.connectionLink.setdecoding(pyodbc.SQL_CHAR, self.connectionInfo.charset)
                 self.connectionLink.setdecoding(pyodbc.SQL_WCHAR, self.connectionInfo.charset)
         except Exception as e:
-            return StiDataResult.getError(self, str(e))
+            return StiDataResult.getError(str(e)).getDataAdapterResult(self)
         
-        return StiDataResult.getSuccess(self)
+        return StiDataResult.getSuccess().getDataAdapterResult(self)
     
     def process(self):
-        if not super().process():
-            return False
+        if super().process():
+            return True
 
         parameterNames = {
             'driver': ['driver'],
@@ -38,6 +44,6 @@ class StiOdbcAdapter(StiDataAdapter):
             'password': ['pwd', 'password']
         }
 
-        return self.parseParameters(parameterNames)
+        return self.processParameters(parameterNames)
     
     

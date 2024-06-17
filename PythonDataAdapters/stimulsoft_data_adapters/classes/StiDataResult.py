@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.2.6
-Build date: 2024.05.20
+Version: 2024.3.1
+Build date: 2024.06.13
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -21,33 +21,38 @@ class StiDataResult(StiBaseResult):
     The result contains a collection of data, message about the result of the command execution, and other technical information.
     """
 
+### Properties
+
     adapterVersion: str = None
     types: list = None
     columns: list = None
     rows: list = None
-    count: int = 0
+    count = 0
 
 
-### Public
+### Result
 
-    def getSuccess(adapter: StiDataAdapter, notice: str = None) -> StiDataResult:
+    def getDataAdapterResult(self, adapter: StiDataAdapter) -> StiDataResult:
+        self.adapterVersion = adapter.version
+        self.checkVersion = adapter.checkVersion
+        return self
+
+    @staticmethod
+    def getSuccess(notice: str = None) -> StiDataResult:
         """Creates a successful result."""
         
         result: StiDataResult = StiBaseResult.getSuccess(notice)
         result.__class__ = StiDataResult
-        result.adapterVersion = adapter.version
-        result.checkVersion = adapter.checkVersion
         result.types = []
         result.columns = []
         result.rows = []
 
         return result
     
-    def getError(adapter: StiDataAdapter, notice: str) -> StiBaseResult:
+    @staticmethod
+    def getError(notice: str) -> StiDataResult:
         """Creates an error result."""
 
         result: StiDataResult = StiBaseResult.getError(notice)
         result.__class__ = StiDataResult
-        result.adapterVersion = adapter.version
-        result.checkVersion = adapter.checkVersion
         return result

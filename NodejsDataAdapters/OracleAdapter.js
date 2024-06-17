@@ -150,10 +150,10 @@ exports.process = function (command, onResult) {
             var parameters = null;
             var result = "";
 
-            if (baseSqlCommand != null && baseSqlCommand.indexOf("@") > -1) {
-                while (baseSqlCommand.indexOf("@") >= 0 && baseParameters != null && baseParameters.length > 0) {
-                    result += baseSqlCommand.substring(0, baseSqlCommand.indexOf("@"));
-                    baseSqlCommand = baseSqlCommand.substring(baseSqlCommand.indexOf("@") + 1);
+            if (baseSqlCommand != null && baseSqlCommand.indexOf(":") > -1) {
+                while (baseSqlCommand.indexOf(":") >= 0 && baseParameters != null && baseParameters.length > 0) {
+                    result += baseSqlCommand.substring(0, baseSqlCommand.indexOf(":"));
+                    baseSqlCommand = baseSqlCommand.substring(baseSqlCommand.indexOf(":") + 1);
 
                     var parameterName = "";
 
@@ -172,13 +172,13 @@ exports.process = function (command, onResult) {
                             var parameterValue = parameter.value;
                             if (parameter.typeGroup == "number") parameterValue = +parameter.value;
                             else if (parameter.typeGroup == "datetime") parameterValue = new Date(parameter.value);
-                            if (parameters == null) parameter = {};
+                            else if (parameter.typeGroup == "date") parameterValue = new Date(parameter.value);
+                            else if (parameter.typeGroup == "time") parameterValue = new Date(parameter.value);
+                            if (parameters == null) parameters = {};
                             parameters[parameter.name] = parameterValue;
                         }
-                        result += ':' + parameter.name;
                     }
-                    else
-                        result += "@" + parameterName;
+                    result += ':' + parameter.name;
                 }
             }
 

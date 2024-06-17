@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.2.6
-Build date: 2024.05.20
+Version: 2024.3.1
+Build date: 2024.06.13
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -24,17 +24,10 @@ class StiBaseResponse:
     You can get the data, its type and other parameters necessary to create a web server response.
     """
 
+### Properties
+
     handler: StiBaseHandler = None
     result: StiBaseResult = None
-
-
-### Private
-
-    def __getArrtibutes(obj: object):
-        return { attr: getattr(obj, attr) for attr in dir(obj) if not callable(getattr(obj, attr)) and not attr.startswith('_') }
-
-
-### Properties
 
     @property
     def origin(self) -> str:
@@ -43,8 +36,8 @@ class StiBaseResponse:
         return self.handler.origin
 
     @property
-    def mimetype(self) -> str:
-        """Returns the mime-type for the handler response."""
+    def mimeType(self) -> str:
+        """Returns the MIME type for the handler response."""
 
         return 'application/json'
     
@@ -52,23 +45,23 @@ class StiBaseResponse:
     def contentType(self) -> str:
         """Returns the content type for the handler response. Can be used for the 'Content-Type' header of the response."""
 
-        return self.mimetype + '; charset=utf-8'
+        return self.mimeType + '; charset=utf-8'
     
     @property
     def data(self) -> bytes:
         """Returns the handler response as a byte array. When using encryption, the response will be encrypted and encoded into a Base64 string."""
 
-        data = json.dumps(self.result, default = StiBaseResponse.__getArrtibutes)
+        data = json.dumps(self.result, default = StiBaseResult.getProperties)
         if self.handler.request.encryptData == True:
             data = codecs.encode(codecs.encode(data.encode(), 'base64').decode(), 'rot13')
+            
         return data.encode()
 
-### Public
+
+### Response
 
     def getFrameworkResponse(self, handler = None):
-        """
-        Returns a response intended for one of the supported frameworks.
-        """
+        """Returns a response intended for one of the supported frameworks."""
         
         if self.handler.framework == StiFrameworkType.DJANGO:
             try:
@@ -83,7 +76,7 @@ class StiBaseResponse:
             try:
                 from flask import make_response
                 response = make_response(self.data)
-                response.mimetype = self.mimetype
+                response.mimetype = self.mimeType
                 response.headers.add('Access-Control-Allow-Origin', self.origin)
                 return response
             except:

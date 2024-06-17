@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.2.6
-Build date: 2024.05.20
+Version: 2024.3.1
+Build date: 2024.06.13
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -13,10 +13,16 @@ from .StiDataAdapter import StiDataAdapter
 
 
 class StiMsSqlAdapter(StiDataAdapter):
-    version: str = '2024.2.6'
-    checkVersion: bool = True
+
+### Properties
+
+    version = '2024.3.1'
+    checkVersion = True
     trustServerCertificate: str = None
     integratedSecurity: str = None
+
+
+### Methods
 
     def getOdbcConnectionString(self):
         connectionString: str = \
@@ -52,13 +58,13 @@ class StiMsSqlAdapter(StiDataAdapter):
                 host = self.connectionInfo.host,
                 port = self.connectionInfo.port)
         except Exception as e:
-            return StiDataResult.getError(self, str(e))
+            return StiDataResult.getError(str(e)).getDataAdapterResult(self)
         
-        return StiDataResult.getSuccess(self)
+        return StiDataResult.getSuccess().getDataAdapterResult(self)
     
     def process(self):
-        if not super().process():
-            return False
+        if super().process():
+            return True
         
         self.connectionInfo.port = 1433
 
@@ -71,10 +77,10 @@ class StiMsSqlAdapter(StiDataAdapter):
             'charset': ['charset']
         }
 
-        return self.parseParameters(parameterNames)
+        return self.processParameters(parameterNames)
     
-    def parseUnknownParameter(self, parameter: str, name: str, value: str):
-        super().parseUnknownParameter(parameter, name, value)
+    def processUnknownParameter(self, parameter: str, name: str, value: str):
+        super().processUnknownParameter(parameter, name, value)
         
         if name.lower() == 'trustservercertificate':
             self.trustServerCertificate = value
@@ -85,11 +91,11 @@ class StiMsSqlAdapter(StiDataAdapter):
         paramsString = super().makeQuery(procedure, parameters)
         return f'EXEC {procedure} {paramsString}'
 
-    def parseType(self, meta: tuple):
+    def getType(self, meta: tuple):
         import pymssql
 
         if self.connectionInfo.driver:
-            return super().parseType(meta)
+            return super().getType(meta)
 
         types = {
             'int': [pymssql.NUMBER],

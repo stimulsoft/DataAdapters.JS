@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.2.6
-Build date: 2024.05.20
+Version: 2024.3.1
+Build date: 2024.06.13
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -10,8 +10,14 @@ from .StiDataAdapter import StiDataAdapter
 
 
 class StiFirebirdAdapter(StiDataAdapter):
-    version: str = '2024.2.6'
-    checkVersion: bool = True
+
+### Properties
+
+    version = '2024.3.1'
+    checkVersion = True
+
+
+### Methods
 
     def getOdbcConnectionString(self):
         connectionString: str = \
@@ -22,7 +28,7 @@ class StiFirebirdAdapter(StiDataAdapter):
         
         return connectionString
 
-    def connect(self):
+    def connect(self) -> StiDataResult:
         if self.connectionInfo.driver:
             return self.connectOdbc()
         
@@ -38,13 +44,13 @@ class StiFirebirdAdapter(StiDataAdapter):
                 database = dsn,
                 charset = self.connectionInfo.charset)
         except Exception as e:
-            return StiDataResult.getError(self, str(e))
+            return StiDataResult.getError(str(e)).getDataAdapterResult(self)
         
-        return StiDataResult.getSuccess(self)
+        return StiDataResult.getSuccess().getDataAdapterResult(self)
     
     def process(self):
-        if not super().process():
-            return False
+        if super().process():
+            return True
 
         self.connectionInfo.port = 3050
 
@@ -58,7 +64,7 @@ class StiFirebirdAdapter(StiDataAdapter):
             'charset': ['charset']
         }
 
-        return self.parseParameters(parameterNames)
+        return self.processParameters(parameterNames)
     
     def makeQuery(self, procedure: str, parameters: list):
         paramsString = super().makeQuery(procedure, parameters)

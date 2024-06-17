@@ -1,21 +1,27 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.2.6
-Build date: 2024.05.20
+Version: 2024.3.1
+Build date: 2024.06.13
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
-from typing import Final
+from enum import Enum
 
 
-class StiDatabaseType:
-    MYSQL: Final = 'MySQL'
-    MSSQL: Final = 'MS SQL'
-    POSTGRESQL: Final = 'PostgreSQL'
-    FIREBIRD: Final = 'Firebird'
-    ORACLE: Final = 'Oracle'
-    ODBC: Final = 'ODBC'
-    MONGODB: Final = 'MongoDB'
+class StiDatabaseType(Enum):
 
-    def getTypes():
-        return [getattr(StiDatabaseType, field) for field in dir(StiDatabaseType) if not callable(getattr(StiDatabaseType, field)) and not field.startswith('__')]
+    NONE = None
+    MYSQL = 'MySQL'
+    MSSQL = 'MS SQL'
+    POSTGRESQL = 'PostgreSQL'
+    FIREBIRD = 'Firebird'
+    ORACLE = 'Oracle'
+    ODBC = 'ODBC'
+    MONGODB = 'MongoDB'
+
+
+### Helpers
+
+    @staticmethod
+    def getValues():
+        return [enum.value for enum in StiDatabaseType if enum.value != None]

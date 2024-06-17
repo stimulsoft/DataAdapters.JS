@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.2.6
-Build date: 2024.05.20
+Version: 2024.3.1
+Build date: 2024.06.13
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -10,6 +10,8 @@ from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 from uuid import UUID
 
+from pyodbc import Connection
+
 from .classes.StiConnectionInfo import StiConnectionInfo
 from .classes.StiDataResult import StiDataResult
 from .classes.StiParameter import StiParameter
@@ -17,12 +19,18 @@ from .enums.StiDatabaseType import StiDatabaseType
 
 
 class StiDataAdapter:
-    version: str = '2024.2.6'
-    checkVersion: bool = False
+
+### Properties
+
+    version = ''
+    checkVersion = False
 
     connectionString: str = None
     connectionInfo: StiConnectionInfo = None
-    connectionLink: object = None
+    connectionLink: Connection = None
+
+
+### Methods
 
     def getOdbcConnectionString(self):
         connectionString: str = \
@@ -35,7 +43,7 @@ class StiDataAdapter:
         return connectionString
 
     def connect(self):
-        return StiDataResult.getSuccess(self)
+        return StiDataResult.getSuccess().getDataAdapterResult(self)
     
     def connectOdbc(self):
         from .StiOdbcAdapter import StiOdbcAdapter
@@ -60,9 +68,9 @@ class StiDataAdapter:
     
     def process(self):
         self.connectionInfo = StiConnectionInfo()
-        return True
+        return False
     
-    def parseParameters(self, parameterNames: dict[str, list[str]]):
+    def processParameters(self, parameterNames: dict[str, list[str]]):
         parameters = self.connectionString.split(';')
 
         for parameter in parameters:
@@ -82,14 +90,14 @@ class StiDataAdapter:
                         break
 
             if unknown:
-                self.parseUnknownParameter(parameter, name, value)
+                self.processUnknownParameter(parameter, name, value)
 
         return True
     
-    def parseUnknownParameter(self, parameter: str, name: str, value: str):
+    def processUnknownParameter(self, parameter: str, name: str, value: str):
         pass
 
-    def parseType(self, meta: tuple):
+    def getType(self, meta: tuple):
         types = {
             'boolean': [bool],
             'int': [int],
@@ -165,11 +173,11 @@ class StiDataAdapter:
         except Exception as e:
             message = str(e)
             cursor.close()
-            return StiDataResult.getError(self, message)
+            return StiDataResult.getError(message).getDataAdapterResult(self)
         
         for meta in cursor.description:
             result.columns.append(meta[0])
-            columnType = self.parseType(meta)
+            columnType = self.getType(meta)
             result.types.append(columnType)
 
         try:
@@ -182,14 +190,18 @@ class StiDataAdapter:
                 result.rows.append(row)
         except Exception as e:
             message = str(e)
-            return StiDataResult.getError(self, message)
+            return StiDataResult.getError(message).getDataAdapterResult(self)
         finally:
             cursor.close()
 
         result.count = len(result.rows)
         return result
+    
 
-    def getDataAdapter(database: str, connectionString: str):
+### Helpers
+
+    @staticmethod
+    def getDataAdapter(database: StiDatabaseType, connectionString: str):
         if database == StiDatabaseType.MYSQL:
             from .StiMySqlAdapter import StiMySqlAdapter
             return StiMySqlAdapter(connectionString)
@@ -220,6 +232,7 @@ class StiDataAdapter:
         
         return None
     
+    @staticmethod
     def applyQueryParameters(query: str, parameters: dict[str, StiParameter], escape: bool) -> str:
         result: str = ''
 
@@ -255,6 +268,9 @@ class StiDataAdapter:
                 result += '@' + parameterName
 
         return result + query
+    
+
+### Constructor
     
     def __init__(self, connectionString: str):
         self.connectionString = connectionString.strip()

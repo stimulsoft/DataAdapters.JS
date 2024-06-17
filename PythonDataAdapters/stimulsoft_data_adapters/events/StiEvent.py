@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.2.6
-Build date: 2024.05.20
+Version: 2024.3.1
+Build date: 2024.06.13
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -17,7 +17,7 @@ if typing.TYPE_CHECKING:
 
 class StiEvent:
 
-### Private
+### Fields
 
     __name: str = None
     __callbacks: list = None
@@ -39,9 +39,9 @@ class StiEvent:
         return self.__handler
     
 
-### Protected
+### Helpers
 
-    def _applyFields(self, *args, **keywargs) -> StiEventArgs:
+    def _setArgs(self, *args, **keywargs) -> StiEventArgs:
         eventArgs = args[0] if len(args) > 0 else keywargs.get('args')
         if isinstance(eventArgs, StiEventArgs):
             eventArgs.event = self.name[2:]
@@ -49,6 +49,14 @@ class StiEvent:
             return eventArgs
         
         return None
+    
+    def append(self, callback) -> StiEvent:
+        self.callbacks.append(callback)
+        return self
+
+    def remove(self, callback) -> StiEvent:
+        self.callbacks.remove(callback)
+        return self
 
 ### Override
 
@@ -56,18 +64,19 @@ class StiEvent:
         return len(self.callbacks or '')
 
     def __iadd__(self, callback) -> StiEvent:
-        self.callbacks.append(callback)
-        return self
+        return self.append(callback)
     
     def __isub__(self, callback) -> StiEvent:
-        self.callbacks.remove(callback)
-        return self
+        return self.remove(callback)
 
     def __call__(self, *args, **keywargs) -> object:
         for callback in self.callbacks:
             if (callable(callback)):
-                self._applyFields(*args, **keywargs)
-                return callback(*args, **keywargs)
+                self._setArgs(*args, **keywargs)
+                result = callback(*args, **keywargs)
+                if result != None:
+                    return result
+        return None
 	
 
 ### Constructor

@@ -1,11 +1,16 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.2.6
-Build date: 2024.05.20
+Version: 2024.3.1
+Build date: 2024.06.13
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
+from enum import Enum, Flag
+
+
 class StiEventArgs:
+
+### Properties
 
     event: str = None
     """Name of the current event."""
@@ -14,17 +19,26 @@ class StiEventArgs:
     """The component that sent the request."""
 
 
-### Private
+### Helpers
 
-    def __populateVars(self, obj: object):
-        attributes = [attr for attr in dir(self) if not attr.startswith('_') and attr != 'sender']
-        for attr in attributes:
-            if hasattr(obj, attr):
-                setattr(self, attr, getattr(obj, attr))
+    def __getProperties(self) -> list:
+        return [name for name in dir(self) if not name.startswith('_')  and name != 'sender' and not callable(getattr(self, name))]
+
+    def __setObject(self, object: object):
+        properties = self.__getProperties()
+        for name in properties:
+            if hasattr(object, name):
+                value = getattr(object, name)
+                self.__setProperty(name, value)
+
+    def __setProperty(self, name, value):
+        selfvalue = getattr(self, name)
+        if isinstance(selfvalue, Enum) or isinstance(value, Flag): setattr(self, name, selfvalue.__class__(value))
+        else: setattr(self, name, value)
 
 
 ### Constructor
 
-    def __init__(self, obj: object = None):
-        if (obj != None):
-            self.__populateVars(obj)
+    def __init__(self, object = None):
+        if (object != None):
+            self.__setObject(object)

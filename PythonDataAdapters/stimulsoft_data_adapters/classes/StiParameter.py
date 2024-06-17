@@ -1,12 +1,14 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.2.6
-Build date: 2024.05.20
+Version: 2024.3.1
+Build date: 2024.06.13
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
 class StiParameter:
-    
+
+### Properties
+
     name: str = None
     """The name of the parameter."""
 
@@ -24,6 +26,9 @@ class StiParameter:
 
     value: object = None
     """The value of the parameter. The type of object depends on the type of parameter."""
+
+
+### Constructor
 
     def __init__(self, name: str, typeCode: int, typeName: str, typeGroup: str, size: int, value: object):
         self.name = name

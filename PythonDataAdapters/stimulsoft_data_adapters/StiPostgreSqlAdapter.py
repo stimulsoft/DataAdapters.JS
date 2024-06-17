@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.2.6
-Build date: 2024.05.20
+Version: 2024.3.1
+Build date: 2024.06.13
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -10,8 +10,14 @@ from .StiDataAdapter import StiDataAdapter
 
 
 class StiPostgreSqlAdapter(StiDataAdapter):
-    version: str = '2024.2.6'
-    checkVersion: bool = True
+
+### Properties
+
+    version = '2024.3.1'
+    checkVersion = True
+
+
+### Methods
 
     def connect(self):
         if self.connectionInfo.driver:
@@ -32,13 +38,13 @@ class StiPostgreSqlAdapter(StiDataAdapter):
             import psycopg
             self.connectionLink = psycopg.connect(connectionString)
         except Exception as e:
-            return StiDataResult.getError(self, str(e))
+            return StiDataResult.getError(str(e)).getDataAdapterResult(self)
         
-        return StiDataResult.getSuccess(self)
+        return StiDataResult.getSuccess().getDataAdapterResult(self)
     
     def process(self):
-        if not super().process():
-            return False
+        if super().process():
+            return True
 
         self.connectionInfo.port = 5432
 
@@ -52,11 +58,11 @@ class StiPostgreSqlAdapter(StiDataAdapter):
             'charset': ['charset']
         }
 
-        return self.parseParameters(parameterNames)
+        return self.processParameters(parameterNames)
     
-    def parseType(self, meta: tuple):
+    def getType(self, meta: tuple):
         if self.connectionInfo.driver:
-            return super().parseType(meta)
+            return super().getType(meta)
         
         import psycopg
         column: psycopg.Column = meta

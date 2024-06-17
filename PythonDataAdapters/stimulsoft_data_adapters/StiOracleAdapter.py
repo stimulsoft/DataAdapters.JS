@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.2.6
-Build date: 2024.05.20
+Version: 2024.3.1
+Build date: 2024.06.13
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -10,8 +10,14 @@ from .StiDataAdapter import StiDataAdapter
 
 
 class StiOracleAdapter(StiDataAdapter):
-    version: str = '2024.2.6'
-    checkVersion: bool = True
+
+### Properties
+
+    version = '2024.3.1'
+    checkVersion = True
+
+
+### Methods
 
     def getOdbcConnectionString(self):
         connectionString: str = \
@@ -36,15 +42,15 @@ class StiOracleAdapter(StiDataAdapter):
                 encoding = self.connectionInfo.charset,
                 mode = self.connectionInfo.privilege)
         except Exception as e:
-            return StiDataResult.getError(self, str(e))
+            return StiDataResult.getError(str(e)).getDataAdapterResult(self)
         
-        return StiDataResult.getSuccess(self)
+        return StiDataResult.getSuccess().getDataAdapterResult(self)
     
     def process(self):
-        import oracledb
+        if super().process():
+            return True
         
-        if not super().process():
-            return False
+        import oracledb
         
         self.connectionInfo.port = 3306
         self.connectionInfo.privilege = oracledb.AUTH_MODE_DEFAULT
@@ -57,12 +63,12 @@ class StiOracleAdapter(StiDataAdapter):
             'charset': ['charset']
         }
 
-        return self.parseParameters(parameterNames)
+        return self.processParameters(parameterNames)
     
-    def parseUnknownParameter(self, parameter: str, name: str, value: str):
+    def processUnknownParameter(self, parameter: str, name: str, value: str):
         import oracledb
         
-        super().parseUnknownParameter(parameter, name, value)
+        super().processUnknownParameter(parameter, name, value)
 
         if name.lower() == 'dba privilege' or name.lower() == 'privilege':
             value = value.lower()
@@ -71,9 +77,9 @@ class StiOracleAdapter(StiDataAdapter):
             if value == 'sysdba' or value == 'oci_sysdba':
                 self.connectionInfo.privilege = oracledb.AUTH_MODE_SYSDBA
 
-    def parseType(self, meta: tuple):
+    def getType(self, meta: tuple):
         if self.connectionInfo.driver:
-            return super().parseType(meta)
+            return super().getType(meta)
         
         import oracledb
         info: oracledb.FetchInfo = meta

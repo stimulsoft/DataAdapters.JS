@@ -1,54 +1,60 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.2.6
-Build date: 2024.05.20
+Version: 2024.3.1
+Build date: 2024.06.13
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
 import codecs
 import json
+from enum import Enum, Flag
 
+from ..enums import StiDatabaseType, StiDataCommand, StiBaseEventType
 from .StiBaseResult import StiBaseResult
 
 
 class StiBaseRequest:
     """Contains all set request parameters passed to the event handler."""
 
-    event: str = None
-    command: str = None
-    encryptData: bool = False
+### Properties
+
+    event = StiBaseEventType.NONE
+    command = StiDataCommand.NONE
+    encryptData = False
     connectionString: str = None
     queryString: str = None
     parameters: dict[str, object] = None
-    database: str = None
+    database = StiDatabaseType.NONE
     dataSource: str = None
     connection: str = None
-    timeout: int = 0
-    escapeQueryParameters: bool = False
+    timeout = 0
+    escapeQueryParameters = False
     error: str = None
 
 
-### Private
+### Helpers
 
-    def __populateVars(self, obj: object, prefix: bool = False):
-        fields = dir(self)
-        for prop in obj:
-            field = prop[4:] if prefix and prop[0:4] == 'sti_' else prop
-            if field in fields:
-                self._setField(field, obj[prop])
+    def __getProperties(self) -> list:
+        return [name for name in dir(self) if not name.startswith('_') and not callable(getattr(self, name))]
+
+    def __setObject(self, object: dict, prefix = False):
+        properties = self.__getProperties()
+        for property in object:
+            name = property[4:] if prefix and property[0:4] == 'sti_' else property
+            if name in properties:
+                self._setProperty(name, object.get(property))
+    
+    def _setProperty(self, name, value):
+        selfvalue = getattr(self, name)
+        if isinstance(selfvalue, Enum) or isinstance(value, Flag): setattr(self, name, selfvalue.__class__(value))
+        else: setattr(self, name, value)
 
 
-### Protected
-
-    def _setField(self, name, value):
-        setattr(self, name, value)
-
-
-### Public
+### Process
 
     def process(self, query: dict, body: str) -> bool:
         if len(query or '') > 0:
-            self.__populateVars(query, True)
+            self.__setObject(query, True)
 
         if len(body or '') > 0:
             if body[0] != '{':
@@ -67,7 +73,7 @@ class StiBaseRequest:
                 self.error = 'JSON: ' + str(e)
                 return False
 
-            self.__populateVars(obj)
+            self.__setObject(obj)
 
         return True
 

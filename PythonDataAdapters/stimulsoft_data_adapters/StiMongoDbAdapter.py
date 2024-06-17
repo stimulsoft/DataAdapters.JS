@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.2.6
-Build date: 2024.05.20
+Version: 2024.3.1
+Build date: 2024.06.13
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -12,21 +12,27 @@ from .StiDataAdapter import StiDataAdapter
 
 
 class StiMongoDbAdapter(StiDataAdapter):
-    version: str = '2024.2.6'
-    checkVersion: bool = True
+
+### Properties
+
+    version = '2024.3.1'
+    checkVersion = True
+
+
+### Methods
 
     def connect(self):
         try:
             from pymongo import MongoClient
             self.connectionLink = MongoClient(self.connectionString)
         except Exception as e:
-            return StiDataResult.getError(self, str(e))
+            return StiDataResult.getError(str(e)).getDataAdapterResult(self)
         
-        return StiDataResult.getSuccess(self)
+        return StiDataResult.getSuccess().getDataAdapterResult(self)
     
     def process(self):
-        if not super().process():
-            return False
+        if super().process():
+            return True
         
         url = urlparse(self.connectionString)
         self.connectionInfo.host = url.hostname
@@ -36,12 +42,12 @@ class StiMongoDbAdapter(StiDataAdapter):
         self.connectionInfo.database = url.path.strip(' /')
 
         parameterNames = []
-        return self.parseParameters(parameterNames)
+        return self.processParameters(parameterNames)
     
-    def parseParameters(self, parameterNames: dict[str, list[str]]):
+    def processParameters(self, parameterNames: dict[str, list[str]]):
         return True
     
-    def parseType(self, meta: object):
+    def getType(self, meta: object):
         types = {
             'boolean': ['bool'],
             'int': ['int', 'long', 'minKey', 'maxKey'],
@@ -104,7 +110,7 @@ class StiMongoDbAdapter(StiDataAdapter):
                 row = []
                 row.append(tableName)
                 row.append(columnName)
-                row.append(self.parseType(columnType))
+                row.append(self.getType(columnType))
                 result.rows.append(row)
 
         return result

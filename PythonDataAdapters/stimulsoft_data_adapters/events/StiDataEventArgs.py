@@ -1,22 +1,23 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.2.6
-Build date: 2024.05.20
+Version: 2024.3.1
+Build date: 2024.06.13
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
 from ..classes.StiDataResult import StiDataResult
 from ..classes.StiParameter import StiParameter
+from ..enums import StiDatabaseType, StiDataCommand
 from .StiEventArgs import StiEventArgs
 
 
 class StiDataEventArgs(StiEventArgs):
 
-    command: str = None
-    """The current command for the data adapter. The supported commands are in the 'StiDataCommand' enum."""
+    command = StiDataCommand.NONE
+    """[enum] The current command for the data adapter."""
 
-    database: str = None
-    """The database type for which the command will be executed. The supported database types are in the 'StiDatabaseType' enum."""
+    database = StiDatabaseType.NONE
+    """[enum] The database type for which the command will be executed."""
 
     connection: str = None
     """The name of the current database connection."""
