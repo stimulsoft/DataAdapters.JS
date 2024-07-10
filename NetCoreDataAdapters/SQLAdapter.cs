@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2024.3.1
-Build date: 2024.06.13
+Version: 2024.3.2
+Build date: 2024.07.09
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 using FirebirdSql.Data.FirebirdClient;
@@ -26,7 +26,7 @@ namespace NetCoreDataAdapters
 
         private static Result End(Result result)
         {
-            result.AdapterVersion = "2024.3.1";
+            result.AdapterVersion = "2024.3.2";
             try
             {
                 if (reader != null) reader.Close();
@@ -82,6 +82,7 @@ namespace NetCoreDataAdapters
                     sqlParameter.Value = GetValue((JsonElement)parameter.Value, parameter.TypeGroup);
                     sqlCommand.Parameters.Add(sqlParameter);
                 }
+
                 reader = sqlCommand.ExecuteReader();
                 return OnQuery();
             }
@@ -150,6 +151,7 @@ namespace NetCoreDataAdapters
                         row[index] = value.ToString();
                     }
                 }
+                if (command.MaxDataRows <= rows.Count) break;
                 rows.Add(row);
             }
 

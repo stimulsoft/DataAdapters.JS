@@ -1,14 +1,14 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2024.3.1
-Build date: 2024.06.13
+Version: 2024.3.2
+Build date: 2024.07.09
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 exports.process = function (command, onResult) {
     var end = function (result) {
         try {
             if (connection) connection.close();
-            result.adapterVersion = "2024.3.1";
+            result.adapterVersion = "2024.3.2";
             onResult(result);
         }
         catch (e) {
@@ -27,7 +27,7 @@ exports.process = function (command, onResult) {
             });
         }
 
-        var query = function (queryString, parameters) {
+        var query = function (queryString, parameters, maxDataRows) {
             var request = connection.request();
 
             for (var index in parameters) {
@@ -39,7 +39,7 @@ exports.process = function (command, onResult) {
             var onExecute = function (error, recordset) {
                 if (error) onError(error.message);
                 else {
-                    onQuery(recordset);
+                    onQuery(recordset, maxDataRows);
                 }
             };
 
@@ -51,12 +51,12 @@ exports.process = function (command, onResult) {
 
         var onConnect = function () {
             if (command.queryString) {
-                query(command.queryString, command.parameters);
+                query(command.queryString, command.parameters, command.maxDataRows);
             }
             else end({ success: true });
         }
 
-        var onQuery = function (recordset) {
+        var onQuery = function (recordset, maxDataRows) {
             recordset = recordset.recordset;
             var columns = [];
             var rows = [];
@@ -145,6 +145,8 @@ exports.process = function (command, onResult) {
                     else
                         row[columnIndex] = recordset[recordIndex][columnName];
                 }
+
+                if (maxDataRows != null && maxDataRows <= rows.length) break;
                 rows.push(row);
             }
 

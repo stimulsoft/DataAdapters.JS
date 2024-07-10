@@ -1,14 +1,14 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2024.3.1
-Build date: 2024.06.13
+Version: 2024.3.2
+Build date: 2024.07.09
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 exports.process = function (command, onResult) {
     var end = function (result) {
         try {
             if (client) client.end();
-            result.adapterVersion = "2024.3.1";
+            result.adapterVersion = "2024.3.2";
             onResult(result);
         }
         catch (e) {
@@ -27,11 +27,11 @@ exports.process = function (command, onResult) {
             });
         }
 
-        var query = function (queryString, parameters) {
+        var query = function (queryString, parameters, maxDataRows) {
             client.query(queryString, parameters, function (error, recordset) {
                 if (error) onError(error.message);
                 else {
-                    onQuery(recordset);
+                    onQuery(recordset, maxDataRows);
                 }
             });
         }
@@ -42,15 +42,24 @@ exports.process = function (command, onResult) {
                     command.queryString = "CALL " + command.queryString + "(" + command.parameters.map(parameter => "@" + parameter.name).join(", ") + ")";
 
                 var { queryString, parameters } = applyQueryParameters(command.queryString, command.parameters, command.escapeQueryParameters);
-                query(queryString, parameters);
+                query(queryString, parameters, command.maxDataRows);
             }
             else end({ success: true });
         }
 
-        var onQuery = function (recordset) {
+        var onQuery = function (recordset, maxDataRows) {
             var columns = [];
             var rows = [];
             var types = [];
+
+            if (Array.isArray(recordset)) {
+                for (var resultIndex of recordset) {
+                    if (recordset[resultIndex].command == "SELECT") {
+                        recordset = recordset[resultIndex];
+                        break;
+                    }
+                }
+            }
 
             for (var columnIndex in recordset.fields) {
                 var column = recordset.fields[columnIndex]
@@ -137,7 +146,8 @@ exports.process = function (command, onResult) {
                 }
             }
 
-            if (recordset.rows.length > 0 && Array.isArray(recordset.rows[0])) recordset.rows = recordset.rows[0];
+            if (recordset.rows && recordset.rows.length > 0 && Array.isArray(recordset.rows[0])) recordset.rows = recordset.rows[0];
+
             for (var recordIndex in recordset.rows) {
                 var row = [];
                 for (var columnName in recordset.rows[recordIndex]) {
@@ -169,6 +179,7 @@ exports.process = function (command, onResult) {
 
                     row[columnIndex] = recordset.rows[recordIndex][columnName];
                 }
+                if (maxDataRows != null && maxDataRows <= rows.length) break;
                 rows.push(row);
             }
 

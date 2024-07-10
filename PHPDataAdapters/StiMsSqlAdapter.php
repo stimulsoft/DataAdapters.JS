@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2024.3.1
-# Build date: 2024.06.13
+# Version: 2024.3.2
+# Build date: 2024.07.09
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -13,7 +13,7 @@ use Stimulsoft\StiResult;
 
 class StiMsSqlAdapter extends StiDataAdapter
 {
-    public $version = '2024.3.1';
+    public $version = '2024.3.2';
     public $checkVersion = true;
 
     protected $driverName = 'sqlsrv';

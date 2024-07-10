@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.3.1
-Build date: 2024.06.13
+Version: 2024.3.2
+Build date: 2024.07.09
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -73,11 +73,11 @@ class StiMongoDbAdapter(StiDataAdapter):
 
         return super().getValue(value, valueType)
     
-    def executeNative(self, queryString: str, result: StiDataResult):
+    def executeNative(self, queryString: str, maxDataRows: int, result: StiDataResult):
         if not queryString:
             return self.retrieveSchema(result)
 
-        return self.retrieveData(result, queryString)
+        return self.retrieveData(result, queryString, maxDataRows)
     
     def retrieveSchema(self, result: StiDataResult):
         from pymongo import MongoClient
@@ -115,7 +115,7 @@ class StiMongoDbAdapter(StiDataAdapter):
 
         return result
 
-    def retrieveData(self, result: StiDataResult, queryString: str):
+    def retrieveData(self, result: StiDataResult, queryString: str, maxDataRows: int):
         from pymongo import MongoClient
         connectionLink: MongoClient = self.connectionLink
 
@@ -131,6 +131,8 @@ class StiMongoDbAdapter(StiDataAdapter):
         database = connectionLink.get_database(self.connectionInfo.database)
         collection = database.get_collection(queryString)
         cursor = collection.find()
+        if maxDataRows != None:
+            cursor.limit(maxDataRows)
         for document in cursor:
             row = [None] * result.count
             for key, value in document.items():

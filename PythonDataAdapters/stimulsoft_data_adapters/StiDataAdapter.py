@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.3.1
-Build date: 2024.06.13
+Version: 2024.3.2
+Build date: 2024.07.09
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -153,19 +153,21 @@ class StiDataAdapter:
 
         return paramsString
     
-    def executeQuery(self, queryString: str):
+    def executeQuery(self, queryString: str, maxDataRows: int):
         result = self.connect()
         if result.success:
             result.types = []
             result.columns = []
             result.rows = []
 
-            result = self.executeNative(queryString, result)
+            if maxDataRows != 0:
+                result = self.executeNative(queryString, maxDataRows, result)
+            
             self.disconnect()
 
         return result
     
-    def executeNative(self, queryString: str, result: StiDataResult):
+    def executeNative(self, queryString: str, maxDataRows: int, result: StiDataResult):
         cursor = self.connectionLink.cursor()
 
         try:
@@ -188,6 +190,10 @@ class StiDataAdapter:
                     value = self.getValue(rowValue, valueType)
                     row.append(value)
                 result.rows.append(row)
+            
+                if len(result.rows) == maxDataRows:
+                    cursor.fetchall()
+
         except Exception as e:
             message = str(e)
             return StiDataResult.getError(message).getDataAdapterResult(self)

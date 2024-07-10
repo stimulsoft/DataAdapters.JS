@@ -26,24 +26,24 @@ exports.process = function (command, onResult) {
                     command.queryString = "BEGIN " + command.queryString + "(" + command.parameters.map(parameter => "@" + parameter.name).join(", ") + "); END;";
 
                 var { queryString, parameters } = applyQueryParameters(command.queryString, command.parameters, command.escapeQueryParameters);
-                query(connection, queryString, parameters);
+                query(connection, queryString, parameters, command.maxDataRows);
             }
             else end({ success: true });
         }
 
-        var query = function (connection, queryString, parameters) {
+        var query = function (connection, queryString, parameters, maxDataRows) {
             var args = [queryString];
             if (parameters) args.push(parameters);
 
             connection.execute(...args, function (error, result) {
                 if (error) onError(error.message);
                 else {
-                    onQuery(result);
+                    onQuery(result, maxDataRows);
                 }
             });
         }
 
-        var onQuery = function (result) {
+        var onQuery = function (result, maxDataRows) {
             var columns = [];
             var rows = [];
             var types = [];
@@ -92,6 +92,7 @@ exports.process = function (command, onResult) {
                     row.push(value);
                 }
 
+                if (maxDataRows != null && maxDataRows <= rows.length) break;
                 rows.push(row);
             }
 

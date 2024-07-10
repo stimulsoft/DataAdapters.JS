@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.3.1
-Build date: 2024.06.13
+Version: 2024.3.2
+Build date: 2024.07.09
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -223,7 +223,7 @@ class StiBaseHandler:
             return StiBaseResult.getError(f'Unknown database type: {args.database}')
 
         if self.request.command == StiDataCommand.RETRIEVE_SCHEMA:
-            args.result = self.dataAdapter.executeQuery(args.dataSource)
+            args.result = self.dataAdapter.executeQuery(args.dataSource, args.maxDataRows)
             self.onEndProcessData(args)
             return args.result
 
@@ -241,7 +241,7 @@ class StiBaseHandler:
             if len(args.parameters) > 0:
                 args.queryString = StiDataAdapter.applyQueryParameters(args.queryString, args.parameters, self.request.escapeQueryParameters)
 
-            args.result = self.dataAdapter.executeQuery(args.queryString)
+            args.result = self.dataAdapter.executeQuery(args.queryString, args.maxDataRows)
             self.onEndProcessData(args)
             return args.result
         

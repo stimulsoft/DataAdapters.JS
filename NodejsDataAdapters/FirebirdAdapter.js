@@ -1,14 +1,14 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2024.3.1
-Build date: 2024.06.13
+Version: 2024.3.2
+Build date: 2024.07.09
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 exports.process = function (command, onResult) {
     var end = function (result) {
         try {
             if (db) db.detach();
-            result.adapterVersion = "2024.3.1";
+            result.adapterVersion = "2024.3.2";
             onResult(result);
         }
         catch (e) {
@@ -31,7 +31,7 @@ exports.process = function (command, onResult) {
         var query = function (queryString) {
             db.query(queryString, undefined, function (error, recordset) {
                 if (error) onError(error.message);
-                else onQuery(recordset);
+                else onQuery(recordset, maxDataRows);
                 db.detach();
             });
         }
@@ -39,12 +39,12 @@ exports.process = function (command, onResult) {
         var onConnect = function () {
             if (command.queryString) {
                 var queryString = applyQueryParameters(command.queryString, command.parameters, command.escapeQueryParameters);
-                query(queryString);
+                query(queryString, command.maxDataRows);
             }
             else end({ success: true });
         }
 
-        var onQuery = function (recordset) {
+        var onQuery = function (recordset, maxDataRows) {
             var columns = [];
             var rows = [];
             var types = [];
@@ -69,6 +69,7 @@ exports.process = function (command, onResult) {
                     row[columnIndex] = recordset[recordIndex][columnName];
                 }
                 isColumnsFill = true;
+                if (maxDataRows != null && maxDataRows <= rows.length) break;
                 rows.push(row);
             }
 

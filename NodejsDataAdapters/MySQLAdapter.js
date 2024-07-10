@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2024.3.1
-Build date: 2024.06.13
+Version: 2024.3.2
+Build date: 2024.07.09
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 exports.process = function (command, onResult) {
@@ -13,7 +13,7 @@ exports.process = function (command, onResult) {
         catch (e) {
         }
         finally {
-            result.adapterVersion = "2024.3.1";
+            result.adapterVersion = "2024.3.2";
             onResult(result);
         }
     }
@@ -30,12 +30,12 @@ exports.process = function (command, onResult) {
             });
         }
 
-        var query = function (queryString, parameters, timeout) {
+        var query = function (queryString, parameters, timeout, maxDataRows) {
             connection.query("USE " + command.connectionStringInfo.database);
             connection.query({ sql: queryString, timeout: timeout }, parameters, function (error, rows, fields) {
                 if (error) onError(error.message);
                 else {
-                    onQuery(rows, fields);
+                    onQuery(rows, fields, maxDataRows);
                 }
             });
         }
@@ -46,12 +46,12 @@ exports.process = function (command, onResult) {
                     command.queryString = "CALL " + command.queryString + "(" + command.parameters.map(parameter => "@" + parameter.name).join(", ") + ")";
 
                 var { queryString, parameters } = applyQueryParameters(command.queryString, command.parameters, command.escapeQueryParameters);
-                query(queryString, parameters, command.timeout);
+                query(queryString, parameters, command.timeout, command.maxDataRows);
             }
             else end({ success: true });
         }
 
-        var onQuery = function (recordset, fields) {
+        var onQuery = function (recordset, fields, maxDataRows) {
             var columns = [];
             var rows = [];
             var types = [];
@@ -119,6 +119,7 @@ exports.process = function (command, onResult) {
             if (recordset.length > 0 && Array.isArray(recordset[0])) recordset = recordset[0];
             for (var recordIndex in recordset) {
                 var row = [];
+
                 for (var columnName in recordset[recordIndex]) {
                     var columnIndex = columns.indexOf(columnName);
                     if (recordset[recordIndex][columnName] instanceof Uint8Array ||
@@ -140,6 +141,7 @@ exports.process = function (command, onResult) {
 
                     row[columnIndex] = recordset[recordIndex][columnName];
                 }
+                if (maxDataRows != null && maxDataRows <= rows.length) break;
                 rows.push(row);
             }
 

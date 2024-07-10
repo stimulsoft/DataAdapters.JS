@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2024.3.1
-Build date: 2024.06.13
+Version: 2024.3.2
+Build date: 2024.07.09
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 using System;
@@ -80,6 +80,9 @@ namespace AspNetDataAdapters
 
         [DataMember(Name = "escapeQueryParameters")]
         public bool EscapeQueryParameters { get; set; }
+
+        [DataMember(Name = "maxDataRows")]
+        public int? MaxDataRows { get; set; }
     }
 
     [DataContract]
@@ -180,7 +183,7 @@ namespace AspNetDataAdapters
                     inputStream.Close();
             }
 
-            result.HandlerVersion = "2024.3.1";
+            result.HandlerVersion = "2024.3.2";
             result.CheckVersion = true;
 
             context.Response.Headers.Add("Access-Control-Allow-Origin", "*");

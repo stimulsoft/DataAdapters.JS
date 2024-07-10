@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2024.3.1
-Build date: 2024.06.13
+Version: 2024.3.2
+Build date: 2024.07.09
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 ﻿/*
@@ -150,6 +150,7 @@ namespace AspNetDataAdapters
                             row[columnIndex] = value.ToString();
                         }
 
+                        if (command.MaxDataRows <= rows.Count) break;
                         rows.Add(row);
                     }
 
@@ -171,7 +172,7 @@ namespace AspNetDataAdapters
                 };
             }
 
-            result.AdapterVersion = "2024.3.1";
+            result.AdapterVersion = "2024.3.2";
             return result;
         }
     }

@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2024.3.1
-Build date: 2024.06.13
+Version: 2024.3.2
+Build date: 2024.07.09
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 
@@ -37,8 +37,8 @@ import com.stimulsoft.js.StiSqlTypes;
 
 public class JSDataAdapter {
 
-    public static final String handlerVersion = "2024.3.1";
-    public static final String adapterVersion = "2024.3.1";
+    public static final String handlerVersion = "2024.3.2";
+    public static final String adapterVersion = "2024.3.2";
     public static final boolean checkVersion = true;
 
     private static final List<String> USERS_KEYS = Arrays.asList("jdbc.username", "username", "uid", "user", "user id", "userid", "connection.username");
@@ -130,7 +130,7 @@ public class JSDataAdapter {
     private static String onConnect(CommandJson command, Connection con, String dbName) {
         if (command.getQueryString() != null && command.getQueryString().length() > 0) {
             String queryText = applyQueryParameters(command.getQueryString(), command.getParameters(), command.isEscapeQueryParameters(), dbName);
-            return query(queryText, con, dbName);
+            return query(queryText, con, dbName, command);
         } else {
             HashMap<String, Object> result = new HashMap<>();
             result.put("success", true);
@@ -191,9 +191,14 @@ public class JSDataAdapter {
         return result.toString();
     }
 
-    private static String query(String queryString, Connection con, String dbName) {
+    private static String query(String queryString, Connection con, String dbName, CommandJson command) {
         try {
             PreparedStatement pstmt = con.prepareStatement(queryString);
+
+            if (command.getMaxDataRows() != null) {
+                pstmt.setMaxRows(command.getMaxDataRows());
+            }
+
             ResultSet rs = pstmt.executeQuery();
             return onQuery(rs, dbName);
         } catch (Exception e) {
@@ -422,6 +427,15 @@ public class JSDataAdapter {
         private int timeout;
         private ParameterJson[] parameters;
         private boolean escapeQueryParameters;
+        public Integer maxDataRows;
+
+        public Integer getMaxDataRows() {
+            return maxDataRows;
+        }
+
+        public void setMaxDataRows(Integer maxDataRows) {
+            this.maxDataRows = maxDataRows;
+        }
 
         public String getCommand() {
             return command;

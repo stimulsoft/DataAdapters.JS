@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.3.1
-Build date: 2024.06.13
+Version: 2024.3.2
+Build date: 2024.07.09
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -30,6 +30,9 @@ class StiDataEventArgs(StiEventArgs):
 
     queryString: str = None
     """The SQL query that will be executed to get the data array of the current data source."""
+
+    maxDataRows: int = None
+    """The maximum number of data rows. The value is taken from the designer's options for the dashboard in design mode."""
 
     parameters: dict[str, StiParameter] = None
     """A set of parameters for the current SQL query."""

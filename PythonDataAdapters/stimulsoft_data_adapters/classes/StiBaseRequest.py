@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.3.1
-Build date: 2024.06.13
+Version: 2024.3.2
+Build date: 2024.07.09
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -28,6 +28,7 @@ class StiBaseRequest:
     dataSource: str = None
     connection: str = None
     timeout = 0
+    maxDataRows: int = None
     escapeQueryParameters = False
     error: str = None
 
