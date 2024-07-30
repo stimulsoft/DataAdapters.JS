@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2024.3.2
-# Build date: 2024.07.09
+# Version: 2024.3.3
+# Build date: 2024.07.25
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -13,7 +13,7 @@ use Stimulsoft\Adapters\StiMongoDbAdapter;
 
 class StiDataHandler
 {
-    public $version = '2024.3.2';
+    public $version = '2024.3.3';
 
     public function stiErrorHandler($errNo, $errStr, $errFile, $errLine)
     {
