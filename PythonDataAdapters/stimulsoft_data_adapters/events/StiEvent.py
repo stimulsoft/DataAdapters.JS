@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.3.3
-Build date: 2024.07.25
+Version: 2024.3.4
+Build date: 2024.08.14
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -57,6 +57,20 @@ class StiEvent:
     def remove(self, callback) -> StiEvent:
         self.callbacks.remove(callback)
         return self
+    
+    def hasServerCallbacks(self) -> bool:
+        for callback in self.callbacks:
+            if (callable(callback)):
+                return True
+        
+        return False
+    
+    def hasClientCallbacks(self) -> bool:
+        for callback in self.callbacks:
+            if (isinstance(callback, str)):
+                return True
+        
+        return False
 
 ### Override
 

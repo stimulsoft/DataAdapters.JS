@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.3.3
-Build date: 2024.07.25
+Version: 2024.3.4
+Build date: 2024.08.14
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -9,6 +9,8 @@ from datetime import date, datetime, time
 from uuid import UUID
 
 from .classes.StiDataResult import StiDataResult
+from .enums import StiDatabaseType
+from .events.StiConnectionEventArgs import StiConnectionEventArgs
 from .StiDataAdapter import StiDataAdapter
 
 
@@ -16,10 +18,12 @@ class StiMsSqlAdapter(StiDataAdapter):
 
 ### Properties
 
-    version = '2024.3.2'
+    version = '2024.3.3'
     checkVersion = True
     trustServerCertificate: str = None
     integratedSecurity: str = None
+    type = StiDatabaseType.MSSQL
+    driverName = 'pymssql'
 
 
 ### Methods
@@ -48,15 +52,21 @@ class StiMsSqlAdapter(StiDataAdapter):
             self.connectionInfo.charset = 'utf8'
 
         try:
-            import pymssql
-            self.connectionLink = pymssql.connect(
-                server = self.connectionInfo.host,
-                user = self.connectionInfo.userId,
-                password = self.connectionInfo.password,
-                database = self.connectionInfo.database,
-                charset = self.connectionInfo.charset,
-                host = self.connectionInfo.host,
-                port = self.connectionInfo.port)
+            args = StiConnectionEventArgs(self.type, self.driverName, self.connectionInfo)
+            self.handler.onDatabaseConnect(args)
+
+            if args.link != None:
+                self.connectionLink = args.link
+            else:
+                import pymssql
+                self.connectionLink = pymssql.connect(
+                    server = self.connectionInfo.host,
+                    user = self.connectionInfo.userId,
+                    password = self.connectionInfo.password,
+                    database = self.connectionInfo.database,
+                    charset = self.connectionInfo.charset,
+                    host = self.connectionInfo.host,
+                    port = self.connectionInfo.port)
         except Exception as e:
             return StiDataResult.getError(str(e)).getDataAdapterResult(self)
         

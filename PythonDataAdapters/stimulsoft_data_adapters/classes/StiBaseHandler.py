@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.3.3
-Build date: 2024.07.25
+Version: 2024.3.4
+Build date: 2024.08.14
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -31,12 +31,13 @@ class StiBaseHandler:
 
 ### Fields
 
+    __events: dict = None
     __url: str = None
 
 
 ### Properties
 
-    version = '2024.3.2'
+    version = '2024.3.3'
     checkDataAdaptersVersion = True
     framework = StiFrameworkType.DEFAULT
     origin: str = None
@@ -57,11 +58,34 @@ class StiBaseHandler:
 
 ### Events
 
-    onBeginProcessData: StiEvent = None
-    """The event is invoked before data request, which needed to render a report. Python and JavaScript functions are supported."""
+    @property
+    def onDatabaseConnect(self) -> StiEvent:
+        """The event is invoked before connecting to the database after all parameters have been received. Only Python functions are supported."""
+        return self._getEvent('onDatabaseConnect')
 
-    onEndProcessData: StiEvent = None
-    """The event is invoked after loading data before rendering a report. Python and JavaScript functions are supported."""
+    @onDatabaseConnect.setter
+    def onDatabaseConnect(self, value):
+        self._setEvent('onDatabaseConnect', value)
+
+
+    @property
+    def onBeginProcessData(self) -> StiEvent:
+        """The event is invoked before data request, which needed to render a report. Python and JavaScript functions are supported."""
+        return self._getEvent('onBeginProcessData')
+
+    @onBeginProcessData.setter
+    def onBeginProcessData(self, value):
+        self._setEvent('onBeginProcessData', value)
+
+
+    @property
+    def onEndProcessData(self) -> StiEvent:
+        """The event is invoked after loading data before rendering a report. Python and JavaScript functions are supported."""
+        return self._getEvent('onEndProcessData')
+
+    @onEndProcessData.setter
+    def onEndProcessData(self, value):
+        self._setEvent('onEndProcessData', value)
 
 
 ### Helpers
@@ -82,19 +106,23 @@ class StiBaseHandler:
     
     def _checkCommand(self):
         return self.request.command.value in StiDataCommand.getValues()
-    
-    def _updateEvents(self):
-        self._updateEvent('onBeginProcessData')
-        self._updateEvent('onEndProcessData')
 
-    def _updateEvent(self, eventName: str):
-        event = getattr(self, eventName)
-        from ..events.StiEvent import StiEvent
-        if not isinstance(event, StiEvent):
-            callback = event if callable(event) or isinstance(event, (str, bool)) else None
-            event = StiEvent(self, eventName)
-            if callback != None: event.append(callback)
-            setattr(self, eventName, event)
+    def _getEvent(self, name) -> StiEvent:
+        event = self.__events.get(name)
+        if event == None:
+            event = StiEvent(self, name)
+            self.__events[name] = event
+
+        return event
+    
+    def _setEvent(self, name, value):
+        if isinstance(value, StiEvent):
+            self.__events[name] = value
+        elif callable(value) or isinstance(value, (bool, str)):
+            self._getEvent(name).append(value)
+
+    def _setEvents(self, events: dict):
+        self.__events = events
 
 
 ### Process
@@ -213,14 +241,14 @@ class StiBaseHandler:
         return result
     
     def __getDataAdapterResult(self):
-        self._updateEvents()
-
         args = StiDataEventArgs(self.request)
         self.onBeginProcessData(args)
 
         self.dataAdapter: StiDataAdapter = StiDataAdapter.getDataAdapter(args.database, args.connectionString)
         if self.dataAdapter == None:
             return StiBaseResult.getError(f'Unknown database type: {args.database}')
+        
+        self.dataAdapter.handler = self
 
         if self.request.command == StiDataCommand.RETRIEVE_SCHEMA:
             args.result = self.dataAdapter.executeQuery(args.dataSource, args.maxDataRows)
@@ -283,5 +311,5 @@ class StiBaseHandler:
 ### Constructor
 
     def __init__(self, url: str = None):
-        self.url = url
-        self._updateEvents()
+        self.__events = dict()
+        self.__url = url

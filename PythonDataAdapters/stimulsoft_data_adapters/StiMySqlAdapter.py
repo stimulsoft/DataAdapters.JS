@@ -1,12 +1,13 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.3.3
-Build date: 2024.07.25
+Version: 2024.3.4
+Build date: 2024.08.14
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
 from .classes.StiDataResult import StiDataResult
-from .classes.StiBaseResult import StiBaseResult
+from .enums import StiDatabaseType
+from .events.StiConnectionEventArgs import StiConnectionEventArgs
 from .StiDataAdapter import StiDataAdapter
 
 
@@ -14,8 +15,10 @@ class StiMySqlAdapter(StiDataAdapter):
 
 ### Properties
 
-    version = '2024.3.2'
+    version = '2024.3.3'
     checkVersion = True
+    type = StiDatabaseType.MYSQL
+    driverName = 'mysql-connector-python'
     
 
 ### Methods
@@ -28,14 +31,20 @@ class StiMySqlAdapter(StiDataAdapter):
             self.connectionInfo.charset = 'utf8'
         
         try:
-            from mysql.connector.connection import MySQLConnection
-            self.connectionLink = MySQLConnection(
-                user = self.connectionInfo.userId,
-                password = self.connectionInfo.password,
-                host = self.connectionInfo.host,
-                database = self.connectionInfo.database,
-                port = self.connectionInfo.port,
-                charset = self.connectionInfo.charset)
+            args = StiConnectionEventArgs(self.type, self.driverName, self.connectionInfo)
+            self.handler.onDatabaseConnect(args)
+
+            if args.link != None:
+                self.connectionLink = args.link
+            else:
+                from mysql.connector.connection import MySQLConnection
+                self.connectionLink = MySQLConnection(
+                    user = self.connectionInfo.userId,
+                    password = self.connectionInfo.password,
+                    host = self.connectionInfo.host,
+                    database = self.connectionInfo.database,
+                    port = self.connectionInfo.port,
+                    charset = self.connectionInfo.charset)
         except Exception as e:
             return StiDataResult.getError(str(e)).getDataAdapterResult(self)
         

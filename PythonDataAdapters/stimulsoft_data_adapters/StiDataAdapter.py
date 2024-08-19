@@ -1,11 +1,14 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.3.3
-Build date: 2024.07.25
+Version: 2024.3.4
+Build date: 2024.08.14
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
+from __future__ import annotations
+
 import codecs
+import typing
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 from uuid import UUID
@@ -17,6 +20,9 @@ from .classes.StiDataResult import StiDataResult
 from .classes.StiParameter import StiParameter
 from .enums.StiDatabaseType import StiDatabaseType
 
+if typing.TYPE_CHECKING:
+    from .classes.StiBaseHandler import StiBaseHandler
+
 
 class StiDataAdapter:
 
@@ -25,6 +31,9 @@ class StiDataAdapter:
     version = ''
     checkVersion = False
 
+    handler: StiBaseHandler = None
+    type = StiDatabaseType.NONE
+    driverName: str = None
     connectionString: str = None
     connectionInfo: StiConnectionInfo = None
     connectionLink: Connection = None

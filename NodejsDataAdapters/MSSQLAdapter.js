@@ -1,14 +1,14 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2024.3.3
-Build date: 2024.07.25
+Version: 2024.3.4
+Build date: 2024.08.14
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 exports.process = function (command, onResult) {
     var end = function (result) {
         try {
             if (connection) connection.close();
-            result.adapterVersion = "2024.3.3";
+            result.adapterVersion = "2024.3.4";
             onResult(result);
         }
         catch (e) {
@@ -69,6 +69,8 @@ exports.process = function (command, onResult) {
 
                 switch (column.type) {
                     case sql.UniqueIdentifier:
+                        types[columnIndex] = "string"; break;
+
                     case sql.BigInt:
                     case sql.timestamp:
                     case sql.Int:

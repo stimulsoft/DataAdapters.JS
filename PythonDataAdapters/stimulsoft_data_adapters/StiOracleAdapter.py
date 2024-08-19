@@ -1,11 +1,13 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.3.3
-Build date: 2024.07.25
+Version: 2024.3.4
+Build date: 2024.08.14
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
 from .classes.StiDataResult import StiDataResult
+from .enums import StiDatabaseType
+from .events.StiConnectionEventArgs import StiConnectionEventArgs
 from .StiDataAdapter import StiDataAdapter
 
 
@@ -13,8 +15,10 @@ class StiOracleAdapter(StiDataAdapter):
 
 ### Properties
 
-    version = '2024.3.2'
+    version = '2024.3.3'
     checkVersion = True
+    type = StiDatabaseType.ORACLE
+    driverName = 'oracledb'
 
 
 ### Methods
@@ -33,14 +37,20 @@ class StiOracleAdapter(StiDataAdapter):
             return self.connectOdbc()
         
         try:
-            import oracledb
-            oracledb.init_oracle_client()
-            self.connectionLink = oracledb.connect(
-                user = self.connectionInfo.userId,
-                password = self.connectionInfo.password,
-                dsn = self.connectionInfo.database,
-                encoding = self.connectionInfo.charset,
-                mode = self.connectionInfo.privilege)
+            args = StiConnectionEventArgs(self.type, self.driverName, self.connectionInfo)
+            self.handler.onDatabaseConnect(args)
+            
+            if args.link != None:
+                self.connectionLink = args.link
+            else:
+                import oracledb
+                oracledb.init_oracle_client()
+                self.connectionLink = oracledb.connect(
+                    user = self.connectionInfo.userId,
+                    password = self.connectionInfo.password,
+                    dsn = self.connectionInfo.database,
+                    encoding = self.connectionInfo.charset,
+                    mode = self.connectionInfo.privilege)
         except Exception as e:
             return StiDataResult.getError(str(e)).getDataAdapterResult(self)
         

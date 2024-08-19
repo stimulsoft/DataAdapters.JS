@@ -1,11 +1,13 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.3.3
-Build date: 2024.07.25
+Version: 2024.3.4
+Build date: 2024.08.14
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
 from .classes.StiDataResult import StiDataResult
+from .enums import StiDatabaseType
+from .events.StiConnectionEventArgs import StiConnectionEventArgs
 from .StiDataAdapter import StiDataAdapter
 
 
@@ -13,8 +15,10 @@ class StiFirebirdAdapter(StiDataAdapter):
 
 ### Properties
 
-    version = '2024.3.2'
+    version = '2024.3.3'
     checkVersion = True
+    type = StiDatabaseType.FIREBIRD
+    driverName = 'firebird-driver'
 
 
 ### Methods
@@ -36,13 +40,19 @@ class StiFirebirdAdapter(StiDataAdapter):
             self.connectionInfo.charset = 'utf8'
         
         try:
-            from firebird.driver import connect
-            dsn = f'{self.connectionInfo.host}/{self.connectionInfo.port}:{self.connectionInfo.database}'
-            self.connectionLink = connect(
-                user = self.connectionInfo.userId,
-                password = self.connectionInfo.password,
-                database = dsn,
-                charset = self.connectionInfo.charset)
+            args = StiConnectionEventArgs(self.type, self.driverName, self.connectionInfo)
+            self.handler.onDatabaseConnect(args)
+
+            if args.link != None:
+                self.connectionLink = args.link
+            else:
+                from firebird.driver import connect
+                dsn = f'{self.connectionInfo.host}/{self.connectionInfo.port}:{self.connectionInfo.database}'
+                self.connectionLink = connect(
+                    user = self.connectionInfo.userId,
+                    password = self.connectionInfo.password,
+                    database = dsn,
+                    charset = self.connectionInfo.charset)
         except Exception as e:
             return StiDataResult.getError(str(e)).getDataAdapterResult(self)
         

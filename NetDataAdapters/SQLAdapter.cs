@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2024.3.3
-Build date: 2024.07.25
+Version: 2024.3.4
+Build date: 2024.08.14
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 using FirebirdSql.Data.FirebirdClient;
@@ -25,7 +25,7 @@ namespace AspNetDataAdapters
 
         private static Result End(Result result)
         {
-            result.AdapterVersion = "2024.3.3";
+            result.AdapterVersion = "2024.3.4";
             try
             {
                 if (reader != null) reader.Close();
@@ -70,6 +70,7 @@ namespace AspNetDataAdapters
                 var sqlCommand = connection.CreateCommand();
                 sqlCommand.CommandType = command.Command == "Execute" ? CommandType.StoredProcedure : CommandType.Text;
                 sqlCommand.CommandText = command.QueryString;
+                sqlCommand.CommandTimeout = command.Timeout / 1000;
 
                 foreach (var parameter in command.Parameters)
                 {
@@ -188,6 +189,8 @@ namespace AspNetDataAdapters
                 switch (dbType.ToLowerInvariant())
                 {
                     case "uniqueidentifier":
+                        return "string";
+
                     case "bigint":
                     case "int64":
                     case "year":
@@ -233,9 +236,11 @@ namespace AspNetDataAdapters
             {
                 switch (dbType.ToLowerInvariant())
                 {
+                    case "uniqueidentifier":
+                        return "string";
+
                     case "bigint":
                     case "numeric":
-                    case "uniqueidentifier":
                     case "int":
                     case "integer":
                     case "smallint":
@@ -268,6 +273,8 @@ namespace AspNetDataAdapters
                 switch (dbType.ToLowerInvariant())
                 {
                     case "uniqueidentifier":
+                        return "string";
+
                     case "bigint":
                     case "timestamp":
                     case "int":
@@ -306,13 +313,15 @@ namespace AspNetDataAdapters
             {
                 switch (dbType.ToLowerInvariant())
                 {
+                    case "uniqueidentifier":
+                        return "string";
+
                     case "bigint":
                     case "int":
                     case "int4":
                     case "int8":
                     case "integer":
                     case "numeric":
-                    case "uniqueidentifier":
                     case "smallint":
                     case "tinyint":
                         return "int";

@@ -1,13 +1,15 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.3.3
-Build date: 2024.07.25
+Version: 2024.3.4
+Build date: 2024.08.14
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
 from urllib.parse import urlparse
 
 from .classes.StiDataResult import StiDataResult
+from .enums import StiDatabaseType
+from .events.StiConnectionEventArgs import StiConnectionEventArgs
 from .StiDataAdapter import StiDataAdapter
 
 
@@ -15,16 +17,24 @@ class StiMongoDbAdapter(StiDataAdapter):
 
 ### Properties
 
-    version = '2024.3.2'
+    version = '2024.3.3'
     checkVersion = True
+    type = StiDatabaseType.MONGODB
+    driverName = 'pymongo'
 
 
 ### Methods
 
     def connect(self):
         try:
-            from pymongo import MongoClient
-            self.connectionLink = MongoClient(self.connectionString)
+            args = StiConnectionEventArgs(self.type, self.driverName, self.connectionInfo)
+            self.handler.onDatabaseConnect(args)
+
+            if args.link != None:
+                self.connectionLink = args.link
+            else:
+                from pymongo import MongoClient
+                self.connectionLink = MongoClient(self.connectionString)
         except Exception as e:
             return StiDataResult.getError(str(e)).getDataAdapterResult(self)
         
