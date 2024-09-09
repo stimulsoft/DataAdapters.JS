@@ -1,14 +1,14 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2024.3.4
-Build date: 2024.08.14
+Version: 2024.3.5
+Build date: 2024.09.04
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 exports.process = function (command, onResult) {
     var end = function (result) {
         try {
             if (db) db.detach();
-            result.adapterVersion = "2024.3.4";
+            result.adapterVersion = "2024.3.5";
             onResult(result);
         }
         catch (e) {

@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.3.4
-Build date: 2024.08.14
+Version: 2024.3.5
+Build date: 2024.09.04
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -18,7 +18,7 @@ class StiOdbcAdapter(StiDataAdapter):
 
 ### Properties
 
-    version = '2024.3.3'
+    version = '2024.3.4'
     checkVersion = True
     connectionLink: Connection
     type = StiDatabaseType.ODBC
