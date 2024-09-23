@@ -87,7 +87,7 @@ exports.process = function (command, onResult) {
                 for (var columnIndex in record) {
                     var value = record[columnIndex];
                     if (value instanceof Uint8Array) value = Buffer.from(result.rows[recordIndex][columnIndex]).toString('base64');
-                    if (value instanceof Date) value = date.toISOString();
+                    if (value instanceof Date) value = new Date(value.getTime() - (value.getTimezoneOffset() * 60000)).toISOString();;
 
                     row.push(value);
                 }
