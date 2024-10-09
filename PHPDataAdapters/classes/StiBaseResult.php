@@ -8,59 +8,68 @@
 
 namespace Stimulsoft;
 
-use Stimulsoft\Adapters\StiDataAdapter;
+use JsonSerializable;
+use ReflectionClass;
+use ReflectionProperty;
 
 /**
  * The result of executing an event handler request. The result contains a collection of data,
  * message about the result of the command execution, and other technical information.
  */
-class StiDataResult extends StiBaseResult
+class StiBaseResult implements JsonSerializable
 {
 
 ### Properties
 
-    public $adapterVersion;
+    public $handlerVersion = null;
+    public $checkVersion = true;
+    public $success = true;
+    public $notice = null;
+
+
+### Abstract
+
     public $types;
-    public $columns;
-    public $rows;
-    public $count = 0;
+
+
+### JSON
+
+    public function jsonSerialize(): array
+    {
+        $properties = StiFunctions::getProperties($this);
+        $result = [];
+        foreach ($properties as $name)
+            $result[$name] = $this->$name;
+
+        return $result;
+    }
 
 
 ### Result
 
-    public function getDataAdapterResult(StiDataAdapter $adapter): StiDataResult
-    {
-        $this->adapterVersion = $adapter->version;
-        $this->checkVersion = $adapter->checkVersion;
-        return $this;
-    }
-
     /**
      * Creates a successful result.
      * @param string $notice Optionally, a message about the result.
+     * @return StiBaseResult
      */
     public static function getSuccess(string $notice = null)
     {
-        $result = new StiDataResult();
+        $result = new StiBaseResult();
         $result->success = true;
         $result->notice = $notice;
-        $result->types = [];
-        $result->columns = [];
-        $result->rows = [];
-
         return $result;
     }
 
     /**
      * Creates an error result.
      * @param string $notice The error message.
+     * @return StiBaseResult
      */
     public static function getError(string $notice)
     {
-        $result = new StiDataResult();
+        $result = new StiBaseResult();
         $result->success = false;
         $result->notice = $notice;
-
         return $result;
     }
 }

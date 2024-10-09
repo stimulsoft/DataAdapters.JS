@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2024.3.6
-Build date: 2024.09.19
+Version: 2024.4.1
+Build date: 2024.10.08
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 
@@ -37,8 +37,8 @@ import com.stimulsoft.js.StiSqlTypes;
 
 public class JSDataAdapter {
 
-    public static final String handlerVersion = "2024.3.6";
-    public static final String adapterVersion = "2024.3.6";
+    public static final String handlerVersion = "2024.4.1";
+    public static final String adapterVersion = "2024.4.1";
     public static final boolean checkVersion = true;
 
     private static final List<String> USERS_KEYS = Arrays.asList("jdbc.username", "username", "uid", "user", "user id", "userid", "connection.username");

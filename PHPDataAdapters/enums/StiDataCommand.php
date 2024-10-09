@@ -1,12 +1,14 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2024.3.6
-# Build date: 2024.09.19
+# Version: 2024.4.1
+# Build date: 2024.10.08
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
 
-namespace Stimulsoft;
+namespace Stimulsoft\Enums;
+
+use Stimulsoft\StiFunctions;
 
 class StiDataCommand
 {
@@ -15,4 +17,12 @@ class StiDataCommand
     const RetrieveSchema = 'RetrieveSchema';
     const Execute = 'Execute';
     const ExecuteQuery = 'ExecuteQuery';
+
+
+### Helpers
+
+    public static function getValues(): array
+    {
+        return StiFunctions::getConstants('Stimulsoft\Enums\StiDataCommand');
+    }
 }
