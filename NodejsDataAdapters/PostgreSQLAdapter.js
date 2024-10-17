@@ -1,14 +1,14 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2024.4.1
-Build date: 2024.10.08
+Version: 2024.4.2
+Build date: 2024.10.16
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 exports.process = function (command, onResult) {
     var end = function (result) {
         try {
             if (client) client.end();
-            result.adapterVersion = "2024.4.1";
+            result.adapterVersion = "2024.4.2";
             onResult(result);
         }
         catch (e) {
@@ -76,7 +76,7 @@ exports.process = function (command, onResult) {
 
                     case 700: // FLOAT4
                     case 701: // FLOAT8
-                    case 790: // MONEY
+                    case 1700: // NUMERIC
                         types[columnIndex] = "number"; break;
 
                     case 702: // ABSTIME
@@ -113,6 +113,7 @@ exports.process = function (command, onResult) {
                     case 704: // TINTERVAL
                     case 718: // CIRCLE
                     case 774: // MACADDR8
+                    case 790: // MONEY
                     case 829: // MACADDR
                     case 869: // INET
                     case 1033: // ACLITEM
@@ -121,7 +122,6 @@ exports.process = function (command, onResult) {
                     case 1186: // INTERVAL
                     case 1560: // BIT
                     case 1562: // VARBIT
-                    case 1700: // NUMERIC
                     case 1790: // REFCURSOR
                     case 2202: // REGPROCEDURE
                     case 2203: // REGOPER

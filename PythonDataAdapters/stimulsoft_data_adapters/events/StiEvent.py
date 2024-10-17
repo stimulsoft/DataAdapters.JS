@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.4.1
-Build date: 2024.10.08
+Version: 2024.4.2
+Build date: 2024.10.16
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -91,6 +91,9 @@ class StiEvent:
                 if result != None:
                     return result
         return None
+    
+    def __contains__(self, callback):
+        return callback in self.callbacks
 	
 
 ### Constructor
