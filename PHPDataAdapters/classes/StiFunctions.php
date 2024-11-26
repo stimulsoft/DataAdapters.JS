@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2024.4.4
-# Build date: 2024.11.13
+# Version: 2024.4.5
+# Build date: 2024.11.22
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -27,10 +27,28 @@ class StiFunctions
         return !($haystack === null || $needle === null) && substr_compare($haystack, $needle, -strlen($needle ?? '')) === 0;
     }
 
+    public static function isNullOrEmpty($str): bool
+    {
+        return strlen($str || '') == 0;
+    }
+
     public static function newGuid($length = 16): string
     {
         return bin2hex(openssl_random_pseudo_bytes($length));
     }
+
+    public static function getJavaScriptValue($value): string
+    {
+        return $value === null ? 'null' : json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    }
+
+    public static function isJavaScriptFunctionName($value): bool
+    {
+        return preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $value);
+    }
+
+
+### Reflection
 
     public static function populateObject($class, $object)
     {
@@ -44,9 +62,6 @@ class StiFunctions
             }
         }
     }
-
-
-### Reflection
 
     public static function getConstants($class, $names = false): array
     {

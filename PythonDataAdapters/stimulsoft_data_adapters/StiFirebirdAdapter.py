@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.4.4
-Build date: 2024.11.13
+Version: 2024.4.5
+Build date: 2024.11.22
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -15,7 +15,7 @@ class StiFirebirdAdapter(StiDataAdapter):
 
 ### Properties
 
-    version = '2024.4.3'
+    version = '2024.4.4'
     checkVersion = True
     type = StiDatabaseType.FIREBIRD
     driverName = 'firebird-driver'
