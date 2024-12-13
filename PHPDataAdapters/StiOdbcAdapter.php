@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2024.4.5
-# Build date: 2024.11.22
+# Version: 2025.1.1
+# Build date: 2024.12.12
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -18,16 +18,20 @@ class StiOdbcAdapter extends StiDataAdapter
 
 ### Properties
 
-    public $version = '2024.4.5';
+    public $version = '2025.1.1';
     public $checkVersion = true;
 
     protected $type = StiDatabaseType::ODBC;
+    protected $driverName = 'odbc';
 
 
 ### Methods
 
     protected function getLastErrorResult(): StiDataResult
     {
+        if ($this->driverType == 'PDO')
+            return parent::getLastErrorResult();
+
         $code = odbc_error();
         $error = odbc_errormsg();
         $message = $error ?: self::UnknownError;
@@ -38,6 +42,9 @@ class StiOdbcAdapter extends StiDataAdapter
 
     protected function connect(): StiDataResult
     {
+        if ($this->driverType == 'PDO')
+            return parent::connect();
+
         $args = new StiConnectionEventArgs($this->type, $this->driverName, $this->connectionInfo);
         $this->handler->onDatabaseConnect->call($args);
 
@@ -53,7 +60,9 @@ class StiOdbcAdapter extends StiDataAdapter
 
     protected function disconnect()
     {
-        if ($this->connectionLink) {
+        if ($this->driverType == 'PDO')
+            parent::disconnect();
+        else if ($this->connectionLink) {
             odbc_close($this->connectionLink);
             $this->connectionLink = null;
         }
@@ -61,7 +70,8 @@ class StiOdbcAdapter extends StiDataAdapter
 
     public function process(): bool
     {
-        $this->connectionInfo = new StiConnectionInfo();
+        if (parent::process())
+            return true;
 
         $parameterNames = array(
             'userId' => ['uid', 'user', 'username', 'userid', 'user id'],
@@ -71,9 +81,20 @@ class StiOdbcAdapter extends StiDataAdapter
         return $this->processParameters($parameterNames);
     }
 
+    protected function processUnknownParameter($parameter, $name, $value)
+    {
+        if (!is_null($parameter) && mb_strlen($parameter) > 0) {
+            if (mb_strlen($this->connectionInfo->dsn) > 0)
+                $this->connectionInfo->dsn .= ';';
+
+            $this->connectionInfo->dsn .= $parameter;
+        }
+    }
+
     protected function getType($meta): string
     {
-        $type = strtolower($meta);
+        $type = $this->driverType == 'PDO' ? $meta['pdo_type'] : strtolower($meta);
+
         switch ($type) {
             case 'short':
             case 'int':
@@ -90,9 +111,11 @@ class StiOdbcAdapter extends StiDataAdapter
             case 'byte':
             case 'counter':
             case 'year':
+            case \PDO::PARAM_INT:
                 return 'int';
 
             case 'bit':
+            case \PDO::PARAM_BOOL:
                 return 'boolean';
 
             case 'float':
@@ -118,6 +141,9 @@ class StiOdbcAdapter extends StiDataAdapter
             case 'text':
             case 'uniqueidentifier':
             case 'xml':
+            case \PDO::PARAM_STR:
+            case \PDO::PARAM_STR_NATL:
+            case \PDO::PARAM_STR_CHAR:
                 return 'string';
 
             case 'date':
@@ -140,6 +166,7 @@ class StiOdbcAdapter extends StiDataAdapter
             case 'longbinary':
             case 'cursor':
             case 'bytea':
+            case \PDO::PARAM_LOB:
                 return 'array';
         }
 
@@ -171,44 +198,40 @@ class StiOdbcAdapter extends StiDataAdapter
         return $value;
     }
 
-    public function executeQuery($queryString, $maxDataRows): StiDataResult
+    public function executeNative($queryString, $maxDataRows, $result): StiDataResult
     {
-        $result = $this->connect();
-        if ($result->success) {
-            $query = odbc_exec($this->connectionLink, $queryString);
-            if (!$query)
-                return $this->getLastErrorResult();
+        $query = odbc_exec($this->connectionLink, $queryString);
+        if (!$query)
+            return $this->getLastErrorResult();
 
-            $result->types = [];
-            $result->columns = [];
-            $result->rows = [];
+        $result->types = [];
+        $result->columns = [];
+        $result->rows = [];
 
-            $result->count = odbc_num_fields($query);
+        $result->count = odbc_num_fields($query);
+
+        for ($i = 1; $i <= $result->count; $i++) {
+            $type = odbc_field_type($query, $i);
+            $result->types[] = $this->getType($type);
+            $result->columns[] = odbc_field_name($query, $i);
+        }
+
+        while (odbc_fetch_row($query)) {
+            $row = [];
 
             for ($i = 1; $i <= $result->count; $i++) {
-                $type = odbc_field_type($query, $i);
-                $result->types[] = $this->getType($type);
-                $result->columns[] = odbc_field_name($query, $i);
+                $type = $result->types[$i - 1];
+                $value = odbc_result($query, $i);
+                $row[] = $this->getValue($type, $value);
             }
 
-            while (odbc_fetch_row($query)) {
-                $row = [];
+            $result->rows[] = $row;
 
-                for ($i = 1; $i <= $result->count; $i++) {
-                    $type = $result->types[$i - 1];
-                    $value = odbc_result($query, $i);
-                    $row[] = $this->getValue($type, $value);
-                }
-
-                $result->rows[] = $row;
-
-                if (count($result->rows) === $maxDataRows)
-                    break;
-            }
-
-            odbc_free_result($query);
-            $this->disconnect();
+            if (count($result->rows) === $maxDataRows)
+                break;
         }
+
+        odbc_free_result($query);
 
         return $result;
     }

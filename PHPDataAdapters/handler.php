@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2024.4.5
-# Build date: 2024.11.22
+# Version: 2025.1.1
+# Build date: 2024.12.12
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -10,12 +10,15 @@ use Stimulsoft\StiBaseHandler;
 use Stimulsoft\Events\StiDataEventArgs;
 
 // Event handler classes and functions
-require_once 'enums\StiDatabaseType.php';
+require_once 'enums\StiBaseEventType.php';
 require_once 'enums\StiDataCommand.php';
+require_once 'enums\StiDatabaseType.php';
 require_once 'events\StiEvent.php';
 require_once 'events\StiEventArgs.php';
+require_once 'events\StiConnectionEventArgs.php';
 require_once 'events\StiDataEventArgs.php';
 require_once 'classes\StiConnectionInfo.php';
+require_once 'classes\StiFunctions.php';
 require_once 'classes\StiBaseRequest.php';
 require_once 'classes\StiBaseResult.php';
 require_once 'classes\StiDataResult.php';

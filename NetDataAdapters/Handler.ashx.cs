@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2024.4.5
-Build date: 2024.11.22
+Version: 2025.1.1
+Build date: 2024.12.12
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 using System;
@@ -183,7 +183,7 @@ namespace AspNetDataAdapters
                     inputStream.Close();
             }
 
-            result.HandlerVersion = "2024.4.5";
+            result.HandlerVersion = "2025.1.1";
             result.CheckVersion = true;
 
             context.Response.Headers.Add("Access-Control-Allow-Origin", "*");

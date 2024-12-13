@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2024.4.5
-Build date: 2024.11.22
+Version: 2025.1.1
+Build date: 2024.12.12
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -37,7 +37,7 @@ class StiBaseHandler:
 
 ### Properties
 
-    version = '2024.4.4'
+    version = '2024.4.5'
     checkDataAdaptersVersion = True
     framework = StiFrameworkType.DEFAULT
     origin: str = None
