@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2025.1.1
-# Build date: 2024.12.12
+# Version: 2025.1.2
+# Build date: 2024.12.19
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -18,7 +18,7 @@ class StiMySqlAdapter extends StiDataAdapter
 
 ### Properties
 
-    public $version = '2025.1.1';
+    public $version = '2025.1.2';
     public $checkVersion = true;
 
     protected $type = StiDatabaseType::MySQL;
@@ -71,7 +71,8 @@ class StiMySqlAdapter extends StiDataAdapter
 
     public function process(): bool
     {
-        if (parent::process()) return true;
+        if (parent::process())
+            return true;
 
         $this->connectionInfo->port = 3306;
         $this->connectionInfo->charset = 'utf8';
