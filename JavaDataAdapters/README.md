@@ -4,6 +4,8 @@ This in Eclipse Java project.
 index.html
 ```js
 StiOptions.WebServer.url = "http://localhost:8080/JSDataAdapters/JSDataAdapter/";
+
+//for JakartaEE use: StiOptions.WebServer.url = "http://localhost:8080/JSDataAdapters/JSDataAdapterJakartaEE/";
 ```
 
 In the JSDataAdapter.java file, you can change all parameters passed from the JS client-side.

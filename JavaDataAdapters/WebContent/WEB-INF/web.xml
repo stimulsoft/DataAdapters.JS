@@ -11,8 +11,16 @@
 		<servlet-name>JSDataAdapter</servlet-name>
 		<servlet-class>com.stimulsoft.js.JSDataAdapterServlet</servlet-class>
 	</servlet>
+	<servlet>
+		<servlet-name>JSDataAdapterJakartaEE</servlet-name>
+		<servlet-class>com.stimulsoft.js.JSDataAdapterJakartaEEServlet</servlet-class>
+	</servlet>
 	<servlet-mapping>
 		<servlet-name>JSDataAdapter</servlet-name>
 		<url-pattern>/JSDataAdapter/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>JSDataAdapterJakartaEE</servlet-name>
+		<url-pattern>/JSDataAdapterJakartaEE/*</url-pattern>
 	</servlet-mapping>
 </web-app>
