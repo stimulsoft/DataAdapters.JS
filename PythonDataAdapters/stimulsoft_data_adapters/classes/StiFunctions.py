@@ -1,12 +1,13 @@
 """
 Stimulsoft.Reports.JS
-Version: 2025.1.3
-Build date: 2025.01.09
+Version: 2025.1.4
+Build date: 2025.01.24
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
 import re
 from enum import Enum
+import uuid
 
 
 class StiFunctions:
@@ -22,6 +23,17 @@ class StiFunctions:
 
     def isNullOrEmpty(value) -> bool:
         return len(value or '') == 0
+    
+    def newGuid(length = 16) -> str:
+        return uuid.uuid4().hex[:length]
 
     def isJavaScriptFunctionName(value) -> bool:
         return re.search("^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$", value)
+    
+    def isDashboardsProduct() -> bool:
+        try:
+            from stimulsoft_dashboards.report.StiDashboard import StiDashboard
+        except Exception as e:
+            return False
+        
+        return True

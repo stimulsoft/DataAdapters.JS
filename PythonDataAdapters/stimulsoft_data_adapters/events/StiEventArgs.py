@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2025.1.3
-Build date: 2025.01.09
+Version: 2025.1.4
+Build date: 2025.01.24
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -33,7 +33,8 @@ class StiEventArgs:
 
     def __setProperty(self, name, value):
         selfvalue = getattr(self, name)
-        if isinstance(selfvalue, Enum) or isinstance(value, Flag): setattr(self, name, selfvalue.__class__(value))
+        if isinstance(selfvalue, Enum) or isinstance(value, Flag):
+            if value != None: setattr(self, name, selfvalue.__class__(value))
         else: setattr(self, name, value)
 
 
