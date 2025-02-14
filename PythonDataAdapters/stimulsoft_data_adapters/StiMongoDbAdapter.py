@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2025.1.4
-Build date: 2025.01.24
+Version: 2025.1.5
+Build date: 2025.02.11
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -17,7 +17,7 @@ class StiMongoDbAdapter(StiDataAdapter):
 
 ### Properties
 
-    version = '2025.1.3'
+    version = '2025.1.4'
     checkVersion = True
     type = StiDatabaseType.MONGODB
     driverName = 'pymongo'

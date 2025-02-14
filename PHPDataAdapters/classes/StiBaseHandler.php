@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2025.1.4
-# Build date: 2025.01.24
+# Version: 2025.1.5
+# Build date: 2025.02.11
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -31,7 +31,7 @@ class StiBaseHandler
     public static $legacyMode = false;
 
     /** @var string Current version of the event handler. */
-    public $version = '2025.1.4';
+    public $version = '2025.1.5';
 
     /** @var bool Enables checking for client-side and server-side data adapter versions to match. */
     public $checkDataAdaptersVersion = true;
