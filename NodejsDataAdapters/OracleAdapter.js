@@ -86,8 +86,9 @@ exports.process = function (command, onResult) {
 
                 for (var columnIndex in record) {
                     var value = record[columnIndex];
-                    if (value instanceof Uint8Array) value = Buffer.from(result.rows[recordIndex][columnIndex]).toString('base64');
-                    if (value instanceof Date) value = new Date(value.getTime() - (value.getTimezoneOffset() * 60000)).toISOString();;
+                    if (value instanceof Uint8Array) value = Buffer.from(value).toString('base64');
+                    else if (value instanceof Date) value = new Date(value.getTime() - (value.getTimezoneOffset() * 60000)).toISOString();
+                    else if (value != null && typeof value == "object") value = value.toString();
 
                     row.push(value);
                 }
@@ -189,7 +190,9 @@ exports.process = function (command, onResult) {
         command.connectionStringInfo = getConnectionStringInfo(command.connectionString);
         var oracledb = require('oracledb');
         try {
-            oracledb.initOracleClient();
+            var settings = require("oracledb/lib/settings");
+            if (settings.thinDriverInitialized == false)
+                oracledb.initOracleClient();
         }
         catch (e) {
             var utils = require("oracledb/lib/thin/util.js");

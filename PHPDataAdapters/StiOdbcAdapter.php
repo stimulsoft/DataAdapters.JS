@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2025.1.5
-# Build date: 2025.02.11
+# Version: 2025.1.6
+# Build date: 2025.02.28
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -18,7 +18,7 @@ class StiOdbcAdapter extends StiDataAdapter
 
 ### Properties
 
-    public $version = '2025.1.5';
+    public $version = '2025.1.6';
     public $checkVersion = true;
 
     protected $type = StiDatabaseType::ODBC;

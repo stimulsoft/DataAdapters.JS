@@ -1,13 +1,13 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2025.1.5
-Build date: 2025.02.11
+Version: 2025.1.6
+Build date: 2025.02.28
 License: https://www.stimulsoft.com/en/licensing/reports
 */
-﻿/*
+/*
 Stimulsoft.Reports.JS
-Version: 2023.3.3
-Build date: 2023.08.23
+Version: 2025.1.5
+Build date: 2025.02.11
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 using MongoDB.Bson;
@@ -172,7 +172,7 @@ namespace NetCoreDataAdapters
                 };
             }
 
-            result.AdapterVersion = "2025.1.5";
+            result.AdapterVersion = "2025.1.6";
             return result;
         }
     }
