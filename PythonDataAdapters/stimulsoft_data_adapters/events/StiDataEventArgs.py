@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2025.1.6
-Build date: 2025.02.28
+Version: 2025.2.1
+Build date: 2025.03.20
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -39,3 +39,9 @@ class StiDataEventArgs(StiEventArgs):
 
     result: StiDataResult = None
     """The result of executing an event handler request."""
+
+    pathSchema: str = None
+    """The path or URL to the XML schema."""
+
+    pathData: str = None
+    """The path or URL to the file data."""

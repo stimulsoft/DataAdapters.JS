@@ -1,16 +1,17 @@
 """
 Stimulsoft.Reports.JS
-Version: 2025.1.6
-Build date: 2025.02.28
+Version: 2025.2.1
+Build date: 2025.03.20
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
 import codecs
 import urllib.parse
 
-from stimulsoft_data_adapters.enums import StiBaseEventType
-
+from ..classes.StiDataResult import StiDataResult
+from ..classes.StiFunctions import StiFunctions
 from ..classes.StiParameter import StiParameter
+from ..enums.StiBaseEventType import StiBaseEventType
 from ..enums.StiDatabaseType import StiDatabaseType
 from ..enums.StiDataCommand import StiDataCommand
 from ..enums.StiFrameworkType import StiFrameworkType
@@ -33,23 +34,51 @@ class StiBaseHandler:
 
     __events: dict = None
     __url: str = None
+    __requestCookies = None
 
 
 ### Properties
 
-    version = '2025.1.5'
+    version = '2025.2.1'
+    """Current version of the event handler."""
+    
     checkDataAdaptersVersion = True
+    """Enables checking for client-side and server-side data adapter versions to match."""
+
     framework = StiFrameworkType.DEFAULT
     origin: str = None
     query: dict = None
     body: str = None
     error: str = None
     request: StiBaseRequest = None
+    frameworkRequest: object = None
     dataAdapter: StiDataAdapter = None
+
+    passQueryParameters = False
+    """Enables automatic passing of GET parameters from the current URL to event handler requests."""
+
+    encryptSqlData = True
+    """
+    Enables encryption of SQL data transmitted from the server to the report generator.
+    This improves security but slows down the processing of large data.
+    """
     
     @property
     def url(self):
-        return self.__url or ''
+        #return self.__url or ''
+        
+        url = self.__url or ''
+        if self.passQueryParameters:
+            pass
+            """
+            foreach ($_GET as $key => $value)
+                if (strpos($url, $key) === false) {
+                    $url .= strpos($url, '?') === false ? '?' : '&';
+                    $url .= "$key=" . rawurlencode($value);
+                }
+            """
+
+        return url
     
     @url.setter
     def url(self, value):
@@ -97,6 +126,21 @@ class StiBaseHandler:
     def __setBody(self, body: bytes | str) -> None:
         if body != None:
             self.body = body if type(body) == str else codecs.decode(body)
+
+    def __removeResourceParameters(self, url: str) -> str:
+        query = urllib.parse.urlparse(url).query
+        if StiFunctions.isNullOrEmpty(query):
+            return url
+        
+        params = []
+        remove = ['sti_event', 'sti_data']
+        for param, values in urllib.parse.parse_qs(query).items():
+            if param not in remove:
+                for value in values:
+                    params.append((param, value))
+
+        baseUrl = url[:url.find('?')]
+        return baseUrl if len(params) == 0 else baseUrl + '?' + urllib.parse.urlencode(params)
     
     def _createRequest(self):
         return StiBaseRequest()
@@ -131,11 +175,17 @@ class StiBaseHandler:
         try:
             from django.http import HttpRequest as DjangoRequest
             if isinstance(request, DjangoRequest):
+                # This code is needed to update CSRF token in cookies
+                from django.middleware.csrf import get_token
+                get_token(request)
+
                 self.__setQuery(request.GET)
                 self.__setBody(request.body)
-                self.url = self.url or request.build_absolute_uri()
+                self.__requestCookies = request.COOKIES
+                self.url = self.url or self.__removeResourceParameters(request.build_absolute_uri())
                 self.origin = '{0}://{1}'.format(request.scheme, request.get_host())
                 self.framework = StiFrameworkType.DJANGO
+                self.frameworkRequest = request
                 return True
         except Exception as e:
             if not isinstance(e, ModuleNotFoundError):
@@ -147,9 +197,11 @@ class StiBaseHandler:
             if isinstance(request, FlaskRequest):
                 self.__setQuery(request.args.to_dict())
                 self.__setBody(request.get_data(False))
-                self.url = self.url or request.base_url
+                self.__requestCookies = request.cookies
+                self.url = self.url or self.__removeResourceParameters(request.base_url)
                 self.origin = request.origin
                 self.framework = StiFrameworkType.FLASK
+                self.frameworkRequest = request
                 return True
         except Exception as e:
             if not isinstance(e, ModuleNotFoundError):
@@ -161,9 +213,11 @@ class StiBaseHandler:
             if isinstance(request, TornadoRequest):
                 self.__setQuery(request.query)
                 self.__setBody(request.body)
-                self.url = self.url or request.full_url()
+                self.__requestCookies = request.cookies
+                self.url = self.url or self.__removeResourceParameters(request.full_url())
                 self.origin = '{0}://{1}'.format(request.protocol, request.host)
                 self.framework = StiFrameworkType.TORNADO
+                self.frameworkRequest = request
                 return True
         except Exception as e:
             if not isinstance(e, ModuleNotFoundError):
@@ -240,25 +294,61 @@ class StiBaseHandler:
         result.handlerVersion = self.version
         return result
     
+    def __getDataResult(self, result: StiBaseResult, notice: str, args: StiDataEventArgs) -> StiBaseResult:
+
+        # The event did not return any result, the result of the data adapter is used
+        if result == None:
+            result = args.result
+
+        # Copying message from event if data adapter message is empty
+        if StiFunctions.isNullOrEmpty(args.result.notice):
+            args.result.notice = result.notice if not StiFunctions.isNullOrEmpty(result.notice) else notice
+
+        # If the result from the event is successful, use the result of the data adapter
+        if result.success:
+            return args.result
+
+        # Passing data adapter parameters
+        if isinstance(result, StiDataResult):
+            result = result.getDataAdapterResult(self.dataAdapter)
+
+        return result
+    
     def __getDataAdapterResult(self):
         args = StiDataEventArgs(self.request)
-        self.onBeginProcessData(args)
+        result = self.onBeginProcessData.getResult(args)
+        if result != None and not result.success:
+            return result
+        
+        # Saving a message to return in the results of the next events
+        notice = result.notice if result != None else None
 
-        self.dataAdapter: StiDataAdapter = StiDataAdapter.getDataAdapter(args.database, args.connectionString)
+        # Prepare the connection string or the URL of the data file
+        connectionString = args.connectionString
+        if self.request.command == StiDataCommand.GET_DATA or self.request.command == StiDataCommand.GET_SCHEMA:
+            connectionString = args.pathData if self.request.command == StiDataCommand.GET_DATA else args.pathSchema
+
+        # Get the necessary data adapter
+        self.dataAdapter: StiDataAdapter = StiDataAdapter.getDataAdapter(args.database, connectionString)
         if self.dataAdapter == None:
             return StiBaseResult.getError(f'Unknown database type: {args.database}')
         
         self.dataAdapter.handler = self
 
+        # Get the data source schema
         if self.request.command == StiDataCommand.RETRIEVE_SCHEMA:
-            args.result = self.dataAdapter.executeQuery(args.dataSource, args.maxDataRows)
-            self.onEndProcessData(args)
-            return args.result
+            args.result = self.dataAdapter.getDataResult(args.dataSource, args.maxDataRows)
+            result = self.onEndProcessData.getResult(args, StiDataResult)
+            return self.__getDataResult(result, notice, args)
 
+        # Process SQL data
         if self.request.command == StiDataCommand.EXECUTE or self.request.command == StiDataCommand.EXECUTE_QUERY:
+
+            # The MongoDB data source does not contain a connection string
+            # Using the data source name to find a match from the MongoDB data object
             try:
                 from ..StiMongoDbAdapter import StiMongoDbAdapter
-                if (isinstance(self.dataAdapter, StiMongoDbAdapter)):
+                if isinstance(self.dataAdapter, StiMongoDbAdapter):
                     args.queryString = args.dataSource
             except:
                 pass
@@ -267,11 +357,24 @@ class StiBaseHandler:
                 args.queryString = self.dataAdapter.makeQuery(args.queryString, args.parameters)
 
             if len(args.parameters) > 0:
-                args.queryString = StiDataAdapter.applyQueryParameters(args.queryString, args.parameters, self.request.escapeQueryParameters)
+                from ..StiSqlAdapter import StiSqlAdapter
+                args.queryString = StiSqlAdapter.applyQueryParameters(args.queryString, args.parameters, self.request.escapeQueryParameters)
 
-            args.result = self.dataAdapter.executeQuery(args.queryString, args.maxDataRows)
-            self.onEndProcessData(args)
-            return args.result
+            args.result = self.dataAdapter.getDataResult(args.queryString, args.maxDataRows)
+            result = self.onEndProcessData.getResult(args, StiDataResult)
+            return self.__getDataResult(result, notice, args)
+
+        # Process file data
+        if self.request.command == StiDataCommand.GET_DATA or self.request.command == StiDataCommand.GET_SCHEMA:
+            args.result = self.dataAdapter.getDataResult(connectionString)
+            result = self.onEndProcessData.getResult(args, StiDataResult)
+
+            # If the server side event is not set, the result is always successful
+            # Required for loading file data on the JavaScript client-side
+            if not self.onEndProcessData.hasServerCallbacks():
+                args.result.success = True
+
+            return self.__getDataResult(result, notice, args)
         
         return self.dataAdapter.test()
 

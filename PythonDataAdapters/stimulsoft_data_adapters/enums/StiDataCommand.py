@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2025.1.6
-Build date: 2025.02.28
+Version: 2025.2.1
+Build date: 2025.03.20
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -12,6 +12,8 @@ class StiDataCommand(Enum):
 
     NONE = None
     GET_SUPPORTED_ADAPTERS = 'GetSupportedAdapters'
+    GET_SCHEMA = 'GetSchema'
+    GET_DATA = 'GetData'
     TEST_CONNECTION = 'TestConnection'
     RETRIEVE_SCHEMA = 'RetrieveSchema'
     EXECUTE = 'Execute'

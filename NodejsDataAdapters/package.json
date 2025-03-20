@@ -1,6 +1,6 @@
 {
     "name": "stimulsoft-data-adapter",
-    "version": "2025.1.6",
+    "version": "2025.2.1",
     "description": "Nodejs data adapter for Stimulsoft Reports.JS",
     "main": "index.js",
     "scripts": {
@@ -12,12 +12,12 @@
     },
     "dependencies": {
         "limber-firebird-client": "^3.0.17",
-        "mongodb": "^6.11.0",
+        "mongodb": "^6.15.0",
         "mssql": "^11.0.1",
-        "mysql2": "^3.11.5",
-        "oracledb": "^6.7.0",
-        "pg": "^8.13.1",
-        "tzdata": "^1.0.42"
+        "mysql2": "^3.13.0",
+        "oracledb": "^6.8.0",
+        "pg": "^8.14.1",
+        "tzdata": "^1.0.43"
     },
     "files": [
         "package.json",

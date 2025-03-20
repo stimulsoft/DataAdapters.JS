@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2025.1.6
-# Build date: 2025.02.28
+# Version: 2025.2.1
+# Build date: 2025.03.20
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -68,9 +68,9 @@ class StiEventArgs
 
 ### Constructor
 
-    public function __construct($obj = null)
+    public function __construct($request = null)
     {
-        if ($obj !== null)
-            $this->setObject($obj);
+        if ($request !== null)
+            $this->setObject($request);
     }
 }

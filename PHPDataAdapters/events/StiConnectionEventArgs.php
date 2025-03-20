@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2025.1.6
-# Build date: 2025.02.28
+# Version: 2025.2.1
+# Build date: 2025.03.20
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -28,9 +28,9 @@ class StiConnectionEventArgs extends StiEventArgs
 
 ### Constructor
 
-    public function __construct($database, $driver, $info)
+    public function __construct($request, $database, $driver, $info)
     {
-        parent::__construct();
+        parent::__construct($request);
 
         $this->database = $database;
         $this->driver = $driver;

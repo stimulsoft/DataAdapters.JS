@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2025.1.6
-# Build date: 2025.02.28
+# Version: 2025.2.1
+# Build date: 2025.03.20
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -40,4 +40,10 @@ class StiDataEventArgs extends StiEventArgs
 
     /** @var StiDataResult The result of executing an event handler request. */
     public $result = null;
+
+    /** @var string The path or URL to the XML schema. */
+    public $pathSchema = null;
+
+    /** @var string The path or URL to the file data. */
+    public $pathData = null;
 }

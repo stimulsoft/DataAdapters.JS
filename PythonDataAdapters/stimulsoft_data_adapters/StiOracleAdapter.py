@@ -1,22 +1,26 @@
 """
 Stimulsoft.Reports.JS
-Version: 2025.1.6
-Build date: 2025.02.28
+Version: 2025.2.1
+Build date: 2025.03.20
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
 from .classes.StiDataResult import StiDataResult
 from .enums import StiDatabaseType
 from .events.StiConnectionEventArgs import StiConnectionEventArgs
-from .StiDataAdapter import StiDataAdapter
+from .StiSqlAdapter import StiSqlAdapter
 
 
-class StiOracleAdapter(StiDataAdapter):
+class StiOracleAdapter(StiSqlAdapter):
 
 ### Properties
 
-    version = '2025.1.5'
+    version = '2025.1.6'
+    """Current version of the data adapter."""
+
     checkVersion = True
+    """Sets the version matching check on the server and client sides."""
+    
     type = StiDatabaseType.ORACLE
     driverName = 'oracledb'
 
@@ -37,7 +41,7 @@ class StiOracleAdapter(StiDataAdapter):
             return self.connectOdbc()
         
         try:
-            args = StiConnectionEventArgs(self.type, self.driverName, self.connectionInfo)
+            args = StiConnectionEventArgs(self.handler.request, self.type, self.driverName, self.connectionInfo)
             self.handler.onDatabaseConnect(args)
             
             if args.link != None:

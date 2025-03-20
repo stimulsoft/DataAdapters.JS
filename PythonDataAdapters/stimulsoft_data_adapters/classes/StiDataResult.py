@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2025.1.6
-Build date: 2025.02.28
+Version: 2025.2.1
+Build date: 2025.03.20
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -13,6 +13,7 @@ from .StiBaseResult import StiBaseResult
 
 if typing.TYPE_CHECKING:
     from ..StiDataAdapter import StiDataAdapter
+    from ..StiSqlAdapter import StiSqlAdapter
 
 
 class StiDataResult(StiBaseResult):
@@ -27,7 +28,20 @@ class StiDataResult(StiBaseResult):
     types: list = None
     columns: list = None
     rows: list = None
+    data: str = None
+    dataType: str = None
     count = 0
+
+    @property
+    def type(self) -> str:
+        if self.success:
+            if hasattr(self, 'columns') and isinstance(self.columns, list):
+                return 'SQL'
+
+            if self.dataType != None:
+                return 'File'
+
+        return super().type
 
 
 ### Result
@@ -35,6 +49,13 @@ class StiDataResult(StiBaseResult):
     def getDataAdapterResult(self, adapter: StiDataAdapter) -> StiDataResult:
         self.adapterVersion = adapter.version
         self.checkVersion = adapter.checkVersion
+
+        from ..StiSqlAdapter import StiSqlAdapter
+        if isinstance(adapter, StiSqlAdapter):
+            self.types = []
+            self.columns = []
+            self.rows = []
+
         return self
 
     @staticmethod
@@ -43,10 +64,7 @@ class StiDataResult(StiBaseResult):
         
         result: StiDataResult = StiBaseResult.getSuccess(notice)
         result.__class__ = StiDataResult
-        result.types = []
-        result.columns = []
-        result.rows = []
-
+        
         return result
     
     @staticmethod
@@ -55,4 +73,5 @@ class StiDataResult(StiBaseResult):
 
         result: StiDataResult = StiBaseResult.getError(notice)
         result.__class__ = StiDataResult
+        
         return result

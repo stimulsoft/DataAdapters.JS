@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2025.1.6
-Build date: 2025.02.28
+Version: 2025.2.1
+Build date: 2025.03.20
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 using FirebirdSql.Data.FirebirdClient;
@@ -150,7 +150,7 @@ namespace NetCoreDataAdapters
                 result.Notice = e.Message;
             }
 
-            result.HandlerVersion = "2025.1.6";
+            result.HandlerVersion = "2025.2.1";
             result.CheckVersion = true;
 
             var contentType = "application/json";
@@ -161,9 +161,9 @@ namespace NetCoreDataAdapters
                 contentType = "text/plain";
             }
 
-            Response.Headers.Add("Access-Control-Allow-Origin", "*");
-            Response.Headers.Add("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Engaged-Auth-Token");
-            Response.Headers.Add("Cache-Control", "no-cache");
+            Response.Headers["Access-Control-Allow-Origin"]= "*";
+            Response.Headers["Access-Control-Allow-Headers"] = "Origin, X-Requested-With, Content-Type, Accept, Engaged-Auth-Token";
+            Response.Headers["Cache-Control"] = "no-cache";
             Response.ContentType = contentType;
             await Response.WriteAsync(resultText);
             await Response.CompleteAsync();

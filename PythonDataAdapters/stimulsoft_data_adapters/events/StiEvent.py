@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2025.1.6
-Build date: 2025.02.28
+Version: 2025.2.1
+Build date: 2025.03.20
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import typing
 
+from ..classes.StiBaseResult import StiBaseResult
 from .StiEventArgs import StiEventArgs
 
 if typing.TYPE_CHECKING:
@@ -41,6 +42,26 @@ class StiEvent:
 
 ### Helpers
 
+    def getResult(self, args: StiEventArgs, resultClass = None) -> StiBaseResult:
+        if resultClass == None:
+            resultClass = StiBaseResult
+
+        if len(self) > 0:
+            result = self(args)
+
+            if result == None or result == True:
+                return resultClass.getSuccess()
+
+            if result == False:
+                return resultClass.getError(f"An error occurred while processing the '{self.name}' event.")
+
+            if isinstance(result, StiBaseResult):
+                return result
+
+            return resultClass.getSuccess(str(result))
+
+        return None
+
     def _setArgs(self, *args, **keywargs) -> StiEventArgs:
         eventArgs = args[0] if len(args) > 0 else keywargs.get('args')
         if isinstance(eventArgs, StiEventArgs):
@@ -60,7 +81,7 @@ class StiEvent:
     
     def hasServerCallbacks(self) -> bool:
         for callback in self.callbacks:
-            if (callable(callback)):
+            if (callable(callback) or callback == True):
                 return True
         
         return False

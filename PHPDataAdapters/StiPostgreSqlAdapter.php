@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2025.1.6
-# Build date: 2025.02.28
+# Version: 2025.2.1
+# Build date: 2025.03.20
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -12,7 +12,7 @@ use Stimulsoft\Enums\StiDatabaseType;
 use Stimulsoft\Events\StiConnectionEventArgs;
 use Stimulsoft\StiDataResult;
 
-class StiPostgreSqlAdapter extends StiDataAdapter
+class StiPostgreSqlAdapter extends StiSqlAdapter
 {
 
 ### Constants
@@ -22,7 +22,10 @@ class StiPostgreSqlAdapter extends StiDataAdapter
 
 ### Properties
 
-    public $version = '2025.1.6';
+    /** @var string Current version of the data adapter. */
+    public $version = '2025.2.1';
+
+    /** @var bool Sets the version matching check on the server and client sides. */
     public $checkVersion = true;
 
     protected $type = StiDatabaseType::PostgreSQL;
@@ -50,7 +53,7 @@ class StiPostgreSqlAdapter extends StiDataAdapter
         if (!function_exists('pg_connect'))
             return StiDataResult::getError(self::DriverNotFound)->getDataAdapterResult($this);
 
-        $args = new StiConnectionEventArgs($this->type, $this->driverName, $this->connectionInfo);
+        $args = new StiConnectionEventArgs($this->handler->request, $this->type, $this->driverName, $this->connectionInfo);
         $this->handler->onDatabaseConnect->call($args);
 
         if ($args->link !== null)

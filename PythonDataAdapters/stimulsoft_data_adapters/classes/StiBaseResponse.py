@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2025.1.6
-Build date: 2025.02.28
+Version: 2025.2.1
+Build date: 2025.03.20
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -11,6 +11,8 @@ import codecs
 import json
 import typing
 
+from ..classes.StiDataResult import StiDataResult
+from ..enums.StiDataType import StiDataType
 from ..enums.StiFrameworkType import StiFrameworkType
 from .StiBaseResult import StiBaseResult
 
@@ -39,7 +41,10 @@ class StiBaseResponse:
     def mimeType(self) -> str:
         """Returns the MIME type for the handler response."""
 
-        return 'application/json'
+        if isinstance(self.result, StiDataResult) and self.result.dataType != None:
+            return self.result.dataType
+
+        return StiDataType.JSON.value
     
     @property
     def contentType(self) -> str:
@@ -51,8 +56,12 @@ class StiBaseResponse:
     def data(self) -> bytes:
         """Returns the handler response as a byte array. When using encryption, the response will be encrypted and encoded into a Base64 string."""
 
+        if isinstance(self.result, StiDataResult) and self.result.type == 'File':
+            return (self.result.data or '').encode()
+
         data = json.dumps(self.result, default = StiBaseResult.getProperties)
-        if self.handler.request.encryptData == True:
+        encryptSqlData = self.handler.encryptSqlData or self.result.type != 'SQL'
+        if self.handler.request.encryptData and encryptSqlData:
             data = codecs.encode(codecs.encode(data.encode(), 'base64').decode(), 'rot13')
             
         return data.encode()
@@ -68,6 +77,8 @@ class StiBaseResponse:
                 from django.http import HttpResponse
                 contentType = self.contentType
                 response = HttpResponse(self.data, content_type = contentType)
+                response.headers['Access-Control-Allow-Origin'] = self.origin
+                response.headers['X-Stimulsoft-Result'] = self.result.type
                 return response
             except:
                 return self
@@ -76,8 +87,9 @@ class StiBaseResponse:
             try:
                 from flask import make_response
                 response = make_response(self.data)
-                response.mimetype = self.mimeType
-                response.headers.add('Access-Control-Allow-Origin', self.origin)
+                response.headers.set('Content-Type', self.contentType)
+                response.headers.set('Access-Control-Allow-Origin', self.origin)
+                response.headers.set('X-Stimulsoft-Result', self.result.type)
                 return response
             except:
                 return self
@@ -87,6 +99,8 @@ class StiBaseResponse:
                 from tornado.web import RequestHandler as TornadoRequestHandler
                 if isinstance(handler, TornadoRequestHandler):
                     handler.set_header('Content-Type', self.contentType)
+                    handler.set_header('Access-Control-Allow-Origin', self.origin)
+                    handler.set_header('X-Stimulsoft-Result', self.result.type)
                     handler.write(self.data)
                     return None
 

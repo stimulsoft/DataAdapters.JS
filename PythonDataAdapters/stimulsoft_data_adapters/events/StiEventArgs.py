@@ -1,11 +1,13 @@
 """
 Stimulsoft.Reports.JS
-Version: 2025.1.6
-Build date: 2025.02.28
+Version: 2025.2.1
+Build date: 2025.03.20
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
 from enum import Enum, Flag
+
+from ..classes.StiBaseRequest import StiBaseRequest
 
 
 class StiEventArgs:
@@ -40,6 +42,6 @@ class StiEventArgs:
 
 ### Constructor
 
-    def __init__(self, object = None):
-        if (object != None):
-            self.__setObject(object)
+    def __init__(self, request: StiBaseRequest):
+        if (request != None):
+            self.__setObject(request)

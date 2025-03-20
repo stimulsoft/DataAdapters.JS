@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2025.1.6
-Build date: 2025.02.28
+Version: 2025.2.1
+Build date: 2025.03.20
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -20,6 +20,12 @@ class StiBaseResult:
     checkVersion = True
     success = True
     notice: str = None
+
+    @property
+    def type(self) -> str:
+        """The type of request processing result, used for the 'X-Stimulsoft-Result' header."""
+
+        return 'Success' if self.success else 'Error'
 
 
 ### Abstract
@@ -43,6 +49,7 @@ class StiBaseResult:
         result = StiBaseResult()
         result.success = True
         result.notice = notice
+
         return result
     
     @staticmethod
@@ -52,4 +59,5 @@ class StiBaseResult:
         result = StiBaseResult()
         result.success = False
         result.notice = notice
+        
         return result

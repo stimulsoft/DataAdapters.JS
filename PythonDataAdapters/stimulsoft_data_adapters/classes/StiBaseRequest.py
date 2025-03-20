@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2025.1.6
-Build date: 2025.02.28
+Version: 2025.2.1
+Build date: 2025.03.20
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -9,12 +9,13 @@ import codecs
 import json
 from enum import Enum, Flag
 
-from ..enums import StiDatabaseType, StiDataCommand, StiBaseEventType
+from ..enums import StiBaseEventType, StiDatabaseType, StiDataCommand
 from .StiBaseResult import StiBaseResult
 
 
 class StiBaseRequest:
     """Contains all set request parameters passed to the event handler."""
+
 
 ### Properties
 
@@ -29,6 +30,8 @@ class StiBaseRequest:
     connection: str = None
     timeout = 0
     maxDataRows: int = None
+    pathData: str = None
+    pathSchema: str = None
     escapeQueryParameters = False
     error: str = None
 
@@ -88,4 +91,3 @@ class StiBaseRequest:
             return StiBaseResult.getError(self.error)
 
         StiBaseResult.getSuccess()
-    

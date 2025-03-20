@@ -1,10 +1,11 @@
 """
 Stimulsoft.Reports.JS
-Version: 2025.1.6
-Build date: 2025.02.28
+Version: 2025.2.1
+Build date: 2025.03.20
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
+from ..classes import StiBaseRequest
 from ..classes.StiConnectionInfo import StiConnectionInfo
 from ..enums import StiDatabaseType
 from .StiEventArgs import StiEventArgs
@@ -27,8 +28,8 @@ class StiConnectionEventArgs(StiEventArgs):
 
 ### Constructor
 
-    def __init__(self, database: StiDatabaseType, driver: str, info: StiConnectionInfo):
-        super().__init__()
+    def __init__(self, request: StiBaseRequest, database: StiDatabaseType, driver: str, info: StiConnectionInfo):
+        super().__init__(request)
 
         self.database = database
         self.driver = driver

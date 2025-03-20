@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2025.1.6
-Build date: 2025.02.28
+Version: 2025.2.1
+Build date: 2025.03.20
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -11,15 +11,19 @@ from uuid import UUID
 from .classes.StiDataResult import StiDataResult
 from .enums import StiDatabaseType
 from .events.StiConnectionEventArgs import StiConnectionEventArgs
-from .StiDataAdapter import StiDataAdapter
+from .StiSqlAdapter import StiSqlAdapter
 
 
-class StiMsSqlAdapter(StiDataAdapter):
+class StiMsSqlAdapter(StiSqlAdapter):
 
 ### Properties
 
-    version = '2025.1.5'
+    version = '2025.1.6'
+    """Current version of the data adapter."""
+
     checkVersion = True
+    """Sets the version matching check on the server and client sides."""
+    
     trustServerCertificate: str = None
     integratedSecurity: str = None
     type = StiDatabaseType.MSSQL
@@ -52,7 +56,7 @@ class StiMsSqlAdapter(StiDataAdapter):
             self.connectionInfo.charset = 'utf8'
 
         try:
-            args = StiConnectionEventArgs(self.type, self.driverName, self.connectionInfo)
+            args = StiConnectionEventArgs(self.handler.request, self.type, self.driverName, self.connectionInfo)
             self.handler.onDatabaseConnect(args)
 
             if args.link != None:

@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2025.1.6
-# Build date: 2025.02.28
+# Version: 2025.2.1
+# Build date: 2025.03.20
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -13,6 +13,8 @@ use Stimulsoft\StiFunctions;
 class StiDataCommand
 {
     const GetSupportedAdapters = 'GetSupportedAdapters';
+    const GetSchema = 'GetSchema';
+    const GetData = 'GetData';
     const TestConnection = 'TestConnection';
     const RetrieveSchema = 'RetrieveSchema';
     const Execute = 'Execute';
