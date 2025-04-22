@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2025.2.2
-# Build date: 2025.04.08
+# Version: 2025.2.3
+# Build date: 2025.04.18
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -32,7 +32,7 @@ class StiDataAdapter
 ### Properties
 
     /** @var string Current version of the data adapter. */
-    public $version = '2025.2.2';
+    public $version = '2025.2.3';
 
     /** @var bool Sets the version matching check on the server and client sides. */
     public $checkVersion = false;
@@ -94,7 +94,7 @@ class StiDataAdapter
      * @param StiDatabaseType|string $database [enum] The database type for which the command will be executed.
      * @param string $connectionString The connection string or URL for the current data source.
      */
-    public static function getDataAdapter(string $database, string|null $connectionString)
+    public static function getDataAdapter(string $database, $connectionString)
     {
         switch ($database) {
             case StiDatabaseType::MySQL:
