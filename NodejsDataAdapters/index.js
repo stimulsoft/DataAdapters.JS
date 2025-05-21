@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2025.2.3
-Build date: 2025.04.18
+Version: 2025.2.4
+Build date: 2025.05.19
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 
@@ -75,7 +75,7 @@ function getResponse(result) {
     return result
 }
 function onProcess(onResult, encryptData, result) {
-    result.handlerVersion = "2025.2.3";
+    result.handlerVersion = "2025.2.4";
     result.checkVersion = true;
     result.encryptData = encryptData;
     onResult(result);

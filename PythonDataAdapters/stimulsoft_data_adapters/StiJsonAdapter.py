@@ -1,7 +1,7 @@
 """
 Stimulsoft.Reports.JS
-Version: 2025.2.3
-Build date: 2025.04.18
+Version: 2025.2.4
+Build date: 2025.05.19
 License: https://www.stimulsoft.com/en/licensing/reports
 """
 
@@ -14,7 +14,7 @@ class StiJsonAdapter(StiFileAdapter):
     
 ### Properties
 
-    version = '2025.2.2'
+    version = '2025.2.3'
     """Current version of the data adapter."""
 
     checkVersion = True

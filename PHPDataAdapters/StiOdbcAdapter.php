@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2025.2.3
-# Build date: 2025.04.18
+# Version: 2025.2.4
+# Build date: 2025.05.19
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -19,7 +19,7 @@ class StiOdbcAdapter extends StiSqlAdapter
 ### Properties
 
     /** @var string Current version of the data adapter. */
-    public $version = '2025.2.3';
+    public $version = '2025.2.4';
 
     /** @var bool Sets the version matching check on the server and client sides. */
     public $checkVersion = true;
@@ -145,8 +145,8 @@ class StiOdbcAdapter extends StiSqlAdapter
             case 'uniqueidentifier':
             case 'xml':
             case \PDO::PARAM_STR:
-            case \PDO::PARAM_STR_NATL:
-            case \PDO::PARAM_STR_CHAR:
+            case \PDO::PARAM_STR_NATL:  // PHP 7.2+
+            case \PDO::PARAM_STR_CHAR:  // PHP 7.2+
                 return 'string';
 
             case 'date':

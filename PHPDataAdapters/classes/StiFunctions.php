@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2025.2.3
-# Build date: 2025.04.18
+# Version: 2025.2.4
+# Build date: 2025.05.19
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -32,9 +32,9 @@ class StiFunctions
         return strlen($str || '') == 0;
     }
 
-    public static function newGuid($length = 16): string
+    public static function newGuid(int $length = 16): string
     {
-        return bin2hex(openssl_random_pseudo_bytes($length));
+        return substr(bin2hex(openssl_random_pseudo_bytes($length)), 0, $length);
     }
 
     public static function getJavaScriptValue($value): string

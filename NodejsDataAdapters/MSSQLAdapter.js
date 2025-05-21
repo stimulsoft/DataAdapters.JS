@@ -1,14 +1,14 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2025.2.3
-Build date: 2025.04.18
+Version: 2025.2.4
+Build date: 2025.05.19
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 exports.process = function (command, onResult) {
     var end = function (result) {
         try {
             if (connection) connection.close();
-            result.adapterVersion = "2025.2.3";
+            result.adapterVersion = "2025.2.4";
             onResult(result);
         }
         catch (e) {
@@ -228,7 +228,7 @@ exports.process = function (command, onResult) {
                                 break;
 
                             case "encrypt":
-                                config.options["encrypt"] = !!match[1];
+                                config.options["encrypt"] = match[1].toLowerCase() == "true";
                                 break;
 
                             case "connectiontimeout":
@@ -244,7 +244,7 @@ exports.process = function (command, onResult) {
                                 break;
 
                             case "trustservercertificate":
-                                config.options["trustServerCertificate"] = !!match[1];
+                                config.options["trustServerCertificate"] = match[1].toLowerCase() == "true";
                                 break;
                         }
                     }

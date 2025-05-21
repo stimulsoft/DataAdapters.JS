@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2025.2.3
-Build date: 2025.04.18
+Version: 2025.2.4
+Build date: 2025.05.19
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 exports.process = function (command, onResult) {
@@ -13,7 +13,7 @@ exports.process = function (command, onResult) {
         catch (e) {
         }
         finally {
-            result.adapterVersion = "2025.2.3";
+            result.adapterVersion = "2025.2.4";
             onResult(result);
         }
     }
@@ -31,7 +31,7 @@ exports.process = function (command, onResult) {
         }
 
         var query = function (queryString, parameters, timeout, maxDataRows) {
-            connection.query("USE " + command.connectionStringInfo.database);
+            connection.query("USE `" + command.connectionStringInfo.database + "`");
             connection.query({ sql: queryString, timeout: timeout }, parameters, function (error, rows, fields) {
                 if (error) onError(error.message);
                 else {

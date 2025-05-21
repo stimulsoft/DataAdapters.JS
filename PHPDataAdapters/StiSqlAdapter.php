@@ -1,13 +1,16 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2025.2.3
-# Build date: 2025.04.18
+# Version: 2025.2.4
+# Build date: 2025.05.19
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
 
 namespace Stimulsoft\Adapters;
 
+use DateTime;
+use PDO;
+use PDOException;
 use Stimulsoft\Events\StiConnectionEventArgs;
 use Stimulsoft\StiConnectionInfo;
 use Stimulsoft\StiDataResult;
@@ -31,7 +34,7 @@ class StiSqlAdapter extends StiDataAdapter
         $message = count($info) >= 3 ? $info[2] : StiDataAdapter::UnknownError;
         if ($code != 0) $message = "[$code] $message";
 
-        return StiDataResult::getError($message, $this);
+        return StiDataResult::getError($message)->getDataAdapterResult($this);
     }
 
     protected function connect(): StiDataResult
@@ -49,7 +52,7 @@ class StiSqlAdapter extends StiDataAdapter
             $message = $e->getMessage();
             if ($code != 0) $message = "[$code] $message";
 
-            return StiDataResult::getError($message, $this);
+            return StiDataResult::getError($message)->getDataAdapterResult($this);
         }
 
         return parent::connect();
@@ -246,8 +249,11 @@ class StiSqlAdapter extends StiDataAdapter
         return $result;
     }
 
-    public function getDataResult($queryString, $maxDataRows = -1): StiDataResult
+    public function getDataResult(?string $queryString, ?int $maxDataRows = -1): StiDataResult
     {
+        if ($maxDataRows === null)
+            $maxDataRows = -1;
+
         return $this->executeQuery($queryString, $maxDataRows);
     }
 

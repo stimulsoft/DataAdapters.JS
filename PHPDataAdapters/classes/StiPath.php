@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2025.2.3
-# Build date: 2025.04.18
+# Version: 2025.2.4
+# Build date: 2025.05.19
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -58,7 +58,7 @@ class StiPath
         return basename($filePath);
     }
 
-    private static function getRealFilePath($filePath, $checkFileNames)
+    private static function getRealFilePath($filePath, $checkFileNames): ?string
     {
         if (StiPath::isUrl($filePath)) {
             $headers = get_headers($filePath);
@@ -76,7 +76,7 @@ class StiPath
         return null;
     }
 
-    private static function getRealDirectoryPath($directoryPath, $checkFileNames)
+    private static function getRealDirectoryPath($directoryPath, $checkFileNames): ?string
     {
         if (StiPath::isUrl($directoryPath))
             return null;
@@ -105,7 +105,7 @@ class StiPath
 
 ### Constructor
 
-    public function __construct($filePath, $checkFileNames = true)
+    public function __construct(?string $filePath, bool $checkFileNames = true)
     {
         $this->filePath = self::getRealFilePath($filePath, $checkFileNames);
         $this->directoryPath = self::getRealDirectoryPath($filePath, $checkFileNames);

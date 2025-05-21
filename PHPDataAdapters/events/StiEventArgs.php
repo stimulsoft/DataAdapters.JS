@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2025.2.3
-# Build date: 2025.04.18
+# Version: 2025.2.4
+# Build date: 2025.05.19
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -57,7 +57,7 @@ class StiEventArgs
                 $this->setProperty($name, $object->$name);
     }
 
-    protected function setProperty($name, $value)
+    protected function setProperty(string $name, $value)
     {
         if ($name == 'fileName' && $value !== null)
             $value = $this->getFileName($value);

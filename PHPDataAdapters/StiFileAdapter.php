@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2025.2.3
-# Build date: 2025.04.18
+# Version: 2025.2.4
+# Build date: 2025.05.19
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -11,6 +11,7 @@ namespace Stimulsoft\Adapters;
 use Exception;
 use Stimulsoft\Enums\StiDataType;
 use Stimulsoft\StiDataResult;
+use Stimulsoft\StiHandler;
 use Stimulsoft\StiPath;
 
 class StiFileAdapter extends StiDataAdapter
@@ -29,7 +30,8 @@ class StiFileAdapter extends StiDataAdapter
 
     protected function connect(): StiDataResult
     {
-        $path = new StiPath($this->connectionString, $this->handler->checkFileNames);
+        $checkFileNames = $this->handler instanceof StiHandler ? $this->handler->checkFileNames : true;
+        $path = new StiPath($this->connectionString, $checkFileNames);
         if ($path->filePath == null)
             return StiDataResult::getError("Data file '$this->connectionString' not found.")->getDataAdapterResult($this);
 
@@ -38,9 +40,9 @@ class StiFileAdapter extends StiDataAdapter
         return StiDataResult::getSuccess()->getDataAdapterResult($this);
     }
 
-    public function getDataResult($filePath, $maxDataRows = -1): StiDataResult
+    public function getDataResult(?string $queryString, ?int $maxDataRows = -1): StiDataResult
     {
-        $this->connectionString = $filePath;
+        $this->connectionString = $queryString;
         $this->process();
 
         $result = $this->connect();
