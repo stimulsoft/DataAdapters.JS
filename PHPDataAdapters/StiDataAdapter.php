@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2025.2.4
-# Build date: 2025.05.19
+# Version: 2025.2.5
+# Build date: 2025.06.02
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -32,7 +32,7 @@ class StiDataAdapter
 ### Properties
 
     /** @var string Current version of the data adapter. */
-    public $version = '2025.2.4';
+    public $version = '2025.2.5';
 
     /** @var bool Sets the version matching check on the server and client sides. */
     public $checkVersion = false;
