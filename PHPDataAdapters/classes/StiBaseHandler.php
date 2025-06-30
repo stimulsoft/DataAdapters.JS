@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2025.2.5
-# Build date: 2025.06.02
+# Version: 2025.3.1
+# Build date: 2025.06.25
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -32,7 +32,7 @@ class StiBaseHandler
     public static $legacyMode = false;
 
     /** @var string Current version of the event handler. */
-    public $version = '2025.2.5';
+    public $version = '2025.3.1';
 
     /** @var bool Enables checking for client-side and server-side data adapter versions to match. */
     public $checkDataAdaptersVersion = true;
@@ -174,7 +174,7 @@ class StiBaseHandler
         if ($this->request->parameters !== null && $this->request->queryString !== null && strlen($this->request->queryString) > 0) {
             foreach ($this->request->parameters as $item) {
                 $name = mb_strpos($item->name, '@') === 0 || mb_strpos($item->name, ':') === 0 ? mb_substr($item->name, 1) : $item->name;
-                $parameters[$name] = new StiParameter($name, $item->type, $item->typeName, $item->typeGroup, $item->size ?? 0, $item->value);
+                $parameters[$name] = new StiParameter($name, $item->type ?? 0, $item->typeName ?? null, $item->typeGroup ?? null, $item->size ?? 0, $item->value ?? null);
             }
         }
 
