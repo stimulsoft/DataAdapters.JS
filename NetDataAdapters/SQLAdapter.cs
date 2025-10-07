@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2025.3.5
-Build date: 2025.09.04
+Version: 2025.4.1
+Build date: 2025.10.06
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 using FirebirdSql.Data.FirebirdClient;
@@ -20,15 +20,13 @@ namespace AspNetDataAdapters
     public class SQLAdapter
     {
         private static DbConnection connection;
-        private static DbDataReader reader;
         private static CommandJson command;
 
         private static Result End(Result result)
         {
-            result.AdapterVersion = "2025.3.5";
+            result.AdapterVersion = "2025.4.1";
             try
             {
-                if (reader != null) reader.Close();
                 if (connection != null) connection.Close();
 
                 return result;
@@ -83,9 +81,11 @@ namespace AspNetDataAdapters
                     sqlParameter.Value = GetValue(parameter.Value, parameter.TypeGroup);
                     sqlCommand.Parameters.Add(sqlParameter);
                 }
-                
-                reader = sqlCommand.ExecuteReader();
-                return OnQuery();
+
+                using (var reader = sqlCommand.ExecuteReader())
+                {
+                    return OnQuery(reader);
+                }
             }
             catch (Exception e)
             {
@@ -93,7 +93,7 @@ namespace AspNetDataAdapters
             }
         }
 
-        private static Result OnQuery()
+        private static Result OnQuery(DbDataReader reader)
         {
             var columns = new List<string>();
             var rows = new List<string[]>();
@@ -147,7 +147,7 @@ namespace AspNetDataAdapters
                     else
                     {
                         if (types[index] == "array")
-                            value = GetBytes(index);
+                            value = GetBytes(index, reader);
 
                         row[index] = value.ToString();
                     }
@@ -156,11 +156,12 @@ namespace AspNetDataAdapters
                 if (command.MaxDataRows <= rows.Count) break;
                 rows.Add(row);
             }
-
+            
+            reader.Close();
             return End(new Result { Success = true, Columns = columns.ToArray(), Rows = rows.ToArray(), Types = types.ToArray() });
         }
 
-        private static string GetBytes(int index)
+        private static string GetBytes(int index, DbDataReader reader)
         {
             if (reader.GetFieldValue<object>(index) == DBNull.Value) return "";
 

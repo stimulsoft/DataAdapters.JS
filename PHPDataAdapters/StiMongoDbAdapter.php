@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2025.3.5
-# Build date: 2025.09.04
+# Version: 2025.4.1
+# Build date: 2025.10.06
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -29,7 +29,7 @@ class StiMongoDbAdapter extends StiSqlAdapter
 ### Properties
 
     /** @var string Current version of the data adapter. */
-    public $version = '2025.3.5';
+    public $version = '2025.4.1';
 
     /** @var bool Sets the version matching check on the server and client sides. */
     public $checkVersion = true;
