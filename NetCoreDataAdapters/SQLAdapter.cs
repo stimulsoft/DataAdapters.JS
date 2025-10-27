@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2025.4.1
-Build date: 2025.10.06
+Version: 2025.4.2
+Build date: 2025.10.27
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 using FirebirdSql.Data.FirebirdClient;
@@ -25,7 +25,7 @@ namespace NetCoreDataAdapters
 
         private static Result End(Result result)
         {
-            result.AdapterVersion = "2025.4.1";
+            result.AdapterVersion = "2025.4.2";
             try
             {
                 if (connection != null) connection.Close();
