@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2025.4.3
-Build date: 2025.11.14
+Version: 2026.1.1
+Build date: 2025.12.17
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 using FirebirdSql.Data.FirebirdClient;
@@ -129,7 +129,7 @@ namespace NetCoreDataAdapters
                     {
                         case "MySQL":
                             if (!sslModeRegex.IsMatch(command.ConnectionString))
-                                command.ConnectionString += (command.ConnectionString.TrimEnd().EndsWith(";") ? "" : ";") + "SslMode=None;";
+                                command.ConnectionString += (command.ConnectionString.TrimEnd().EndsWith(";") ? "" : ";") + "SslMode=Disabled;";
                             result = SQLAdapter.Process(command, new MySqlConnection(command.ConnectionString)); break;
                         case "Firebird": result = SQLAdapter.Process(command, new FbConnection(command.ConnectionString)); break;
                         case "MS SQL":
@@ -150,7 +150,7 @@ namespace NetCoreDataAdapters
                 result.Notice = e.Message;
             }
 
-            result.HandlerVersion = "2025.4.3";
+            result.HandlerVersion = "2026.1.1";
             result.CheckVersion = true;
 
             var contentType = "application/json";
