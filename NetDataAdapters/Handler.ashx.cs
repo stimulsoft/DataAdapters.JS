@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2026.1.3
-Build date: 2026.01.29
+Version: 2026.1.4
+Build date: 2026.02.19
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 using System;
@@ -71,7 +71,6 @@ namespace AspNetDataAdapters
         [DataMember(Name = "dataSource")]
         public string DataSource { get; set; }
 
-
         [DataMember(Name = "timeout")]
         public int Timeout { get; set; }
 
@@ -100,7 +99,7 @@ namespace AspNetDataAdapters
         [DataMember(Name = "typeName")]
         public string TypeName { get; set; }
 
-        [DataMember(Name = "Type")]
+        [DataMember(Name = "type")]
         public int Type { get; set; }
 
         [DataMember(Name = "size")]
@@ -183,7 +182,7 @@ namespace AspNetDataAdapters
                     inputStream.Close();
             }
 
-            result.HandlerVersion = "2026.1.3";
+            result.HandlerVersion = "2026.1.4";
             result.CheckVersion = true;
 
             context.Response.Headers.Add("Access-Control-Allow-Origin", "*");

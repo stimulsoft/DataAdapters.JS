@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2026.1.3
-Build date: 2026.01.29
+Version: 2026.1.4
+Build date: 2026.02.19
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 using FirebirdSql.Data.FirebirdClient;
@@ -24,7 +24,7 @@ namespace AspNetDataAdapters
 
         private static Result End(Result result)
         {
-            result.AdapterVersion = "2026.1.3";
+            result.AdapterVersion = "2026.1.4";
             try
             {
                 if (connection != null) connection.Close();
@@ -76,7 +76,6 @@ namespace AspNetDataAdapters
                     sqlParameter.ParameterName = parameter.Name;
                     sqlParameter.DbType = GetDbType(parameter.TypeName);
                     sqlParameter.Size = parameter.Size;
-                    sqlParameter.Value = parameter.Value;
                     if (sqlParameter.DbType == DbType.Decimal) sqlParameter.Precision = (byte)parameter.Size;
                     sqlParameter.Value = GetValue(parameter.Value, parameter.TypeGroup);
                     sqlCommand.Parameters.Add(sqlParameter);
@@ -388,6 +387,8 @@ namespace AspNetDataAdapters
 
         private static object GetValue(object obj, string type)
         {
+            if (obj == null) return DBNull.Value;
+
             try
             {
                 switch (type)

@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2026.1.3
-Build date: 2026.01.29
+Version: 2026.1.4
+Build date: 2026.02.19
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 using FirebirdSql.Data.FirebirdClient;
@@ -25,7 +25,7 @@ namespace NetCoreDataAdapters
 
         private static Result End(Result result)
         {
-            result.AdapterVersion = "2026.1.3";
+            result.AdapterVersion = "2026.1.4";
             try
             {
                 if (connection != null) connection.Close();
@@ -75,10 +75,10 @@ namespace NetCoreDataAdapters
                 {
                     var sqlParameter = sqlCommand.CreateParameter();
                     sqlParameter.ParameterName = parameter.Name;
-                    sqlParameter.DbType = (DbType)parameter.NetType;
+                    sqlParameter.DbType = GetDbType(parameter.TypeName);
                     sqlParameter.Size = parameter.Size;
                     if (sqlParameter.DbType == DbType.Decimal) sqlParameter.Precision = (byte)parameter.Size;
-                    sqlParameter.Value = GetValue((JsonElement)parameter.Value, parameter.TypeGroup);
+                    sqlParameter.Value = GetValue(parameter.Value, parameter.TypeGroup);
                     sqlCommand.Parameters.Add(sqlParameter);
                 }
 
@@ -385,24 +385,73 @@ namespace NetCoreDataAdapters
             return "string";
         }
 
-        private static object GetValue(JsonElement json, string type)
+        private static object GetValue(object obj, string type)
         {
+            if (obj == null) return DBNull.Value;
+
             try
             {
                 switch (type)
                 {
-                    case "string": return json.GetString();
-                    case "number": return json.GetDecimal();
-                    case "datetime": return json.GetDateTime();
-                    case "guid": return json.GetGuid();
+                    case "string": return obj.ToString();
+                    case "number": return Decimal.Parse(obj.ToString());
+                    case "datetime": return DateTime.Parse(obj.ToString());
+                    case "guid": return new Guid(obj.ToString());
                 }
             }
             catch
+            { 
+            }
+            return obj;
+        }
+
+        private static DbType GetDbType(string typeName)
+        {
+            if (connection is MySqlConnection)
             {
             }
-            return json.GetString();
+            else if (connection is FbConnection)
+            {
+            }
+            else if (connection is SqlConnection)
+            {
+                switch (typeName.ToLowerInvariant())
+                {
+                    case "bit": return DbType.Boolean;
+                    case "float": return DbType.Double;
+                    case "tinyint": return DbType.Byte;
+                    case "smallint": return DbType.Int16;
+                    case "int": return DbType.Int32;
+                    case "bigint": return DbType.Int64;
+                    case "money": return DbType.Decimal;
+                    case "real": return DbType.Single;
+
+                    case "nchar": return DbType.String;
+                    case "ntext": return DbType.String;
+                    case "nvarchar": return DbType.String;
+                    case "text": return DbType.String;
+                    case "varchar": return DbType.String;
+                    case "char": return DbType.StringFixedLength;
+
+                    case "uniqueidentifier": return DbType.Guid;
+                    case "smalldatetime": return DbType.DateTime;
+                    case "smallmoney": return DbType.Decimal;
+                }
+            }
+            else if (connection is NpgsqlConnection)
+            {
+            }
+            else if (connection is OracleConnection)
+            {
+            }
+
+            DbType type;
+            if (Enum.TryParse(typeName, true, out type))
+                return type;
+
+            return DbType.Object;
         }
-        
+
         public static Result Process(CommandJson command, DbConnection connection)
         {
             SQLAdapter.connection = connection;
