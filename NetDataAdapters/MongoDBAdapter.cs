@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2026.1.4
-Build date: 2026.02.19
+Version: 2026.1.5
+Build date: 2026.03.10
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 /*
@@ -172,7 +172,7 @@ namespace AspNetDataAdapters
                 };
             }
 
-            result.AdapterVersion = "2026.1.4";
+            result.AdapterVersion = "2026.1.5";
             return result;
         }
     }
