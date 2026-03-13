@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2026.1.5
-Build date: 2026.03.10
+Version: 2026.1.6
+Build date: 2026.03.13
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 using FirebirdSql.Data.FirebirdClient;
@@ -24,7 +24,7 @@ namespace AspNetDataAdapters
 
         private static Result End(Result result)
         {
-            result.AdapterVersion = "2026.1.5";
+            result.AdapterVersion = "2026.1.6";
             try
             {
                 if (connection != null) connection.Close();
