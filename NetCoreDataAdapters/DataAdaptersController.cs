@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2026.1.7
-Build date: 2026.03.20
+Version: 2026.2.1
+Build date: 2026.04.23
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 using FirebirdSql.Data.FirebirdClient;
@@ -150,7 +150,7 @@ namespace NetCoreDataAdapters
                 result.Notice = e.Message;
             }
 
-            result.HandlerVersion = "2026.1.7";
+            result.HandlerVersion = "2026.2.1";
             result.CheckVersion = true;
 
             var contentType = "application/json";

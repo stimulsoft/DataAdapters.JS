@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2026.1.7
-# Build date: 2026.03.20
+# Version: 2026.2.1
+# Build date: 2026.04.23
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -17,7 +17,7 @@ class StiJsonAdapter extends StiFileAdapter
 ### Properties
 
     /** @var string Current version of the data adapter. */
-    public $version = '2026.1.7';
+    public $version = '2026.2.1';
 
     /** @var bool Sets the version matching check on the server and client sides. */
     public $checkVersion = true;
