@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2026.2.1
-# Build date: 2026.04.23
+# Version: 2026.2.2
+# Build date: 2026.04.28
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -25,7 +25,7 @@ class StiOracleAdapter extends StiSqlAdapter
 ### Properties
 
     /** @var string Current version of the data adapter. */
-    public $version = '2026.2.1';
+    public $version = '2026.2.2';
 
     /** @var bool Sets the version matching check on the server and client sides. */
     public $checkVersion = true;
