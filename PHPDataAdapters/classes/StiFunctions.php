@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2026.3.1
-# Build date: 2026.07.16
+# Version: 2026.3.2
+# Build date: 2026.08.11
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -45,6 +45,19 @@ class StiFunctions
     public static function isJavaScriptFunctionName($value): bool
     {
         return preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $value);
+    }
+
+    /**
+     * Strips characters that are not allowed in a JavaScript identifier and, if needed,
+     * prefixes the result so it never starts with a digit or ends up empty.
+     */
+    public static function normalizeJavaScriptIdentifier(string $value): string
+    {
+        $value = preg_replace('/[^a-zA-Z0-9_\x7f-\xff]/', '', $value);
+        if ($value === '' || preg_match('/^[0-9]/', $value))
+            $value = '_' . $value;
+
+        return $value;
     }
 
 

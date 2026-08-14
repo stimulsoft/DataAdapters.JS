@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2026.3.1
-Build date: 2026.07.16
+Version: 2026.3.2
+Build date: 2026.08.11
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 /*
@@ -172,7 +172,7 @@ namespace NetCoreDataAdapters
                 };
             }
 
-            result.AdapterVersion = "2026.3.1";
+            result.AdapterVersion = "2026.3.2";
             return result;
         }
     }
