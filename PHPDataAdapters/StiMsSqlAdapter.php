@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2026.3.2
-# Build date: 2026.08.11
+# Version: 2026.3.3
+# Build date: 2026.08.25
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -23,7 +23,7 @@ class StiMsSqlAdapter extends StiSqlAdapter
 ### Properties
 
     /** @var string Current version of the data adapter. */
-    public $version = '2026.3.2';
+    public $version = '2026.3.3';
 
     /** @var bool Sets the version matching check on the server and client sides. */
     public $checkVersion = true;
