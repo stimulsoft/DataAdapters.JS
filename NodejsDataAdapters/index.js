@@ -1,7 +1,7 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2026.3.4
-Build date: 2026.09.09
+Version: 2026.4.1
+Build date: 2026.10.01
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 
@@ -25,7 +25,7 @@ function process(command, onResult) {
     var onProcessHandler = onProcess.bind(null, onResult, command.encryptResult);
 
     if (command.command === "GetSupportedAdapters") {
-        onProcessHandler({ success: true, types: ["MySQL", "MS SQL", "Firebird", "PostgreSQL", "MongoDB", "Oracle"] });
+        onProcessHandler({ success: true, types: ["MySQL", "MS SQL", "Firebird", "PostgreSQL", "MongoDB", "Oracle", "DuckDB"] });
     } else {
         if (command.parameters) {
             command.parameters.forEach(parameter => {
@@ -57,6 +57,10 @@ function process(command, onResult) {
             var OracleAdapter = require('./OracleAdapter');
             OracleAdapter.process(command, onProcessHandler);
         }
+        else if (command.database == "DuckDB") {
+            var DuckDBAdapter = require('./DuckDBAdapter');
+            DuckDBAdapter.process(command, onProcessHandler);
+        }
         else onProcessHandler({ success: false, notice: "Database '" + command.database + "' not supported!" });
     }
 }
@@ -75,7 +79,7 @@ function getResponse(result) {
     return result
 }
 function onProcess(onResult, encryptData, result) {
-    result.handlerVersion = "2026.3.4";
+    result.handlerVersion = "2026.4.1";
     result.checkVersion = true;
     result.encryptData = encryptData;
     onResult(result);

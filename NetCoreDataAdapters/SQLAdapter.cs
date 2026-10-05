@@ -1,10 +1,11 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2026.3.4
-Build date: 2026.09.09
+Version: 2026.4.1
+Build date: 2026.10.01
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 using FirebirdSql.Data.FirebirdClient;
+using DuckDB.NET.Data;
 using MySql.Data.MySqlClient;
 using Npgsql;
 using Oracle.ManagedDataAccess.Client;
@@ -25,7 +26,7 @@ namespace NetCoreDataAdapters
 
         private static Result End(Result result)
         {
-            result.AdapterVersion = "2026.3.4";
+            result.AdapterVersion = "2026.4.1";
             try
             {
                 if (connection != null) connection.Close();
@@ -129,6 +130,15 @@ namespace NetCoreDataAdapters
                     }
 
                     if (value == null) value = "";
+
+                    #region DuckDB
+                    var valueType = value.GetType();
+                    if (valueType.FullName == "DuckDB.NET.Native.DuckDBDateOnly")
+                        value = valueType.GetMethod("ToDateTime").Invoke(value, null);
+                    else if (valueType.FullName == "DuckDB.NET.Native.DuckDBTimeOnly")
+                        value = new TimeSpan((long)valueType.GetProperty("Ticks").GetValue(value));
+                    #endregion
+
                     if (value is DateTime)
                     {
                         row[index] = ((DateTime)value).ToString("yyyy-MM-dd'T'HH:mm:ss.fff");
@@ -352,6 +362,60 @@ namespace NetCoreDataAdapters
                         return "boolean";
                 }
             }
+            else if (connection is DuckDBConnection)
+            {
+                var type = dbType;
+                var bracketIndex = type.IndexOf('(');
+                if (bracketIndex >= 0) type = type.Substring(0, bracketIndex).Trim();
+
+                switch (type.ToLowerInvariant())
+                {
+                    case "boolean":
+                    case "bool":
+                    case "logical":
+                        return "boolean";
+
+                    case "tinyint":
+                    case "smallint":
+                    case "integer":
+                    case "bigint":
+                    case "hugeint":
+                    case "utinyint":
+                    case "usmallint":
+                    case "uinteger":
+                    case "ubigint":
+                        return "int";
+
+                    case "float":
+                    case "double":
+                    case "decimal":
+                    case "numeric":
+                        return "number";
+
+                    case "date":
+                    case "timestamp":
+                    case "timestamp_s":
+                    case "timestamp_ms":
+                    case "timestamp_ns":
+                    case "timestamptz":
+                    case "timestamp with time zone":
+                        return "datetime";
+
+                    case "time":
+                    case "time_ns":
+                        return "time";
+
+                    case "timetz":
+                    case "time with time zone":
+                        return "datetimeoffset";
+
+                    case "blob":
+                    case "bytea":
+                    case "binary":
+                    case "varbinary":
+                        return "array";
+                }
+            }
             else if (connection is OracleConnection)
             {
                 switch (dbType.ToUpperInvariant())
@@ -440,6 +504,32 @@ namespace NetCoreDataAdapters
             }
             else if (connection is NpgsqlConnection)
             {
+            }
+            else if (connection is DuckDBConnection)
+            {
+                switch (typeName.ToLowerInvariant())
+                {
+                    case "boolean": return DbType.Boolean;
+                    case "tinyint": return DbType.SByte;
+                    case "smallint": return DbType.Int16;
+                    case "integer": return DbType.Int32;
+                    case "bigint": return DbType.Int64;
+                    case "hugeint": return DbType.Decimal;
+                    case "utinyint": return DbType.Byte;
+                    case "usmallint": return DbType.UInt16;
+                    case "uinteger": return DbType.UInt32;
+                    case "ubigint": return DbType.UInt64;
+                    case "float": return DbType.Single;
+                    case "double": return DbType.Double;
+                    case "decimal": return DbType.Decimal;
+                    case "varchar": return DbType.String;
+                    case "blob": return DbType.Binary;
+                    case "date": return DbType.Date;
+                    case "time": return DbType.Time;
+                    case "timestamp": return DbType.DateTime;
+                    case "interval": return DbType.Time;
+                    case "uuid": return DbType.Guid;
+                }
             }
             else if (connection is OracleConnection)
             {

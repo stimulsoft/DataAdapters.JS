@@ -1,10 +1,11 @@
 /*
 Stimulsoft.Reports.JS
-Version: 2026.3.4
-Build date: 2026.09.09
+Version: 2026.4.1
+Build date: 2026.10.01
 License: https://www.stimulsoft.com/en/licensing/reports
 */
 using FirebirdSql.Data.FirebirdClient;
+using DuckDB.NET.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -121,7 +122,7 @@ namespace NetCoreDataAdapters
                 if (command.Command == "GetSupportedAdapters")
                 {
                     result.Success = true;
-                    result.Types = new string[] { "MySQL", "Firebird", "MS SQL", "PostgreSQL", "Oracle", "MongoDB" };
+                    result.Types = new string[] { "MySQL", "Firebird", "MS SQL", "PostgreSQL", "Oracle", "MongoDB", "DuckDB" };
                 }
                 else
                 {
@@ -140,6 +141,7 @@ namespace NetCoreDataAdapters
                         case "PostgreSQL": result = SQLAdapter.Process(command, new NpgsqlConnection(command.ConnectionString)); break;
                         case "Oracle": result = SQLAdapter.Process(command, new OracleConnection(command.ConnectionString)); break;
                         case "MongoDB": result = MongoDbAdapter.Process(command); break;
+                        case "DuckDB": result = SQLAdapter.Process(command, new DuckDBConnection(command.ConnectionString)); break;
                         default: result.Success = false; result.Notice = $"Unknown database type [{command.Database}]"; break;
                     }
                 }
@@ -150,7 +152,7 @@ namespace NetCoreDataAdapters
                 result.Notice = e.Message;
             }
 
-            result.HandlerVersion = "2026.3.4";
+            result.HandlerVersion = "2026.4.1";
             result.CheckVersion = true;
 
             var contentType = "application/json";
