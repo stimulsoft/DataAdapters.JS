@@ -1,6 +1,6 @@
 {
     "name": "stimulsoft-data-adapter",
-    "version": "2026.4.1",
+    "version": "2026.4.2",
     "description": "Nodejs data adapter for Stimulsoft Reports.JS",
     "main": "index.js",
     "scripts": {
@@ -17,8 +17,7 @@
         "mssql": "^12.7.2",
         "mysql2": "^3.24.4",
         "oracledb": "^7.0.1",
-        "pg": "^8.23.0",
-        "tzdata": "^1.0.51"
+        "pg": "^8.23.0"
     },
     "files": [
         "package.json",

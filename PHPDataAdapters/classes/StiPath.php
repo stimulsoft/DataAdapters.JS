@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2026.4.1
-# Build date: 2026.10.01
+# Version: 2026.4.2
+# Build date: 2026.10.20
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -47,7 +47,7 @@ class StiPath
         return str_replace('/', DIRECTORY_SEPARATOR, $normalized);
     }
 
-    private static function isUrl($path): bool
+    public static function isUrl($path): bool
     {
         return StiFunctions::startsWith($path, "http://") || StiFunctions::startsWith($path, "https://");
     }
