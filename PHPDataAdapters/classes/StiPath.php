@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2026.4.3
-# Build date: 2026.11.08
+# Version: 2026.4.4
+# Build date: 2026.11.25
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -41,10 +41,28 @@ class StiPath
 
     public static function normalize($path, $checkFileNames = true): string
     {
-        $result = str_replace('\\', '/', $path ?? '');
-        $result = $checkFileNames ? preg_replace(['~/{2,}~', '~/(\./)+~', '~([^/\.]+/(?R)*\.{2,}/)~', '~\.\./~'], ['/', '/', '', ''], $result) : $result;
-        $normalized = explode('?', $result)[0];
-        return str_replace('/', DIRECTORY_SEPARATOR, $normalized);
+        $result = explode('?', str_replace('\\', '/', $path ?? ''))[0];
+        $result = $checkFileNames ? self::removeDotSegments($result) : $result;
+        return str_replace('/', DIRECTORY_SEPARATOR, $result);
+    }
+
+    /**
+     * Resolves the '.' and '..' segments of the path and removes repeated separators.
+     * The '..' segments that go above the beginning of the path are removed.
+     */
+    private static function removeDotSegments(string $path): string
+    {
+        $root = preg_match('~^(?:[A-Za-z]:/?|/)~', $path, $match) ? $match[0] : '';
+        $segments = [];
+        foreach (explode('/', substr($path, strlen($root))) as $segment) {
+            if ($segment === '..')
+                array_pop($segments);
+            elseif ($segment !== '' && $segment !== '.')
+                $segments[] = $segment;
+        }
+
+        $result = $root . implode('/', $segments);
+        return count($segments) > 0 && substr($path, -1) === '/' ? "$result/" : $result;
     }
 
     public static function isUrl($path): bool

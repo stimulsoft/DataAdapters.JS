@@ -1,7 +1,7 @@
 <?php
 # Stimulsoft.Reports.JS
-# Version: 2026.4.3
-# Build date: 2026.11.08
+# Version: 2026.4.4
+# Build date: 2026.11.25
 # License: https://www.stimulsoft.com/en/licensing/reports
 ?>
 <?php
@@ -36,17 +36,25 @@ class StiEventArgs
         return null;
     }
 
-    /** Returns the safe file name. */
+    /**
+     * Returns the safe file name: a relative path that cannot leave the folder it is appended to.
+     * Empty segments and segments of dots only are removed, leading and trailing dots and spaces of each segment
+     * are trimmed, control characters and colons are removed.
+     */
     private function getFileName(string $fileName): string
     {
         $handler = $this->getHandler();
-        if ($handler !== null && property_exists($handler, 'checkFileNames') && $handler->checkFileNames) {
-            $fileName = ltrim($fileName, " \n\r\t\v\x00\\\/.");
-            while (preg_match('/\.\.\/\.\.|\.\.\\\.\./', $fileName))
-                $fileName = preg_replace('/\.\.\/\.\.|\.\.\\\.\./', '..', $fileName);
+        if ($handler === null || !property_exists($handler, 'checkFileNames') || !$handler->checkFileNames)
+            return $fileName;
+
+        $segments = [];
+        foreach (preg_split('~[\\\\/]~', $fileName) as $segment) {
+            $segment = trim(preg_replace('~[\x00-\x1F\x7F:]~', '', $segment), " .");
+            if ($segment !== '')
+                $segments[] = $segment;
         }
 
-        return $fileName;
+        return implode('/', $segments);
     }
 
     private function setObject($object)
